@@ -1,4 +1,3 @@
-
 import { useState } from 'react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
@@ -12,8 +11,43 @@ interface AiStandardDialogProps {
   apiConfig: {
     baseUrl: string;
     apiKey: string;
+    model: string;
   };
-  onStandardGenerated: (standard: any) => void;
+  onStandardGenerated: (standard: Standard) => void;
+}
+
+interface Criteria {
+  name: string;
+  description: string;
+  weight: number;
+  score_range: [number, number];
+}
+
+interface Category {
+  name: string;
+  weight: number;
+  description: string;
+  criteria: { [key: string]: Criteria };
+}
+
+interface ScoringAlgorithm {
+  description: string;
+  formula: string;
+  normalization: string;
+}
+
+interface EvaluationSystem {
+  name: string;
+  description: string;
+  version: string;
+  total_weight: number;
+  categories: { [key: string]: Category };
+  scoring_algorithm: ScoringAlgorithm;
+  generated_at: string;
+}
+
+interface Standard {
+  evaluation_system: EvaluationSystem;
 }
 
 export const AiStandardDialog = ({ apiConfig, onStandardGenerated }: AiStandardDialogProps) => {
@@ -43,7 +77,7 @@ export const AiStandardDialog = ({ apiConfig, onStandardGenerated }: AiStandardD
     }
 
     setIsGenerating(true);
-    
+
     try {
       const prompt = `请根据以下需求生成一个完整的内容质量评估标准：
 
@@ -65,7 +99,7 @@ export const AiStandardDialog = ({ apiConfig, onStandardGenerated }: AiStandardD
           'Content-Type': 'application/json'
         },
         body: JSON.stringify({
-          model: 'gpt-4-1106-preview',
+          model: apiConfig.model,
           messages: [
             {
               role: 'system',
@@ -87,7 +121,8 @@ export const AiStandardDialog = ({ apiConfig, onStandardGenerated }: AiStandardD
 
       const data = await response.json();
       const content = data.choices[0]?.message?.content;
-      
+      console.log(content);
+
       if (!content) {
         throw new Error('AI返回内容为空');
       }
@@ -189,12 +224,12 @@ export const AiStandardDialog = ({ apiConfig, onStandardGenerated }: AiStandardD
       setIsOpen(false);
       setSystemName('');
       setSystemDescription('');
-      
+
       toast({
         title: "生成成功",
         description: "AI已为您生成评估标准，可在预览页面查看",
       });
-      
+
     } catch (error) {
       console.error('生成标准失败:', error);
       toast({

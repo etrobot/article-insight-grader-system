@@ -1,5 +1,4 @@
-
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Button } from '@/components/ui/button';
@@ -12,12 +11,40 @@ import { useToast } from '@/hooks/use-toast';
 
 const Index = () => {
   const [evaluationStandard, setEvaluationStandard] = useState(null);
-  const [apiConfig, setApiConfig] = useState({
-    baseUrl: '',
-    apiKey: ''
+  const [apiConfig, setApiConfig] = useState(() => {
+    // Try to load config from localStorage on initial render
+    if (typeof window !== 'undefined') {
+      const savedConfig = localStorage.getItem('apiSettingsConfig');
+      console.log("Index.tsx: Loading apiConfig from localStorage - Raw savedConfig:", savedConfig);
+      if (savedConfig) {
+        try {
+          const parsedConfig = JSON.parse(savedConfig);
+          console.log("Index.tsx: Loading apiConfig from localStorage - Parsed config:", parsedConfig);
+          return parsedConfig;
+        } catch (e) {
+          console.error("Index.tsx: Failed to parse saved API config from localStorage:", e);
+        }
+      }
+    }
+    // Default initial state if no saved config or parse failed
+    console.log("Index.tsx: Initializing apiConfig with default values.");
+    return {
+      baseUrl: '',
+      apiKey: '',
+      model: ''
+    };
   });
+  const [activeTab, setActiveTab] = useState('builder');
   const [isApiDialogOpen, setIsApiDialogOpen] = useState(false);
   const { toast } = useToast();
+
+  // Save config to localStorage whenever it changes
+  useEffect(() => {
+    console.log("Index.tsx: Saving apiConfig to localStorage:", apiConfig);
+    if (typeof window !== 'undefined') {
+      localStorage.setItem('apiSettingsConfig', JSON.stringify(apiConfig));
+    }
+  }, [apiConfig]);
 
   const handleExportJson = () => {
     if (!evaluationStandard) {
@@ -31,9 +58,9 @@ const Index = () => {
 
     const dataStr = JSON.stringify(evaluationStandard, null, 2);
     const dataUri = 'data:application/json;charset=utf-8,'+ encodeURIComponent(dataStr);
-    
+
     const exportFileDefaultName = 'evaluation_standard.json';
-    
+
     const linkElement = document.createElement('a');
     linkElement.setAttribute('href', dataUri);
     linkElement.setAttribute('download', exportFileDefaultName);
@@ -72,7 +99,7 @@ const Index = () => {
                   <DialogHeader>
                     <DialogTitle>API配置</DialogTitle>
                   </DialogHeader>
-                  <ApiSettings 
+                  <ApiSettings
                     config={apiConfig}
                     onConfigChange={(config) => {
                       setApiConfig(config);
@@ -81,21 +108,13 @@ const Index = () => {
                   />
                 </DialogContent>
               </Dialog>
-              <Button 
-                onClick={handleExportJson}
-                className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700"
-                disabled={!evaluationStandard}
-              >
-                <Download className="w-4 h-4 mr-2" />
-                导出JSON
-              </Button>
             </div>
           </div>
         </div>
       </div>
 
       <div className="container mx-auto px-6 py-8">
-        <Tabs defaultValue="builder" className="space-y-6">
+        <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
           <TabsList className="grid grid-cols-2 w-full max-w-md mx-auto bg-white border border-gray-200 shadow-sm">
             <TabsTrigger value="builder" className="data-[state=active]:bg-blue-600 data-[state=active]:text-white">
               <FileText className="w-4 h-4 mr-2" />
@@ -108,14 +127,15 @@ const Index = () => {
           </TabsList>
 
           <TabsContent value="builder" className="space-y-6">
-            <EvaluationStandardBuilder 
+            <EvaluationStandardBuilder
               onStandardGenerated={setEvaluationStandard}
               apiConfig={apiConfig}
+              onTabChange={setActiveTab}
             />
           </TabsContent>
 
           <TabsContent value="preview" className="space-y-6">
-            <JsonPreview 
+            <JsonPreview
               evaluationStandard={evaluationStandard}
               onExport={handleExportJson}
             />

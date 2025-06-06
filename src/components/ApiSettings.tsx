@@ -1,4 +1,3 @@
-
 import { useState } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -13,17 +12,23 @@ interface ApiSettingsProps {
   config: {
     baseUrl: string;
     apiKey: string;
+    model: string;
   };
-  onConfigChange: (config: { baseUrl: string; apiKey: string }) => void;
+  onConfigChange: (config: { baseUrl: string; apiKey: string; model: string }) => void;
 }
 
 export const ApiSettings = ({ config, onConfigChange }: ApiSettingsProps) => {
-  const [localConfig, setLocalConfig] = useState(config);
+  const [localConfig, setLocalConfig] = useState(() => ({
+    baseUrl: config.baseUrl,
+    apiKey: config.apiKey,
+    model: config.model || '',
+  }));
   const [isConnected, setIsConnected] = useState<boolean | null>(null);
   const [isTesting, setIsTesting] = useState(false);
   const { toast } = useToast();
 
   const handleSave = () => {
+    console.log("handleSave: Saving API configuration with localConfig:", localConfig);
     onConfigChange(localConfig);
     toast({
       title: "设置已保存",
@@ -42,7 +47,7 @@ export const ApiSettings = ({ config, onConfigChange }: ApiSettingsProps) => {
     }
 
     setIsTesting(true);
-    
+
     try {
       const response = await fetch(`${localConfig.baseUrl}/v1/models`, {
         headers: {
@@ -77,8 +82,13 @@ export const ApiSettings = ({ config, onConfigChange }: ApiSettingsProps) => {
     }
   };
 
-  const handleInputChange = (field: 'baseUrl' | 'apiKey', value: string) => {
-    setLocalConfig(prev => ({ ...prev, [field]: value }));
+  const handleInputChange = (field: 'baseUrl' | 'apiKey' | 'model', value: string) => {
+    console.log(`handleInputChange: field=${field}, value=${value}`);
+    setLocalConfig(prev => {
+      const newConfig = { ...prev, [field]: value };
+      console.log("handleInputChange: New localConfig after update:", newConfig);
+      return newConfig;
+    });
     setIsConnected(null);
   };
 
@@ -142,6 +152,21 @@ export const ApiSettings = ({ config, onConfigChange }: ApiSettingsProps) => {
                 您的API密钥将仅在本地存储，不会上传到服务器
               </p>
             </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="model" className="text-gray-700">Model</Label>
+              <Input
+                id="model"
+                type="text"
+                value={localConfig.model}
+                onChange={(e) => handleInputChange('model', e.target.value)}
+                placeholder="gpt-3.5-turbo"
+                className="bg-white border-gray-300 text-gray-900 placeholder:text-gray-400"
+              />
+              <p className="text-xs text-gray-500">
+                用于智能功能的AI模型名称 (例如: gpt-3.5-turbo, claude-3-opus-20240229)
+              </p>
+            </div>
           </div>
 
           {/* 操作按钮 */}
@@ -155,62 +180,13 @@ export const ApiSettings = ({ config, onConfigChange }: ApiSettingsProps) => {
               <TestTube className="w-4 h-4 mr-2" />
               {isTesting ? '测试中...' : '测试连接'}
             </Button>
-            
+
             <Button
               onClick={handleSave}
               className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700"
             >
               保存配置
             </Button>
-          </div>
-        </CardContent>
-      </Card>
-
-      {/* 支持的API服务商 */}
-      <Card className="bg-white border-gray-200">
-        <CardHeader>
-          <CardTitle className="text-gray-900 flex items-center space-x-2">
-            <Info className="w-5 h-5" />
-            <span>支持的API服务</span>
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div className="space-y-3">
-              <h4 className="text-gray-900 font-medium">官方服务</h4>
-              <div className="space-y-2">
-                <div className="flex items-center justify-between">
-                  <span className="text-gray-700">OpenAI</span>
-                  <Badge variant="secondary" className="bg-green-100 text-green-700">
-                    推荐
-                  </Badge>
-                </div>
-                <p className="text-xs text-gray-500">
-                  https://api.openai.com
-                </p>
-              </div>
-            </div>
-
-            <div className="space-y-3">
-              <h4 className="text-gray-900 font-medium">兼容服务</h4>
-              <div className="space-y-2">
-                <div className="flex items-center justify-between">
-                  <span className="text-gray-700">Anthropic Claude</span>
-                  <Badge variant="outline" className="border-gray-300 text-gray-600">
-                    兼容
-                  </Badge>
-                </div>
-                <div className="flex items-center justify-between">
-                  <span className="text-gray-700">Local LLM</span>
-                  <Badge variant="outline" className="border-gray-300 text-gray-600">
-                    兼容
-                  </Badge>
-                </div>
-                <p className="text-xs text-gray-500">
-                  支持所有OpenAI API格式的服务
-                </p>
-              </div>
-            </div>
           </div>
         </CardContent>
       </Card>
