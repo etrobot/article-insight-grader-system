@@ -6,6 +6,7 @@ import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Wand2, Loader2 } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
+import standardPrompt from '@/prompts/standardPrompt';
 
 interface AiStandardDialogProps {
   apiConfig: {
@@ -79,18 +80,9 @@ export const AiStandardDialog = ({ apiConfig, onStandardGenerated }: AiStandardD
     setIsGenerating(true);
 
     try {
-      const prompt = `请根据以下需求生成一个完整的内容质量评估标准：
-
-系统名称：${systemName}
-系统描述：${systemDescription}
-
-请返回一个JSON格式的评估标准，包含以下结构：
-- 评估系统基本信息
-- 多个评估类别，每个类别包含权重和描述
-- 每个类别下的具体评估标准
-- 每个标准的权重和评分范围
-
-请确保权重分配合理，覆盖全面，适合对文章内容进行客观评估。`;
+      const prompt = standardPrompt
+        .replace('{{systemName}}', systemName)
+        .replace('{{systemDescription}}', systemDescription);
 
       const response = await fetch(`${apiConfig.baseUrl}/v1/chat/completions`, {
         method: 'POST',
@@ -138,86 +130,7 @@ export const AiStandardDialog = ({ apiConfig, onStandardGenerated }: AiStandardD
           throw new Error('未找到有效的JSON格式');
         }
       } catch (parseError) {
-        // 如果解析失败，创建一个默认的标准结构
-        parsedStandard = {
-          evaluation_system: {
-            name: systemName,
-            description: systemDescription,
-            version: "1.0",
-            total_weight: 100,
-            categories: {
-              content_quality: {
-                name: "内容质量",
-                weight: 40,
-                description: "评估文章的专业性、准确性和深度",
-                criteria: {
-                  accuracy: {
-                    name: "准确性",
-                    description: "内容事实准确，数据可靠",
-                    weight: 15,
-                    score_range: [1, 5]
-                  },
-                  depth: {
-                    name: "深度分析",
-                    description: "内容有深度，分析透彻",
-                    weight: 15,
-                    score_range: [1, 5]
-                  },
-                  originality: {
-                    name: "原创性",
-                    description: "内容原创，有独特见解",
-                    weight: 10,
-                    score_range: [1, 5]
-                  }
-                }
-              },
-              structure_clarity: {
-                name: "结构清晰度",
-                weight: 30,
-                description: "评估文章的组织结构和逻辑性",
-                criteria: {
-                  logic: {
-                    name: "逻辑性",
-                    description: "文章逻辑清晰，论证有力",
-                    weight: 15,
-                    score_range: [1, 5]
-                  },
-                  organization: {
-                    name: "组织结构",
-                    description: "文章结构合理，层次分明",
-                    weight: 15,
-                    score_range: [1, 5]
-                  }
-                }
-              },
-              readability: {
-                name: "可读性",
-                weight: 30,
-                description: "评估文章的表达和阅读体验",
-                criteria: {
-                  language: {
-                    name: "语言表达",
-                    description: "语言流畅，表达清晰",
-                    weight: 15,
-                    score_range: [1, 5]
-                  },
-                  engagement: {
-                    name: "吸引力",
-                    description: "内容生动有趣，能吸引读者",
-                    weight: 15,
-                    score_range: [1, 5]
-                  }
-                }
-              }
-            },
-            scoring_algorithm: {
-              description: "加权平均算法",
-              formula: "总分 = Σ(类别权重 × 类别得分)",
-              normalization: "最终得分归一化到0-100分"
-            },
-            generated_at: new Date().toISOString()
-          }
-        };
+        throw new Error('AI返回内容无法解析为JSON，请检查提示词或稍后重试');
       }
 
       onStandardGenerated(parsedStandard);
