@@ -1,11 +1,113 @@
-// Update this page (the content is just a fallback if you fail to update the page)
+
+import { useState } from 'react';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Button } from '@/components/ui/button';
+import { Download, Settings, FileText, Sparkles } from 'lucide-react';
+import { EvaluationStandardBuilder } from '@/components/EvaluationStandardBuilder';
+import { ApiSettings } from '@/components/ApiSettings';
+import { JsonPreview } from '@/components/JsonPreview';
+import { useToast } from '@/hooks/use-toast';
 
 const Index = () => {
+  const [evaluationStandard, setEvaluationStandard] = useState(null);
+  const [apiConfig, setApiConfig] = useState({
+    baseUrl: '',
+    apiKey: ''
+  });
+  const { toast } = useToast();
+
+  const handleExportJson = () => {
+    if (!evaluationStandard) {
+      toast({
+        title: "无法导出",
+        description: "请先生成评估标准",
+        variant: "destructive"
+      });
+      return;
+    }
+
+    const dataStr = JSON.stringify(evaluationStandard, null, 2);
+    const dataUri = 'data:application/json;charset=utf-8,'+ encodeURIComponent(dataStr);
+    
+    const exportFileDefaultName = 'evaluation_standard.json';
+    
+    const linkElement = document.createElement('a');
+    linkElement.setAttribute('href', dataUri);
+    linkElement.setAttribute('download', exportFileDefaultName);
+    linkElement.click();
+
+    toast({
+      title: "导出成功",
+      description: "评估标准已保存为JSON文件",
+    });
+  };
+
   return (
-    <div className="min-h-screen flex items-center justify-center bg-background">
-      <div className="text-center">
-        <h1 className="text-4xl font-bold mb-4">Welcome to Your Blank App</h1>
-        <p className="text-xl text-muted-foreground">Start building your amazing project here!</p>
+    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900">
+      {/* Header */}
+      <div className="bg-black/20 backdrop-blur-sm border-b border-white/10">
+        <div className="container mx-auto px-6 py-4">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center space-x-3">
+              <div className="p-2 bg-gradient-to-r from-blue-500 to-purple-600 rounded-lg">
+                <Sparkles className="w-6 h-6 text-white" />
+              </div>
+              <div>
+                <h1 className="text-2xl font-bold text-white">文章质量评估标准生成器</h1>
+                <p className="text-slate-300 text-sm">智能生成定制化的内容评估体系</p>
+              </div>
+            </div>
+            <Button 
+              onClick={handleExportJson}
+              className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700"
+              disabled={!evaluationStandard}
+            >
+              <Download className="w-4 h-4 mr-2" />
+              导出JSON
+            </Button>
+          </div>
+        </div>
+      </div>
+
+      <div className="container mx-auto px-6 py-8">
+        <Tabs defaultValue="builder" className="space-y-6">
+          <TabsList className="grid grid-cols-3 w-full max-w-md mx-auto bg-black/20 border border-white/10">
+            <TabsTrigger value="builder" className="data-[state=active]:bg-blue-600 data-[state=active]:text-white">
+              <FileText className="w-4 h-4 mr-2" />
+              标准构建
+            </TabsTrigger>
+            <TabsTrigger value="preview" className="data-[state=active]:bg-blue-600 data-[state=active]:text-white">
+              <Settings className="w-4 h-4 mr-2" />
+              预览导出
+            </TabsTrigger>
+            <TabsTrigger value="api" className="data-[state=active]:bg-blue-600 data-[state=active]:text-white">
+              <Settings className="w-4 h-4 mr-2" />
+              API设置
+            </TabsTrigger>
+          </TabsList>
+
+          <TabsContent value="builder" className="space-y-6">
+            <EvaluationStandardBuilder 
+              onStandardGenerated={setEvaluationStandard}
+              apiConfig={apiConfig}
+            />
+          </TabsContent>
+
+          <TabsContent value="preview" className="space-y-6">
+            <JsonPreview 
+              evaluationStandard={evaluationStandard}
+              onExport={handleExportJson}
+            />
+          </TabsContent>
+
+          <TabsContent value="api" className="space-y-6">
+            <ApiSettings 
+              config={apiConfig}
+              onConfigChange={setApiConfig}
+            />
+          </TabsContent>
+        </Tabs>
       </div>
     </div>
   );
