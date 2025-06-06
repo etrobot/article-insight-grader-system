@@ -79,32 +79,32 @@ export const ApiSettings = ({ config, onConfigChange }: ApiSettingsProps) => {
 
   const handleInputChange = (field: 'baseUrl' | 'apiKey', value: string) => {
     setLocalConfig(prev => ({ ...prev, [field]: value }));
-    setIsConnected(null); // 重置连接状态
+    setIsConnected(null);
   };
 
   return (
     <div className="space-y-6">
-      <Card className="bg-black/20 backdrop-blur-sm border-white/10">
+      <Card className="bg-white border-gray-200">
         <CardHeader>
-          <CardTitle className="text-white flex items-center space-x-2">
+          <CardTitle className="text-gray-900 flex items-center space-x-2">
             <Settings className="w-5 h-5" />
             <span>OpenAI兼容API配置</span>
           </CardTitle>
-          <CardDescription className="text-slate-300">
+          <CardDescription className="text-gray-600">
             配置与OpenAI API兼容的服务端点，用于智能评估标准生成
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-6">
           {/* 连接状态指示器 */}
           {isConnected !== null && (
-            <Alert className={`border ${isConnected ? 'border-green-500/50 bg-green-500/10' : 'border-red-500/50 bg-red-500/10'}`}>
+            <Alert className={`border ${isConnected ? 'border-green-300 bg-green-50' : 'border-red-300 bg-red-50'}`}>
               <div className="flex items-center space-x-2">
                 {isConnected ? (
-                  <CheckCircle className="w-4 h-4 text-green-400" />
+                  <CheckCircle className="w-4 h-4 text-green-600" />
                 ) : (
-                  <XCircle className="w-4 h-4 text-red-400" />
+                  <XCircle className="w-4 h-4 text-red-600" />
                 )}
-                <AlertDescription className={isConnected ? 'text-green-300' : 'text-red-300'}>
+                <AlertDescription className={isConnected ? 'text-green-700' : 'text-red-700'}>
                   {isConnected ? 'API连接正常，可以使用智能功能' : 'API连接失败，请检查配置'}
                 </AlertDescription>
               </div>
@@ -114,31 +114,31 @@ export const ApiSettings = ({ config, onConfigChange }: ApiSettingsProps) => {
           {/* API配置表单 */}
           <div className="space-y-4">
             <div className="space-y-2">
-              <Label htmlFor="baseUrl" className="text-white">API Base URL</Label>
+              <Label htmlFor="baseUrl" className="text-gray-700">API Base URL</Label>
               <Input
                 id="baseUrl"
                 type="url"
                 value={localConfig.baseUrl}
                 onChange={(e) => handleInputChange('baseUrl', e.target.value)}
                 placeholder="https://api.openai.com"
-                className="bg-white/10 border-white/20 text-white placeholder:text-slate-400"
+                className="bg-white border-gray-300 text-gray-900 placeholder:text-gray-400"
               />
-              <p className="text-xs text-slate-400">
+              <p className="text-xs text-gray-500">
                 支持OpenAI官方API或兼容格式的第三方API服务
               </p>
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="apiKey" className="text-white">API Key</Label>
+              <Label htmlFor="apiKey" className="text-gray-700">API Key</Label>
               <Input
                 id="apiKey"
                 type="password"
                 value={localConfig.apiKey}
                 onChange={(e) => handleInputChange('apiKey', e.target.value)}
                 placeholder="sk-..."
-                className="bg-white/10 border-white/20 text-white placeholder:text-slate-400"
+                className="bg-white border-gray-300 text-gray-900 placeholder:text-gray-400"
               />
-              <p className="text-xs text-slate-400">
+              <p className="text-xs text-gray-500">
                 您的API密钥将仅在本地存储，不会上传到服务器
               </p>
             </div>
@@ -150,7 +150,7 @@ export const ApiSettings = ({ config, onConfigChange }: ApiSettingsProps) => {
               onClick={testConnection}
               disabled={isTesting || !localConfig.baseUrl || !localConfig.apiKey}
               variant="outline"
-              className="border-white/20 text-white hover:bg-white/10"
+              className="border-gray-300 text-gray-700 hover:bg-gray-50"
             >
               <TestTube className="w-4 h-4 mr-2" />
               {isTesting ? '测试中...' : '测试连接'}
@@ -167,9 +167,9 @@ export const ApiSettings = ({ config, onConfigChange }: ApiSettingsProps) => {
       </Card>
 
       {/* 支持的API服务商 */}
-      <Card className="bg-black/20 backdrop-blur-sm border-white/10">
+      <Card className="bg-white border-gray-200">
         <CardHeader>
-          <CardTitle className="text-white flex items-center space-x-2">
+          <CardTitle className="text-gray-900 flex items-center space-x-2">
             <Info className="w-5 h-5" />
             <span>支持的API服务</span>
           </CardTitle>
@@ -177,36 +177,36 @@ export const ApiSettings = ({ config, onConfigChange }: ApiSettingsProps) => {
         <CardContent>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div className="space-y-3">
-              <h4 className="text-white font-medium">官方服务</h4>
+              <h4 className="text-gray-900 font-medium">官方服务</h4>
               <div className="space-y-2">
                 <div className="flex items-center justify-between">
-                  <span className="text-slate-300">OpenAI</span>
-                  <Badge variant="secondary" className="bg-green-500/20 text-green-300">
+                  <span className="text-gray-700">OpenAI</span>
+                  <Badge variant="secondary" className="bg-green-100 text-green-700">
                     推荐
                   </Badge>
                 </div>
-                <p className="text-xs text-slate-400">
+                <p className="text-xs text-gray-500">
                   https://api.openai.com
                 </p>
               </div>
             </div>
 
             <div className="space-y-3">
-              <h4 className="text-white font-medium">兼容服务</h4>
+              <h4 className="text-gray-900 font-medium">兼容服务</h4>
               <div className="space-y-2">
                 <div className="flex items-center justify-between">
-                  <span className="text-slate-300">Anthropic Claude</span>
-                  <Badge variant="outline" className="border-white/20 text-slate-300">
+                  <span className="text-gray-700">Anthropic Claude</span>
+                  <Badge variant="outline" className="border-gray-300 text-gray-600">
                     兼容
                   </Badge>
                 </div>
                 <div className="flex items-center justify-between">
-                  <span className="text-slate-300">Local LLM</span>
-                  <Badge variant="outline" className="border-white/20 text-slate-300">
+                  <span className="text-gray-700">Local LLM</span>
+                  <Badge variant="outline" className="border-gray-300 text-gray-600">
                     兼容
                   </Badge>
                 </div>
-                <p className="text-xs text-slate-400">
+                <p className="text-xs text-gray-500">
                   支持所有OpenAI API格式的服务
                 </p>
               </div>
@@ -216,17 +216,17 @@ export const ApiSettings = ({ config, onConfigChange }: ApiSettingsProps) => {
       </Card>
 
       {/* 功能说明 */}
-      <Card className="bg-black/20 backdrop-blur-sm border-white/10">
+      <Card className="bg-white border-gray-200">
         <CardHeader>
-          <CardTitle className="text-white">AI增强功能</CardTitle>
+          <CardTitle className="text-gray-900">AI增强功能</CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="space-y-3 text-slate-300">
+          <div className="space-y-3 text-gray-700">
             <div className="flex items-start space-x-3">
               <div className="w-2 h-2 bg-blue-400 rounded-full mt-2"></div>
               <div>
-                <h5 className="text-white font-medium">智能标准生成</h5>
-                <p className="text-sm text-slate-400">
+                <h5 className="text-gray-900 font-medium">智能标准生成</h5>
+                <p className="text-sm text-gray-600">
                   根据您的需求自动生成专业的评估标准体系
                 </p>
               </div>
@@ -234,8 +234,8 @@ export const ApiSettings = ({ config, onConfigChange }: ApiSettingsProps) => {
             <div className="flex items-start space-x-3">
               <div className="w-2 h-2 bg-purple-400 rounded-full mt-2"></div>
               <div>
-                <h5 className="text-white font-medium">标准优化建议</h5>
-                <p className="text-sm text-slate-400">
+                <h5 className="text-gray-900 font-medium">标准优化建议</h5>
+                <p className="text-sm text-gray-600">
                   分析评估标准的合理性并提供改进建议
                 </p>
               </div>
@@ -243,8 +243,8 @@ export const ApiSettings = ({ config, onConfigChange }: ApiSettingsProps) => {
             <div className="flex items-start space-x-3">
               <div className="w-2 h-2 bg-green-400 rounded-full mt-2"></div>
               <div>
-                <h5 className="text-white font-medium">自动权重调整</h5>
-                <p className="text-sm text-slate-400">
+                <h5 className="text-gray-900 font-medium">自动权重调整</h5>
+                <p className="text-sm text-gray-600">
                   根据评估目标智能调整各项指标的权重分配
                 </p>
               </div>

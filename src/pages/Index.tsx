@@ -4,6 +4,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Button } from '@/components/ui/button';
 import { Download, Settings, FileText, Sparkles } from 'lucide-react';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { EvaluationStandardBuilder } from '@/components/EvaluationStandardBuilder';
 import { ApiSettings } from '@/components/ApiSettings';
 import { JsonPreview } from '@/components/JsonPreview';
@@ -15,6 +16,7 @@ const Index = () => {
     baseUrl: '',
     apiKey: ''
   });
+  const [isApiDialogOpen, setIsApiDialogOpen] = useState(false);
   const { toast } = useToast();
 
   const handleExportJson = () => {
@@ -44,9 +46,9 @@ const Index = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900">
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50">
       {/* Header */}
-      <div className="bg-black/20 backdrop-blur-sm border-b border-white/10">
+      <div className="bg-white/80 backdrop-blur-sm border-b border-gray-200 shadow-sm">
         <div className="container mx-auto px-6 py-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center space-x-3">
@@ -54,25 +56,47 @@ const Index = () => {
                 <Sparkles className="w-6 h-6 text-white" />
               </div>
               <div>
-                <h1 className="text-2xl font-bold text-white">文章质量评估标准生成器</h1>
-                <p className="text-slate-300 text-sm">智能生成定制化的内容评估体系</p>
+                <h1 className="text-2xl font-bold text-gray-900">文章质量评估标准生成器</h1>
+                <p className="text-gray-600 text-sm">智能生成定制化的内容评估体系</p>
               </div>
             </div>
-            <Button 
-              onClick={handleExportJson}
-              className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700"
-              disabled={!evaluationStandard}
-            >
-              <Download className="w-4 h-4 mr-2" />
-              导出JSON
-            </Button>
+            <div className="flex items-center space-x-3">
+              <Dialog open={isApiDialogOpen} onOpenChange={setIsApiDialogOpen}>
+                <DialogTrigger asChild>
+                  <Button variant="outline" className="border-gray-300">
+                    <Settings className="w-4 h-4 mr-2" />
+                    API设置
+                  </Button>
+                </DialogTrigger>
+                <DialogContent className="max-w-2xl max-h-[80vh] overflow-y-auto">
+                  <DialogHeader>
+                    <DialogTitle>API配置</DialogTitle>
+                  </DialogHeader>
+                  <ApiSettings 
+                    config={apiConfig}
+                    onConfigChange={(config) => {
+                      setApiConfig(config);
+                      setIsApiDialogOpen(false);
+                    }}
+                  />
+                </DialogContent>
+              </Dialog>
+              <Button 
+                onClick={handleExportJson}
+                className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700"
+                disabled={!evaluationStandard}
+              >
+                <Download className="w-4 h-4 mr-2" />
+                导出JSON
+              </Button>
+            </div>
           </div>
         </div>
       </div>
 
       <div className="container mx-auto px-6 py-8">
         <Tabs defaultValue="builder" className="space-y-6">
-          <TabsList className="grid grid-cols-3 w-full max-w-md mx-auto bg-black/20 border border-white/10">
+          <TabsList className="grid grid-cols-2 w-full max-w-md mx-auto bg-white border border-gray-200 shadow-sm">
             <TabsTrigger value="builder" className="data-[state=active]:bg-blue-600 data-[state=active]:text-white">
               <FileText className="w-4 h-4 mr-2" />
               标准构建
@@ -80,10 +104,6 @@ const Index = () => {
             <TabsTrigger value="preview" className="data-[state=active]:bg-blue-600 data-[state=active]:text-white">
               <Settings className="w-4 h-4 mr-2" />
               预览导出
-            </TabsTrigger>
-            <TabsTrigger value="api" className="data-[state=active]:bg-blue-600 data-[state=active]:text-white">
-              <Settings className="w-4 h-4 mr-2" />
-              API设置
             </TabsTrigger>
           </TabsList>
 
@@ -98,13 +118,6 @@ const Index = () => {
             <JsonPreview 
               evaluationStandard={evaluationStandard}
               onExport={handleExportJson}
-            />
-          </TabsContent>
-
-          <TabsContent value="api" className="space-y-6">
-            <ApiSettings 
-              config={apiConfig}
-              onConfigChange={setApiConfig}
             />
           </TabsContent>
         </Tabs>
