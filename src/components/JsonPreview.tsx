@@ -127,7 +127,7 @@ export const JsonPreview = ({ evaluationStandard, onExport }: JsonPreviewProps) 
               <Button
                 onClick={onExport}
                 size="sm"
-                className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700"
+                className="bg-gradient-to-r from-theme-yellow to-theme-orange hover:from-yellow-600 hover:to-orange-600"
               >
                 <Download className="w-4 h-4 mr-2" />
                 导出JSON
@@ -138,10 +138,10 @@ export const JsonPreview = ({ evaluationStandard, onExport }: JsonPreviewProps) 
         <CardContent>
           <Tabs defaultValue="structured" className="space-y-4">
             <TabsList className="grid grid-cols-2 w-full max-w-md bg-secondary border border-border">
-              <TabsTrigger value="structured" className="data-[state=active]:bg-blue-600 data-[state=active]:text-white">
+              <TabsTrigger value="structured" className="data-[state=active]:bg-theme-pink data-[state=active]:text-white">
                 结构化视图
               </TabsTrigger>
-              <TabsTrigger value="json" className="data-[state=active]:bg-blue-600 data-[state=active]:text-white">
+              <TabsTrigger value="json" className="data-[state=active]:bg-theme-pink data-[state=active]:text-white">
                 JSON格式
               </TabsTrigger>
             </TabsList>

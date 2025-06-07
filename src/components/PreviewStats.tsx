@@ -15,7 +15,7 @@ export const PreviewStats = ({ categoriesCount, criteriaCount, totalWeight, vers
       <Card className="bg-card backdrop-blur-sm border-border">
         <CardContent className="p-4">
           <div className="flex items-center space-x-2">
-            <BarChart3 className="w-5 h-5 text-blue-400" />
+            <BarChart3 className="w-5 h-5 text-theme-pink" />
             <div>
               <p className="text-foreground font-medium">{categoriesCount}</p>
               <p className="text-muted-foreground text-sm">评估类别</p>
@@ -27,7 +27,7 @@ export const PreviewStats = ({ categoriesCount, criteriaCount, totalWeight, vers
       <Card className="bg-card backdrop-blur-sm border-border">
         <CardContent className="p-4">
           <div className="flex items-center space-x-2">
-            <Settings2 className="w-5 h-5 text-purple-400" />
+            <Settings2 className="w-5 h-5 text-theme-yellow" />
             <div>
               <p className="text-foreground font-medium">{criteriaCount}</p>
               <p className="text-muted-foreground text-sm">评估标准</p>
@@ -39,7 +39,7 @@ export const PreviewStats = ({ categoriesCount, criteriaCount, totalWeight, vers
       <Card className="bg-card backdrop-blur-sm border-border">
         <CardContent className="p-4">
           <div className="flex items-center space-x-2">
-            <CheckCircle2 className="w-5 h-5 text-green-400" />
+            <CheckCircle2 className="w-5 h-5 text-theme-orange" />
             <div>
               <p className="text-foreground font-medium">{totalWeight}</p>
               <p className="text-muted-foreground text-sm">总权重</p>
@@ -51,7 +51,7 @@ export const PreviewStats = ({ categoriesCount, criteriaCount, totalWeight, vers
       <Card className="bg-card backdrop-blur-sm border-border">
         <CardContent className="p-4">
           <div className="flex items-center space-x-2">
-            <Clock className="w-5 h-5 text-orange-400" />
+            <Clock className="w-5 h-5 text-theme-pink" />
             <div>
               <p className="text-foreground font-medium">v{version}</p>
               <p className="text-muted-foreground text-sm">版本号</p>

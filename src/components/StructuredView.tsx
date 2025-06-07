@@ -41,10 +41,10 @@ export const StructuredView = ({ evaluationSystem }: StructuredViewProps) => {
           </p>
         )}
         <div className="flex flex-wrap gap-2">
-          <Badge variant="secondary" className="bg-blue-500/20 text-blue-300">
+          <Badge variant="secondary" className="bg-theme-pink/20 text-theme-pink">
             版本 {evaluationSystem.version}
           </Badge>
-          <Badge variant="secondary" className="bg-purple-500/20 text-purple-300">
+          <Badge variant="secondary" className="bg-theme-orange/20 text-theme-orange">
             总权重 {evaluationSystem.total_weight}
           </Badge>
         </div>

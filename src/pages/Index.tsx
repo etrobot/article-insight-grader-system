@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -107,13 +108,13 @@ const Index = () => {
   const selectedEvaluation = selectedEvaluationId ? getEvaluation(selectedEvaluationId) : null;
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50">
+    <div className="min-h-screen bg-gradient-to-br from-theme-pink-light via-theme-yellow-light to-theme-orange-light">
       {/* Header */}
       <div className="bg-white/80 backdrop-blur-sm border-b border-gray-200 shadow-sm">
         <div className="container mx-auto px-6 py-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center space-x-3">
-              <div className="p-2 bg-gradient-to-r from-blue-500 to-purple-600 rounded-lg">
+              <div className="p-2 bg-gradient-to-r from-theme-pink to-theme-orange rounded-lg">
                 <Sparkles className="w-6 h-6 text-white" />
               </div>
               <div>
@@ -124,7 +125,7 @@ const Index = () => {
             <div className="flex items-center space-x-3">
               <Button
                 onClick={() => setIsEvaluationDialogOpen(true)}
-                className="bg-gradient-to-r from-green-600 to-teal-600 hover:from-green-700 hover:to-teal-700"
+                className="bg-gradient-to-r from-theme-orange to-theme-yellow hover:from-orange-600 hover:to-yellow-600"
               >
                 <BarChart3 className="w-4 h-4 mr-2" />
                 评估文章
@@ -168,15 +169,15 @@ const Index = () => {
           }
         }} className="space-y-6">
           <TabsList className="grid grid-cols-3 w-full max-w-lg mx-auto bg-white border border-gray-200 shadow-sm">
-            <TabsTrigger value="builder" className="data-[state=active]:bg-blue-600 data-[state=active]:text-white">
+            <TabsTrigger value="builder" className="data-[state=active]:bg-theme-pink data-[state=active]:text-white">
               <FileText className="w-4 h-4 mr-2" />
               标准构建
             </TabsTrigger>
-            <TabsTrigger value="preview" className="data-[state=active]:bg-blue-600 data-[state=active]:text-white">
+            <TabsTrigger value="preview" className="data-[state=active]:bg-theme-pink data-[state=active]:text-white">
               <List className="w-4 h-4 mr-2" />
               标准列表
             </TabsTrigger>
-            <TabsTrigger value="evaluations" className="data-[state=active]:bg-blue-600 data-[state=active]:text-white">
+            <TabsTrigger value="evaluations" className="data-[state=active]:bg-theme-pink data-[state=active]:text-white">
               <History className="w-4 h-4 mr-2" />
               评估记录
             </TabsTrigger>
