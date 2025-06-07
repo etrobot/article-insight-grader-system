@@ -1,4 +1,3 @@
-
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -23,6 +22,7 @@ interface StandardDetailProps {
 }
 
 interface Criterion {
+  id: string;
   name: string;
   weight: number;
   score_range?: [number, number];
@@ -30,10 +30,11 @@ interface Criterion {
 }
 
 interface Category {
+  id: string;
   name: string;
   weight: number;
   description?: string;
-  criteria?: { [key: string]: Criterion };
+  criteria: Criterion[];
 }
 
 export const StandardDetail = ({ standard, onBack }: StandardDetailProps) => {
@@ -71,12 +72,8 @@ export const StandardDetail = ({ standard, onBack }: StandardDetailProps) => {
 
   const getSystemStats = () => {
     const system = standard.evaluation_system;
-    const categories = Object.values(system.categories || {}) as Category[];
-    const totalCriteria = categories.reduce((sum, cat) => {
-      const criteria = Object.values(cat.criteria || {});
-      return sum + criteria.length;
-    }, 0);
-
+    const categories: Category[] = Array.isArray(system.categories) ? system.categories : [];
+    const totalCriteria = categories.reduce((sum, cat) => sum + cat.criteria.length, 0);
     return {
       categoriesCount: categories.length,
       criteriaCount: totalCriteria,
@@ -102,9 +99,6 @@ export const StandardDetail = ({ standard, onBack }: StandardDetailProps) => {
         </Button>
         <div>
           <h1 className="text-foreground text-2xl font-bold">{standard.name}</h1>
-          <p className="text-muted-foreground text-sm">
-            创建于 {new Date(standard.createdAt).toLocaleString('zh-CN')}
-          </p>
         </div>
       </div>
 
@@ -230,44 +224,47 @@ export const StandardDetail = ({ standard, onBack }: StandardDetailProps) => {
                   {/* 评估类别 */}
                   <div className="space-y-4">
                     <h4 className="text-foreground font-medium">评估类别详情</h4>
-                    {Object.entries(standard.evaluation_system.categories || {}).map(([catId, category]: [string, Category]) => (
-                      <div key={catId} className="p-4 bg-secondary rounded-lg border border-border space-y-3">
-                        <div className="flex items-center justify-between">
-                          <h5 className="text-foreground font-medium">{category.name}</h5>
-                          <Badge variant="outline" className="border-border text-muted-foreground">
-                            权重 {category.weight}%
-                          </Badge>
-                        </div>
-                        {category.description && (
-                          <p className="text-muted-foreground text-sm">{category.description}</p>
-                        )}
-
-                        {/* 评估标准 */}
-                        {category.criteria && Object.keys(category.criteria).length > 0 && (
-                          <div className="space-y-2">
-                            <h6 className="text-muted-foreground text-sm font-medium">评估标准:</h6>
-                            {Object.entries(category.criteria).map(([critId, criterion]: [string, Criterion]) => (
-                              <div key={critId} className="p-3 bg-background rounded border border-border">
-                                <div className="flex items-center justify-between mb-1">
-                                  <span className="text-foreground text-sm font-medium">{criterion.name}</span>
-                                  <div className="flex space-x-2">
-                                    <Badge variant="outline" className="border-border text-muted-foreground text-xs">
-                                      权重 {criterion.weight}
-                                    </Badge>
-                                    <Badge variant="outline" className="border-border text-muted-foreground text-xs">
-                                      {criterion.score_range?.[0]}-{criterion.score_range?.[1]}分
-                                    </Badge>
-                                  </div>
-                                </div>
-                                {criterion.description && (
-                                  <p className="text-muted-foreground text-xs">{criterion.description}</p>
-                                )}
-                              </div>
-                            ))}
+                    {Array.isArray(standard.evaluation_system.categories) && standard.evaluation_system.categories.length > 0 ? (
+                      standard.evaluation_system.categories.map((category: Category) => (
+                        <div key={category.id} className="p-4 bg-secondary rounded-lg border border-border space-y-3">
+                          <div className="flex items-center justify-between">
+                            <h5 className="text-foreground font-medium">{category.name}</h5>
+                            <Badge variant="outline" className="border-border text-muted-foreground">
+                              权重 {category.weight}%
+                            </Badge>
                           </div>
-                        )}
-                      </div>
-                    ))}
+                          {category.description && (
+                            <p className="text-muted-foreground text-sm">{category.description}</p>
+                          )}
+                          {/* 评估标准 */}
+                          {Array.isArray(category.criteria) && category.criteria.length > 0 && (
+                            <div className="space-y-2">
+                              <h6 className="text-muted-foreground text-sm font-medium">评估标准:</h6>
+                              {category.criteria.map((criterion: Criterion) => (
+                                <div key={criterion.id} className="p-3 bg-background rounded border border-border">
+                                  <div className="flex items-center justify-between mb-1">
+                                    <span className="text-foreground text-sm font-medium">{criterion.name}</span>
+                                    <div className="flex space-x-2">
+                                      <Badge variant="outline" className="border-border text-muted-foreground text-xs">
+                                        权重 {criterion.weight}
+                                      </Badge>
+                                      <Badge variant="outline" className="border-border text-muted-foreground text-xs">
+                                        {criterion.score_range?.[0]}-{criterion.score_range?.[1]}分
+                                      </Badge>
+                                    </div>
+                                  </div>
+                                  {criterion.description && (
+                                    <p className="text-muted-foreground text-xs">{criterion.description}</p>
+                                  )}
+                                </div>
+                              ))}
+                            </div>
+                          )}
+                        </div>
+                      ))
+                    ) : (
+                      <div className="text-muted-foreground text-sm">暂无评估类别</div>
+                    )}
                   </div>
                 </div>
               )}
