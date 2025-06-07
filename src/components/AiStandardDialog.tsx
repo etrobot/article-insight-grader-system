@@ -1,4 +1,3 @@
-
 import { useState } from 'react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
@@ -15,7 +14,7 @@ interface AiStandardDialogProps {
     apiKey: string;
     model: string;
   };
-  onStandardGenerated: (standardId: string) => void;
+  onStandardGenerated: (standardData: any) => void;
 }
 
 export const AiStandardDialog = ({ apiConfig, onStandardGenerated }: AiStandardDialogProps) => {
