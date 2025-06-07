@@ -3,12 +3,14 @@ import { useState, useEffect } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Button } from '@/components/ui/button';
-import { Settings, FileText, Sparkles, List } from 'lucide-react';
+import { Settings, FileText, Sparkles, List, BarChart3 } from 'lucide-react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { EvaluationStandardBuilder } from '@/components/EvaluationStandardBuilder';
 import { ApiSettings } from '@/components/ApiSettings';
 import { StandardsList } from '@/components/StandardsList';
 import { StandardDetail } from '@/components/StandardDetail';
+import { ArticleEvaluationDialog } from '@/components/ArticleEvaluationDialog';
+import { EvaluationResult } from '@/components/EvaluationResult';
 import { useStandards } from '@/hooks/useStandards';
 import { useToast } from '@/hooks/use-toast';
 
@@ -39,7 +41,9 @@ const Index = () => {
   });
   const [activeTab, setActiveTab] = useState('builder');
   const [isApiDialogOpen, setIsApiDialogOpen] = useState(false);
+  const [isEvaluationDialogOpen, setIsEvaluationDialogOpen] = useState(false);
   const [selectedStandardId, setSelectedStandardId] = useState<string | null>(null);
+  const [evaluationResult, setEvaluationResult] = useState<any>(null);
   const { toast } = useToast();
 
   // Save config to localStorage whenever it changes
@@ -58,10 +62,21 @@ const Index = () => {
 
   const handleViewStandard = (id: string) => {
     setSelectedStandardId(id);
+    setEvaluationResult(null);
   };
 
   const handleBackToList = () => {
     setSelectedStandardId(null);
+    setEvaluationResult(null);
+  };
+
+  const handleEvaluationComplete = (result: any) => {
+    setEvaluationResult(result);
+    setActiveTab('preview');
+  };
+
+  const handleBackToEvaluationList = () => {
+    setEvaluationResult(null);
   };
 
   const selectedStandard = selectedStandardId ? getStandard(selectedStandardId) : null;
@@ -82,6 +97,13 @@ const Index = () => {
               </div>
             </div>
             <div className="flex items-center space-x-3">
+              <Button
+                onClick={() => setIsEvaluationDialogOpen(true)}
+                className="bg-gradient-to-r from-green-600 to-teal-600 hover:from-green-700 hover:to-teal-700"
+              >
+                <BarChart3 className="w-4 h-4 mr-2" />
+                评估文章
+              </Button>
               <Dialog open={isApiDialogOpen} onOpenChange={setIsApiDialogOpen}>
                 <DialogTrigger asChild>
                   <Button variant="outline" className="border-gray-300">
@@ -112,6 +134,7 @@ const Index = () => {
           setActiveTab(value);
           if (value === 'preview') {
             setSelectedStandardId(null);
+            setEvaluationResult(null);
           }
         }} className="space-y-6">
           <TabsList className="grid grid-cols-2 w-full max-w-md mx-auto bg-white border border-gray-200 shadow-sm">
@@ -134,7 +157,12 @@ const Index = () => {
           </TabsContent>
 
           <TabsContent value="preview" className="space-y-6">
-            {selectedStandard ? (
+            {evaluationResult ? (
+              <EvaluationResult
+                result={evaluationResult}
+                onBack={handleBackToEvaluationList}
+              />
+            ) : selectedStandard ? (
               <StandardDetail
                 standard={selectedStandard}
                 onBack={handleBackToList}
@@ -149,6 +177,15 @@ const Index = () => {
           </TabsContent>
         </Tabs>
       </div>
+
+      {/* 评估文章对话框 */}
+      <ArticleEvaluationDialog
+        open={isEvaluationDialogOpen}
+        onOpenChange={setIsEvaluationDialogOpen}
+        standards={standards}
+        apiConfig={apiConfig}
+        onEvaluationComplete={handleEvaluationComplete}
+      />
     </div>
   );
 };
