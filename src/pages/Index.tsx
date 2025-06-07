@@ -1,16 +1,19 @@
+
 import { useState, useEffect } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Button } from '@/components/ui/button';
-import { Download, Settings, FileText, Sparkles } from 'lucide-react';
+import { Settings, FileText, Sparkles, List } from 'lucide-react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { EvaluationStandardBuilder } from '@/components/EvaluationStandardBuilder';
 import { ApiSettings } from '@/components/ApiSettings';
-import { JsonPreview } from '@/components/JsonPreview';
+import { StandardsList } from '@/components/StandardsList';
+import { StandardDetail } from '@/components/StandardDetail';
+import { useStandards } from '@/hooks/useStandards';
 import { useToast } from '@/hooks/use-toast';
 
 const Index = () => {
-  const [evaluationStandard, setEvaluationStandard] = useState(null);
+  const { standards, addStandard, deleteStandard, getStandard } = useStandards();
   const [apiConfig, setApiConfig] = useState(() => {
     // Try to load config from localStorage on initial render
     if (typeof window !== 'undefined') {
@@ -36,6 +39,7 @@ const Index = () => {
   });
   const [activeTab, setActiveTab] = useState('builder');
   const [isApiDialogOpen, setIsApiDialogOpen] = useState(false);
+  const [selectedStandardId, setSelectedStandardId] = useState<string | null>(null);
   const { toast } = useToast();
 
   // Save config to localStorage whenever it changes
@@ -46,31 +50,21 @@ const Index = () => {
     }
   }, [apiConfig]);
 
-  const handleExportJson = () => {
-    if (!evaluationStandard) {
-      toast({
-        title: "无法导出",
-        description: "请先生成评估标准",
-        variant: "destructive"
-      });
-      return;
-    }
-
-    const dataStr = JSON.stringify(evaluationStandard, null, 2);
-    const dataUri = 'data:application/json;charset=utf-8,'+ encodeURIComponent(dataStr);
-
-    const exportFileDefaultName = 'evaluation_standard.json';
-
-    const linkElement = document.createElement('a');
-    linkElement.setAttribute('href', dataUri);
-    linkElement.setAttribute('download', exportFileDefaultName);
-    linkElement.click();
-
-    toast({
-      title: "导出成功",
-      description: "评估标准已保存为JSON文件",
-    });
+  const handleStandardGenerated = (standardData: any) => {
+    const newStandardId = addStandard(standardData);
+    setActiveTab('preview');
+    setSelectedStandardId(newStandardId);
   };
+
+  const handleViewStandard = (id: string) => {
+    setSelectedStandardId(id);
+  };
+
+  const handleBackToList = () => {
+    setSelectedStandardId(null);
+  };
+
+  const selectedStandard = selectedStandardId ? getStandard(selectedStandardId) : null;
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50">
@@ -114,31 +108,44 @@ const Index = () => {
       </div>
 
       <div className="container mx-auto px-6 py-8">
-        <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
+        <Tabs value={activeTab} onValueChange={(value) => {
+          setActiveTab(value);
+          if (value === 'preview') {
+            setSelectedStandardId(null);
+          }
+        }} className="space-y-6">
           <TabsList className="grid grid-cols-2 w-full max-w-md mx-auto bg-white border border-gray-200 shadow-sm">
             <TabsTrigger value="builder" className="data-[state=active]:bg-blue-600 data-[state=active]:text-white">
               <FileText className="w-4 h-4 mr-2" />
               标准构建
             </TabsTrigger>
             <TabsTrigger value="preview" className="data-[state=active]:bg-blue-600 data-[state=active]:text-white">
-              <Settings className="w-4 h-4 mr-2" />
-              预览导出
+              <List className="w-4 h-4 mr-2" />
+              标准列表
             </TabsTrigger>
           </TabsList>
 
           <TabsContent value="builder" className="space-y-6">
             <EvaluationStandardBuilder
-              onStandardGenerated={setEvaluationStandard}
+              onStandardGenerated={handleStandardGenerated}
               apiConfig={apiConfig}
               onTabChange={setActiveTab}
             />
           </TabsContent>
 
           <TabsContent value="preview" className="space-y-6">
-            <JsonPreview
-              evaluationStandard={evaluationStandard}
-              onExport={handleExportJson}
-            />
+            {selectedStandard ? (
+              <StandardDetail
+                standard={selectedStandard}
+                onBack={handleBackToList}
+              />
+            ) : (
+              <StandardsList
+                standards={standards}
+                onDelete={deleteStandard}
+                onView={handleViewStandard}
+              />
+            )}
           </TabsContent>
         </Tabs>
       </div>

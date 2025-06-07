@@ -1,3 +1,4 @@
+
 import { useState } from 'react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
@@ -14,41 +15,7 @@ interface AiStandardDialogProps {
     apiKey: string;
     model: string;
   };
-  onStandardGenerated: (standard: Standard) => void;
-}
-
-interface Criteria {
-  name: string;
-  description: string;
-  weight: number;
-  score_range: [number, number];
-}
-
-interface Category {
-  name: string;
-  weight: number;
-  description: string;
-  criteria: { [key: string]: Criteria };
-}
-
-interface ScoringAlgorithm {
-  description: string;
-  formula: string;
-  normalization: string;
-}
-
-interface EvaluationSystem {
-  name: string;
-  description: string;
-  version: string;
-  total_weight: number;
-  categories: { [key: string]: Category };
-  scoring_algorithm: ScoringAlgorithm;
-  generated_at: string;
-}
-
-interface Standard {
-  evaluation_system: EvaluationSystem;
+  onStandardGenerated: (standardId: string) => void;
 }
 
 export const AiStandardDialog = ({ apiConfig, onStandardGenerated }: AiStandardDialogProps) => {
@@ -133,14 +100,21 @@ export const AiStandardDialog = ({ apiConfig, onStandardGenerated }: AiStandardD
         throw new Error('AI返回内容无法解析为JSON，请检查提示词或稍后重试');
       }
 
-      onStandardGenerated(parsedStandard);
+      // Create the standard object for localStorage
+      const standardForStorage = {
+        name: systemName,
+        description: systemDescription,
+        evaluation_system: parsedStandard
+      };
+
+      onStandardGenerated(standardForStorage);
       setIsOpen(false);
       setSystemName('');
       setSystemDescription('');
 
       toast({
         title: "生成成功",
-        description: "AI已为您生成评估标准，可在预览页面查看",
+        description: "AI已为您生成评估标准，正在跳转到详情页面",
       });
 
     } catch (error) {

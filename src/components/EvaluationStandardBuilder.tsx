@@ -1,9 +1,10 @@
+
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Sparkles } from 'lucide-react';
 import { AiStandardDialog } from '@/components/AiStandardDialog';
 
 interface EvaluationStandardBuilderProps {
-  onStandardGenerated: (standard: object) => void;
+  onStandardGenerated: (standardData: any) => void;
   onTabChange: (tab: string) => void;
   apiConfig: {
     baseUrl: string;
@@ -38,10 +39,7 @@ export const EvaluationStandardBuilder = ({ onStandardGenerated, apiConfig, onTa
               </p>
               <AiStandardDialog
                 apiConfig={apiConfig}
-                onStandardGenerated={(standard) => {
-                  onStandardGenerated(standard);
-                  onTabChange("preview");
-                }}
+                onStandardGenerated={onStandardGenerated}
               />
             </div>
           </div>
