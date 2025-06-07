@@ -1,19 +1,12 @@
+
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import {
-  Eye,
-  Download,
-  Copy,
-  FileJson,
-  BarChart3,
-  Settings2,
-  CheckCircle2,
-  Clock
-} from 'lucide-react';
+import { Eye, Download, Copy, FileJson } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
+import { PreviewStats } from '@/components/PreviewStats';
+import { StructuredView } from '@/components/StructuredView';
 
 interface Criterion {
   name: string;
@@ -39,7 +32,6 @@ interface EvaluationSystem {
 
 interface EvaluationStandard {
   evaluation_system: EvaluationSystem;
-  // 根据实际情况添加其他属性，例如 evaluation_results 等
 }
 
 interface JsonPreviewProps {
@@ -107,57 +99,7 @@ export const JsonPreview = ({ evaluationStandard, onExport }: JsonPreviewProps) 
   return (
     <div className="space-y-6">
       {/* 统计概览 */}
-      {stats && (
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-          <Card className="bg-card backdrop-blur-sm border-border">
-            <CardContent className="p-4">
-              <div className="flex items-center space-x-2">
-                <BarChart3 className="w-5 h-5 text-blue-400" />
-                <div>
-                  <p className="text-foreground font-medium">{stats.categoriesCount}</p>
-                  <p className="text-muted-foreground text-sm">评估类别</p>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-
-          <Card className="bg-card backdrop-blur-sm border-border">
-            <CardContent className="p-4">
-              <div className="flex items-center space-x-2">
-                <Settings2 className="w-5 h-5 text-purple-400" />
-                <div>
-                  <p className="text-foreground font-medium">{stats.criteriaCount}</p>
-                  <p className="text-muted-foreground text-sm">评估标准</p>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-
-          <Card className="bg-card backdrop-blur-sm border-border">
-            <CardContent className="p-4">
-              <div className="flex items-center space-x-2">
-                <CheckCircle2 className="w-5 h-5 text-green-400" />
-                <div>
-                  <p className="text-foreground font-medium">{stats.totalWeight}</p>
-                  <p className="text-muted-foreground text-sm">总权重</p>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-
-          <Card className="bg-card backdrop-blur-sm border-border">
-            <CardContent className="p-4">
-              <div className="flex items-center space-x-2">
-                <Clock className="w-5 h-5 text-orange-400" />
-                <div>
-                  <p className="text-foreground font-medium">v{stats.version}</p>
-                  <p className="text-muted-foreground text-sm">版本号</p>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-        </div>
-      )}
+      {stats && <PreviewStats {...stats} />}
 
       {/* 预览内容 */}
       <Card className="bg-card backdrop-blur-sm border-border">
@@ -205,72 +147,7 @@ export const JsonPreview = ({ evaluationStandard, onExport }: JsonPreviewProps) 
             </TabsList>
 
             <TabsContent value="structured" className="space-y-4">
-              {evaluationStandard?.evaluation_system && (
-                <div className="space-y-6">
-                  {/* 系统信息 */}
-                  <div className="p-4 bg-secondary rounded-lg border border-border">
-                    <h3 className="text-foreground font-semibold text-lg mb-2">
-                      {evaluationStandard.evaluation_system.name}
-                    </h3>
-                    {evaluationStandard.evaluation_system.description && (
-                      <p className="text-muted-foreground text-sm mb-3">
-                        {evaluationStandard.evaluation_system.description}
-                      </p>
-                    )}
-                    <div className="flex flex-wrap gap-2">
-                      <Badge variant="secondary" className="bg-blue-500/20 text-blue-300">
-                        版本 {evaluationStandard.evaluation_system.version}
-                      </Badge>
-                      <Badge variant="secondary" className="bg-purple-500/20 text-purple-300">
-                        总权重 {evaluationStandard.evaluation_system.total_weight}
-                      </Badge>
-                    </div>
-                  </div>
-
-                  {/* 评估类别 */}
-                  <div className="space-y-4">
-                    <h4 className="text-foreground font-medium">评估类别详情</h4>
-                    {Object.entries(evaluationStandard.evaluation_system.categories || {}).map(([catId, category]: [string, Category]) => (
-                      <div key={catId} className="p-4 bg-secondary rounded-lg border border-border space-y-3">
-                        <div className="flex items-center justify-between">
-                          <h5 className="text-foreground font-medium">{category.name}</h5>
-                          <Badge variant="outline" className="border-border text-muted-foreground">
-                            权重 {category.weight}%
-                          </Badge>
-                        </div>
-                        {category.description && (
-                          <p className="text-muted-foreground text-sm">{category.description}</p>
-                        )}
-
-                        {/* 评估标准 */}
-                        {category.criteria && Object.keys(category.criteria).length > 0 && (
-                          <div className="space-y-2">
-                            <h6 className="text-muted-foreground text-sm font-medium">评估标准:</h6>
-                            {Object.entries(category.criteria).map(([critId, criterion]: [string, Criterion]) => (
-                              <div key={critId} className="p-3 bg-background rounded border border-border">
-                                <div className="flex items-center justify-between mb-1">
-                                  <span className="text-foreground text-sm font-medium">{criterion.name}</span>
-                                  <div className="flex space-x-2">
-                                    <Badge variant="outline" className="border-border text-muted-foreground text-xs">
-                                      权重 {criterion.weight}
-                                    </Badge>
-                                    <Badge variant="outline" className="border-border text-muted-foreground text-xs">
-                                      {criterion.score_range?.[0]}-{criterion.score_range?.[1]}分
-                                    </Badge>
-                                  </div>
-                                </div>
-                                {criterion.description && (
-                                  <p className="text-muted-foreground text-xs">{criterion.description}</p>
-                                )}
-                              </div>
-                            ))}
-                          </div>
-                        )}
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              )}
+              <StructuredView evaluationSystem={evaluationStandard.evaluation_system} />
             </TabsContent>
 
             <TabsContent value="json">

@@ -1,9 +1,8 @@
-
 import { useState, useEffect } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Button } from '@/components/ui/button';
-import { Settings, FileText, Sparkles, List, BarChart3 } from 'lucide-react';
+import { Settings, FileText, Sparkles, List, BarChart3, History } from 'lucide-react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { EvaluationStandardBuilder } from '@/components/EvaluationStandardBuilder';
 import { ApiSettings } from '@/components/ApiSettings';
@@ -11,13 +10,16 @@ import { StandardsList } from '@/components/StandardsList';
 import { StandardDetail } from '@/components/StandardDetail';
 import { ArticleEvaluationDialog } from '@/components/ArticleEvaluationDialog';
 import { EvaluationResult } from '@/components/EvaluationResult';
+import { EvaluationsList } from '@/components/EvaluationsList';
 import { useStandards } from '@/hooks/useStandards';
+import { useArticleEvaluations } from '@/hooks/useArticleEvaluations';
 import { useToast } from '@/hooks/use-toast';
 
 const Index = () => {
   const { standards, addStandard, deleteStandard, getStandard } = useStandards();
+  const { evaluations, addEvaluation, deleteEvaluation, getEvaluation } = useArticleEvaluations();
+  
   const [apiConfig, setApiConfig] = useState(() => {
-    // Try to load config from localStorage on initial render
     if (typeof window !== 'undefined') {
       const savedConfig = localStorage.getItem('apiSettingsConfig');
       console.log("Index.tsx: Loading apiConfig from localStorage - Raw savedConfig:", savedConfig);
@@ -31,7 +33,6 @@ const Index = () => {
         }
       }
     }
-    // Default initial state if no saved config or parse failed
     console.log("Index.tsx: Initializing apiConfig with default values.");
     return {
       baseUrl: '',
@@ -39,14 +40,15 @@ const Index = () => {
       model: ''
     };
   });
+  
   const [activeTab, setActiveTab] = useState('builder');
   const [isApiDialogOpen, setIsApiDialogOpen] = useState(false);
   const [isEvaluationDialogOpen, setIsEvaluationDialogOpen] = useState(false);
   const [selectedStandardId, setSelectedStandardId] = useState<string | null>(null);
+  const [selectedEvaluationId, setSelectedEvaluationId] = useState<string | null>(null);
   const [evaluationResult, setEvaluationResult] = useState<any>(null);
   const { toast } = useToast();
 
-  // Save config to localStorage whenever it changes
   useEffect(() => {
     console.log("Index.tsx: Saving apiConfig to localStorage:", apiConfig);
     if (typeof window !== 'undefined') {
@@ -63,23 +65,46 @@ const Index = () => {
   const handleViewStandard = (id: string) => {
     setSelectedStandardId(id);
     setEvaluationResult(null);
+    setSelectedEvaluationId(null);
+  };
+
+  const handleViewEvaluation = (id: string) => {
+    setSelectedEvaluationId(id);
+    setSelectedStandardId(null);
+    setEvaluationResult(null);
+    setActiveTab('evaluations');
   };
 
   const handleBackToList = () => {
     setSelectedStandardId(null);
     setEvaluationResult(null);
+    setSelectedEvaluationId(null);
   };
 
   const handleEvaluationComplete = (result: any) => {
+    // 保存评估结果到localStorage
+    addEvaluation({
+      article_title: result.article_title,
+      article_content: result.article_content || '',
+      standard_id: result.standard?.id || '',
+      standard_name: result.standard?.name || '',
+      total_score: result.total_score,
+      categories: result.categories,
+      summary: result.summary,
+      suggestions: result.suggestions
+    });
+    
     setEvaluationResult(result);
-    setActiveTab('preview');
+    setActiveTab('evaluations');
   };
 
   const handleBackToEvaluationList = () => {
     setEvaluationResult(null);
+    setSelectedEvaluationId(null);
   };
 
   const selectedStandard = selectedStandardId ? getStandard(selectedStandardId) : null;
+  const selectedEvaluation = selectedEvaluationId ? getEvaluation(selectedEvaluationId) : null;
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50">
@@ -135,9 +160,14 @@ const Index = () => {
           if (value === 'preview') {
             setSelectedStandardId(null);
             setEvaluationResult(null);
+            setSelectedEvaluationId(null);
+          } else if (value === 'evaluations') {
+            setSelectedStandardId(null);
+            setEvaluationResult(null);
+            setSelectedEvaluationId(null);
           }
         }} className="space-y-6">
-          <TabsList className="grid grid-cols-2 w-full max-w-md mx-auto bg-white border border-gray-200 shadow-sm">
+          <TabsList className="grid grid-cols-3 w-full max-w-lg mx-auto bg-white border border-gray-200 shadow-sm">
             <TabsTrigger value="builder" className="data-[state=active]:bg-blue-600 data-[state=active]:text-white">
               <FileText className="w-4 h-4 mr-2" />
               标准构建
@@ -145,6 +175,10 @@ const Index = () => {
             <TabsTrigger value="preview" className="data-[state=active]:bg-blue-600 data-[state=active]:text-white">
               <List className="w-4 h-4 mr-2" />
               标准列表
+            </TabsTrigger>
+            <TabsTrigger value="evaluations" className="data-[state=active]:bg-blue-600 data-[state=active]:text-white">
+              <History className="w-4 h-4 mr-2" />
+              评估记录
             </TabsTrigger>
           </TabsList>
 
@@ -157,12 +191,7 @@ const Index = () => {
           </TabsContent>
 
           <TabsContent value="preview" className="space-y-6">
-            {evaluationResult ? (
-              <EvaluationResult
-                result={evaluationResult}
-                onBack={handleBackToEvaluationList}
-              />
-            ) : selectedStandard ? (
+            {selectedStandard ? (
               <StandardDetail
                 standard={selectedStandard}
                 onBack={handleBackToList}
@@ -172,6 +201,26 @@ const Index = () => {
                 standards={standards}
                 onDelete={deleteStandard}
                 onView={handleViewStandard}
+              />
+            )}
+          </TabsContent>
+
+          <TabsContent value="evaluations" className="space-y-6">
+            {evaluationResult ? (
+              <EvaluationResult
+                result={evaluationResult}
+                onBack={handleBackToEvaluationList}
+              />
+            ) : selectedEvaluation ? (
+              <EvaluationResult
+                result={selectedEvaluation}
+                onBack={handleBackToEvaluationList}
+              />
+            ) : (
+              <EvaluationsList
+                evaluations={evaluations}
+                onView={handleViewEvaluation}
+                onDelete={deleteEvaluation}
               />
             )}
           </TabsContent>
