@@ -98,7 +98,7 @@ const Index = () => {
   const selectedEvaluation = selectedEvaluationId ? getEvaluation(selectedEvaluationId) : null;
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-theme-pink-light via-theme-yellow-light to-theme-orange-light">
+    <div className="min-h-screen bg-gradient-to-br from-theme-pink-light via-theme-yellow-light to-theme-orange-light dark:from-theme-pink-light dark:via-theme-yellow-light dark:to-theme-orange-light">
       <Header
         apiConfig={apiConfig}
         isApiDialogOpen={isApiDialogOpen}
