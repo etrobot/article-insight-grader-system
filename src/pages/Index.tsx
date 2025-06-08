@@ -1,17 +1,8 @@
 
 import { useState, useEffect } from 'react';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Button } from '@/components/ui/button';
-import { Settings, FileText, Sparkles, List, BarChart3, History } from 'lucide-react';
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
-import { EvaluationStandardBuilder } from '@/components/EvaluationStandardBuilder';
-import { ApiSettings } from '@/components/ApiSettings';
-import { StandardsList } from '@/components/StandardsList';
-import { StandardDetail } from '@/components/StandardDetail';
+import { Header } from '@/components/Header';
+import { TabsContainer } from '@/components/TabsContainer';
 import { ArticleEvaluationDialog } from '@/components/ArticleEvaluationDialog';
-import { EvaluationResult } from '@/components/EvaluationResult';
-import { EvaluationsList } from '@/components/EvaluationsList';
 import { useStandards } from '@/hooks/useStandards';
 import { useArticleEvaluations } from '@/hooks/useArticleEvaluations';
 import { useToast } from '@/hooks/use-toast';
@@ -83,7 +74,6 @@ const Index = () => {
   };
 
   const handleEvaluationComplete = (result: any) => {
-    // 保存评估结果到localStorage
     addEvaluation({
       article_title: result.article_title,
       article_content: result.article_content || '',
@@ -109,126 +99,34 @@ const Index = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-theme-pink-light via-theme-yellow-light to-theme-orange-light">
-      {/* Header */}
-      <div className="bg-white/80 backdrop-blur-sm border-b border-gray-200 shadow-sm">
-        <div className="container mx-auto px-6 py-4">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center space-x-3">
-              <div className="p-2 bg-gradient-to-r from-theme-pink to-theme-orange rounded-lg">
-                <Sparkles className="w-6 h-6 text-white" />
-              </div>
-              <div>
-                <h1 className="text-2xl font-bold text-gray-900">文章质量评估标准生成器</h1>
-                <p className="text-gray-600 text-sm">智能生成定制化的内容评估体系</p>
-              </div>
-            </div>
-            <div className="flex items-center space-x-3">
-              <Button
-                onClick={() => setIsEvaluationDialogOpen(true)}
-                className="bg-gradient-to-r from-theme-orange to-theme-yellow hover:from-orange-600 hover:to-yellow-600"
-              >
-                <BarChart3 className="w-4 h-4 mr-2" />
-                评估文章
-              </Button>
-              <Dialog open={isApiDialogOpen} onOpenChange={setIsApiDialogOpen}>
-                <DialogTrigger asChild>
-                  <Button variant="outline" className="border-gray-300">
-                    <Settings className="w-4 h-4 mr-2" />
-                    API设置
-                  </Button>
-                </DialogTrigger>
-                <DialogContent className="max-w-2xl max-h-[80vh] overflow-y-auto">
-                  <DialogHeader>
-                    <DialogTitle>API配置</DialogTitle>
-                  </DialogHeader>
-                  <ApiSettings
-                    config={apiConfig}
-                    onConfigChange={(config) => {
-                      setApiConfig(config);
-                      setIsApiDialogOpen(false);
-                    }}
-                  />
-                </DialogContent>
-              </Dialog>
-            </div>
-          </div>
-        </div>
-      </div>
+      <Header
+        apiConfig={apiConfig}
+        isApiDialogOpen={isApiDialogOpen}
+        setIsApiDialogOpen={setIsApiDialogOpen}
+        setIsEvaluationDialogOpen={setIsEvaluationDialogOpen}
+        setApiConfig={setApiConfig}
+      />
 
       <div className="container mx-auto px-6 py-8">
-        <Tabs value={activeTab} onValueChange={(value) => {
-          setActiveTab(value);
-          if (value === 'preview') {
-            setSelectedStandardId(null);
-            setEvaluationResult(null);
-            setSelectedEvaluationId(null);
-          } else if (value === 'evaluations') {
-            setSelectedStandardId(null);
-            setEvaluationResult(null);
-            setSelectedEvaluationId(null);
-          }
-        }} className="space-y-6">
-          <TabsList className="grid grid-cols-3 w-full max-w-lg mx-auto bg-white border border-gray-200 shadow-sm">
-            <TabsTrigger value="builder" className="data-[state=active]:bg-theme-pink data-[state=active]:text-white">
-              <FileText className="w-4 h-4 mr-2" />
-              标准构建
-            </TabsTrigger>
-            <TabsTrigger value="preview" className="data-[state=active]:bg-theme-pink data-[state=active]:text-white">
-              <List className="w-4 h-4 mr-2" />
-              标准列表
-            </TabsTrigger>
-            <TabsTrigger value="evaluations" className="data-[state=active]:bg-theme-pink data-[state=active]:text-white">
-              <History className="w-4 h-4 mr-2" />
-              评估记录
-            </TabsTrigger>
-          </TabsList>
-
-          <TabsContent value="builder" className="space-y-6">
-            <EvaluationStandardBuilder
-              onStandardGenerated={handleStandardGenerated}
-              apiConfig={apiConfig}
-              onTabChange={setActiveTab}
-            />
-          </TabsContent>
-
-          <TabsContent value="preview" className="space-y-6">
-            {selectedStandard ? (
-              <StandardDetail
-                standard={selectedStandard}
-                onBack={handleBackToList}
-              />
-            ) : (
-              <StandardsList
-                standards={standards}
-                onDelete={deleteStandard}
-                onView={handleViewStandard}
-              />
-            )}
-          </TabsContent>
-
-          <TabsContent value="evaluations" className="space-y-6">
-            {evaluationResult ? (
-              <EvaluationResult
-                result={evaluationResult}
-                onBack={handleBackToEvaluationList}
-              />
-            ) : selectedEvaluation ? (
-              <EvaluationResult
-                result={selectedEvaluation}
-                onBack={handleBackToEvaluationList}
-              />
-            ) : (
-              <EvaluationsList
-                evaluations={evaluations}
-                onView={handleViewEvaluation}
-                onDelete={deleteEvaluation}
-              />
-            )}
-          </TabsContent>
-        </Tabs>
+        <TabsContainer
+          activeTab={activeTab}
+          setActiveTab={setActiveTab}
+          standards={standards}
+          evaluations={evaluations}
+          selectedStandard={selectedStandard}
+          selectedEvaluation={selectedEvaluation}
+          evaluationResult={evaluationResult}
+          apiConfig={apiConfig}
+          onStandardGenerated={handleStandardGenerated}
+          onViewStandard={handleViewStandard}
+          onViewEvaluation={handleViewEvaluation}
+          onBackToList={handleBackToList}
+          onBackToEvaluationList={handleBackToEvaluationList}
+          deleteStandard={deleteStandard}
+          deleteEvaluation={deleteEvaluation}
+        />
       </div>
 
-      {/* 评估文章对话框 */}
       <ArticleEvaluationDialog
         open={isEvaluationDialogOpen}
         onOpenChange={setIsEvaluationDialogOpen}
