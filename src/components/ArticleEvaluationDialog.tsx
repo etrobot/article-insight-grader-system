@@ -48,6 +48,14 @@ export const ArticleEvaluationDialog = ({
 
   const selectedStandards = standards.filter(s => selectedStandardIds.includes(s.id));
 
+  // 添加调试日志
+  console.log('ArticleEvaluationDialog - 当前状态:', {
+    selectedStandardIds,
+    articleContentLength: articleContent.length,
+    isEvaluating,
+    standardsCount: standards.length
+  });
+
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-w-4xl max-h-[80vh] overflow-y-auto">
@@ -90,7 +98,10 @@ export const ArticleEvaluationDialog = ({
               {isEvaluating ? '停止并关闭' : '取消'}
             </Button>
             <Button
-              onClick={handleEvaluate}
+              onClick={() => {
+                console.log('评估按钮被点击 - 在组件中');
+                handleEvaluate();
+              }}
               disabled={isEvaluating || selectedStandardIds.length === 0 || !articleContent.trim()}
               className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700"
             >

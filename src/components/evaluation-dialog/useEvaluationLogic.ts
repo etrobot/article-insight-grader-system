@@ -1,7 +1,8 @@
 
-import { useState } from 'react';
+import { useState, useRef } from 'react';
 import { useToast } from '@/hooks/use-toast';
 import { Standard } from '@/hooks/useStandards';
+import { evaluateSingleStandard } from './evaluationApi';
 
 interface UseEvaluationLogicProps {
   standards: Standard[];
@@ -27,6 +28,7 @@ export const useEvaluationLogic = ({
   const [completedEvaluations, setCompletedEvaluations] = useState<any[]>([]);
   const [evaluationProgress, setEvaluationProgress] = useState(0);
   const { toast } = useToast();
+  const isEvaluatingRef = useRef(false);
 
   const handleStandardToggle = (standardId: string) => {
     setSelectedStandardIds(prev => 
@@ -37,6 +39,7 @@ export const useEvaluationLogic = ({
   };
 
   const stopEvaluation = () => {
+    isEvaluatingRef.current = false;
     setIsEvaluating(false);
     setCurrentEvaluationIndex(-1);
     setEvaluationProgress(0);
@@ -47,104 +50,14 @@ export const useEvaluationLogic = ({
     });
   };
 
-  const evaluateSingleStandard = async (standard: Standard, articleContent: string) => {
-    const evaluationPrompt = `请根据以下评估标准对文章进行详细评估：
-
-评估标准：
-${JSON.stringify(standard.evaluation_system, null, 2)}
-
-文章内容：
-${articleContent}
-
-请按照评估标准的结构，对文章进行逐项打分和评价，并给出总分和详细的评估报告。返回JSON格式的评估结果，包含：
-- 各类别的得分和评价
-- 各标准的得分和评价  
-- 总分
-- 综合评价
-- 改进建议
-
-请严格按照以下JSON结构返回：
-{
-  "article_title": "文章标题（从内容中提取或生成）",
-  "total_score": 总分数字,
-  "evaluation_date": "${new Date().toISOString()}",
-  "categories": [
-    {
-      "id": "类别ID",
-      "name": "类别名称", 
-      "score": 得分,
-      "max_score": 满分,
-      "comment": "评价说明",
-      "criteria": [
-        {
-          "id": "标准ID",
-          "name": "标准名称",
-          "score": 得分,
-          "max_score": 满分,
-          "comment": "详细评价"
-        }
-      ]
-    }
-  ],
-  "summary": "综合评价总结",
-  "suggestions": ["改进建议1", "改进建议2"]
-}`;
-
-    const response = await fetch(`${apiConfig.baseUrl}/v1/chat/completions`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${apiConfig.apiKey}`,
-      },
-      body: JSON.stringify({
-        model: apiConfig.model,
-        messages: [
-          {
-            role: 'user',
-            content: evaluationPrompt,
-          },
-        ],
-        temperature: 0.7,
-      }),
-    });
-
-    if (!response.ok) {
-      throw new Error(`API请求失败: ${response.status}`);
-    }
-
-    const data = await response.json();
-    const evaluationContent = data.choices?.[0]?.message?.content;
-
-    if (!evaluationContent) {
-      throw new Error('未收到有效的评估结果');
-    }
-
-    const jsonMatch = evaluationContent.match(/\{[\s\S]*\}/);
-    if (!jsonMatch) {
-      throw new Error('评估结果格式不正确');
-    }
-
-    const evaluationResult = JSON.parse(jsonMatch[0]);
-    evaluationResult.standard = standard;
-    evaluationResult.id = Date.now().toString() + Math.random().toString(36).substr(2, 9);
-    evaluationResult.article_content = articleContent;
-
-    return evaluationResult;
-  };
-
-  const handleEvaluate = async () => {
-    console.log('开始评估按钮被点击');
-    console.log('选中的标准数量:', selectedStandardIds.length);
-    console.log('文章内容长度:', articleContent.trim().length);
-    console.log('API配置:', apiConfig);
-
+  const validateInputs = () => {
     if (selectedStandardIds.length === 0) {
       toast({
         title: "请选择评估标准",
         description: "请至少选择一个评估标准",
         variant: "destructive",
       });
-      return;
+      return false;
     }
 
     if (!articleContent.trim()) {
@@ -153,7 +66,7 @@ ${articleContent}
         description: "请输入要评估的文章内容",
         variant: "destructive",
       });
-      return;
+      return false;
     }
 
     if (!apiConfig.baseUrl || !apiConfig.apiKey || !apiConfig.model) {
@@ -162,10 +75,24 @@ ${articleContent}
         description: "请先在API设置中配置完整的API信息",
         variant: "destructive",
       });
+      return false;
+    }
+
+    return true;
+  };
+
+  const handleEvaluate = async () => {
+    console.log('开始评估按钮被点击');
+    console.log('选中的标准数量:', selectedStandardIds.length);
+    console.log('文章内容长度:', articleContent.trim().length);
+    console.log('API配置:', apiConfig);
+
+    if (!validateInputs()) {
       return;
     }
 
     setIsEvaluating(true);
+    isEvaluatingRef.current = true;
     setCurrentEvaluationIndex(0);
     setCompletedEvaluations([]);
     setEvaluationProgress(0);
@@ -175,7 +102,11 @@ ${articleContent}
 
     try {
       for (let i = 0; i < selectedStandards.length; i++) {
-        if (!isEvaluating) break;
+        // 使用 ref 来检查是否应该停止评估
+        if (!isEvaluatingRef.current) {
+          console.log('评估被用户停止');
+          break;
+        }
 
         setCurrentEvaluationIndex(i);
         setEvaluationProgress((i / selectedStandards.length) * 100);
@@ -184,7 +115,7 @@ ${articleContent}
         console.log(`开始评估标准: ${standard.name}`);
 
         try {
-          const result = await evaluateSingleStandard(standard, articleContent);
+          const result = await evaluateSingleStandard(standard, articleContent, apiConfig);
           results.push(result);
           setCompletedEvaluations([...results]);
           
@@ -233,6 +164,7 @@ ${articleContent}
         variant: "destructive",
       });
     } finally {
+      isEvaluatingRef.current = false;
       setIsEvaluating(false);
     }
   };
@@ -243,6 +175,7 @@ ${articleContent}
     setCurrentEvaluationIndex(-1);
     setCompletedEvaluations([]);
     setEvaluationProgress(0);
+    isEvaluatingRef.current = false;
   };
 
   const handleCancel = () => {
