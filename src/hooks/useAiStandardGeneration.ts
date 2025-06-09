@@ -30,7 +30,7 @@ export const useAiStandardGeneration = (apiConfig: ApiConfig) => {
         .replace('{{systemName}}', systemName)
         .replace('{{systemDescription}}', systemDescription);
 
-      const response = await fetch(`${apiConfig.baseUrl}/v1/chat/completions`, {
+      const response = await fetch(`${apiConfig.baseUrl}/chat/completions`, {
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${apiConfig.apiKey}`,

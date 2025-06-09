@@ -54,7 +54,7 @@ ${articleContent}
   "suggestions": ["改进建议1", "改进建议2"]
 }`;
 
-  const response = await fetch(`${apiConfig.baseUrl}/v1/chat/completions`, {
+  const response = await fetch(`${apiConfig.baseUrl}/chat/completions`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
