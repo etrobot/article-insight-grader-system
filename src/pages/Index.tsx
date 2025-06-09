@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { Header } from '@/components/Header';
 import { TabsContainer } from '@/components/TabsContainer';
@@ -9,7 +8,15 @@ import { useToast } from '@/hooks/use-toast';
 
 const Index = () => {
   const { standards, addStandard, deleteStandard, getStandard } = useStandards();
-  const { evaluations, addEvaluation, deleteEvaluation, getEvaluation } = useArticleEvaluations();
+  const { 
+    evaluations, 
+    addEvaluation, 
+    deleteEvaluation, 
+    deleteArticleGroup,
+    getEvaluation,
+    getArticleGroups,
+    getArticleGroup
+  } = useArticleEvaluations();
   
   const [apiConfig, setApiConfig] = useState(() => {
     if (typeof window !== 'undefined') {
@@ -38,6 +45,7 @@ const Index = () => {
   const [isEvaluationDialogOpen, setIsEvaluationDialogOpen] = useState(false);
   const [selectedStandardId, setSelectedStandardId] = useState<string | null>(null);
   const [selectedEvaluationId, setSelectedEvaluationId] = useState<string | null>(null);
+  const [selectedArticleGroupId, setSelectedArticleGroupId] = useState<string | null>(null);
   const [evaluationResult, setEvaluationResult] = useState<any>(null);
   const { toast } = useToast();
 
@@ -58,17 +66,36 @@ const Index = () => {
     setSelectedStandardId(id);
     setEvaluationResult(null);
     setSelectedEvaluationId(null);
+    setSelectedArticleGroupId(null);
   };
 
   const handleViewEvaluation = (id: string) => {
     setSelectedEvaluationId(id);
     setSelectedStandardId(null);
     setEvaluationResult(null);
-    setActiveTab('evaluations');
+    setSelectedArticleGroupId(null);
+  };
+
+  const handleViewArticleGroup = (articleId: string) => {
+    setSelectedArticleGroupId(articleId);
+    setSelectedStandardId(null);
+    setSelectedEvaluationId(null);
+    setEvaluationResult(null);
   };
 
   const handleBackToList = () => {
     setSelectedStandardId(null);
+    setEvaluationResult(null);
+    setSelectedEvaluationId(null);
+  };
+
+  const handleBackToEvaluationList = () => {
+    setEvaluationResult(null);
+    setSelectedEvaluationId(null);
+  };
+
+  const handleBackToArticleList = () => {
+    setSelectedArticleGroupId(null);
     setEvaluationResult(null);
     setSelectedEvaluationId(null);
   };
@@ -89,13 +116,10 @@ const Index = () => {
     setActiveTab('evaluations');
   };
 
-  const handleBackToEvaluationList = () => {
-    setEvaluationResult(null);
-    setSelectedEvaluationId(null);
-  };
-
   const selectedStandard = selectedStandardId ? getStandard(selectedStandardId) : null;
   const selectedEvaluation = selectedEvaluationId ? getEvaluation(selectedEvaluationId) : null;
+  const selectedArticleGroup = selectedArticleGroupId ? getArticleGroup(selectedArticleGroupId) : null;
+  const articleGroups = getArticleGroups();
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-theme-pink-light via-theme-yellow-light to-theme-orange-light dark:from-theme-pink-light dark:via-theme-yellow-light dark:to-theme-orange-light">
@@ -124,6 +148,11 @@ const Index = () => {
           onBackToEvaluationList={handleBackToEvaluationList}
           deleteStandard={deleteStandard}
           deleteEvaluation={deleteEvaluation}
+          articleGroups={articleGroups}
+          selectedArticleGroup={selectedArticleGroup}
+          onViewArticleGroup={handleViewArticleGroup}
+          onBackToArticleList={handleBackToArticleList}
+          deleteArticleGroup={deleteArticleGroup}
         />
       </div>
 

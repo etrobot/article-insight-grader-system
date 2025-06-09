@@ -5,7 +5,8 @@ import { EvaluationStandardBuilder } from '@/components/EvaluationStandardBuilde
 import { StandardsList } from '@/components/StandardsList';
 import { StandardDetail } from '@/components/StandardDetail';
 import { EvaluationResult } from '@/components/EvaluationResult';
-import { EvaluationsList } from '@/components/EvaluationsList';
+import { ArticleGroupsList } from '@/components/ArticleGroupsList';
+import { ArticleEvaluationsDetail } from '@/components/ArticleEvaluationsDetail';
 import { useLanguage } from '@/contexts/LanguageContext';
 
 interface TabsContainerProps {
@@ -24,6 +25,12 @@ interface TabsContainerProps {
   onBackToEvaluationList: () => void;
   deleteStandard: (id: string) => void;
   deleteEvaluation: (id: string) => void;
+  // 新增的props
+  articleGroups: any[];
+  selectedArticleGroup: any;
+  onViewArticleGroup: (articleId: string) => void;
+  onBackToArticleList: () => void;
+  deleteArticleGroup: (articleId: string) => void;
 }
 
 export const TabsContainer = ({
@@ -41,7 +48,12 @@ export const TabsContainer = ({
   onBackToList,
   onBackToEvaluationList,
   deleteStandard,
-  deleteEvaluation
+  deleteEvaluation,
+  articleGroups,
+  selectedArticleGroup,
+  onViewArticleGroup,
+  onBackToArticleList,
+  deleteArticleGroup
 }: TabsContainerProps) => {
   const { t } = useLanguage();
 
@@ -52,6 +64,7 @@ export const TabsContainer = ({
         onBackToList();
       } else if (value === 'evaluations') {
         onBackToEvaluationList();
+        onBackToArticleList();
       }
     }} className="space-y-6">
       <TabsList className="grid grid-cols-3 w-full max-w-lg mx-auto bg-white border border-gray-200 shadow-sm">
@@ -103,11 +116,18 @@ export const TabsContainer = ({
             result={selectedEvaluation}
             onBack={onBackToEvaluationList}
           />
+        ) : selectedArticleGroup ? (
+          <ArticleEvaluationsDetail
+            articleGroup={selectedArticleGroup}
+            onBack={onBackToArticleList}
+            onViewEvaluation={onViewEvaluation}
+            onDeleteEvaluation={deleteEvaluation}
+          />
         ) : (
-          <EvaluationsList
-            evaluations={evaluations}
-            onView={onViewEvaluation}
-            onDelete={deleteEvaluation}
+          <ArticleGroupsList
+            articleGroups={articleGroups}
+            onView={onViewArticleGroup}
+            onDelete={deleteArticleGroup}
           />
         )}
       </TabsContent>
