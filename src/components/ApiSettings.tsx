@@ -52,7 +52,7 @@ export const ApiSettings = ({ config, onConfigChange }: ApiSettingsProps) => {
     setIsTesting(true);
 
     try {
-      const response = await fetch(`${localConfig.baseUrl}/v1/models`, {
+      const response = await fetch(`${localConfig.baseUrl}/models`, {
         headers: {
           'Authorization': `Bearer ${localConfig.apiKey}`,
           'Content-Type': 'application/json'
