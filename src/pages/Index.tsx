@@ -8,16 +8,16 @@ import { useToast } from '@/hooks/use-toast';
 
 const Index = () => {
   const { standards, addStandard, deleteStandard, getStandard } = useStandards();
-  const { 
-    evaluations, 
-    addEvaluation, 
-    deleteEvaluation, 
+  const {
+    evaluations,
+    addEvaluation,
+    deleteEvaluation,
     deleteArticleGroup,
     getEvaluation,
     getArticleGroups,
     getArticleGroup
   } = useArticleEvaluations();
-  
+
   const [apiConfig, setApiConfig] = useState(() => {
     if (typeof window !== 'undefined') {
       const savedConfig = localStorage.getItem('apiSettingsConfig');
@@ -39,7 +39,7 @@ const Index = () => {
       model: ''
     };
   });
-  
+
   const [activeTab, setActiveTab] = useState('builder');
   const [isApiDialogOpen, setIsApiDialogOpen] = useState(false);
   const [isEvaluationDialogOpen, setIsEvaluationDialogOpen] = useState(false);
@@ -111,7 +111,7 @@ const Index = () => {
       summary: result.summary,
       suggestions: result.suggestions
     });
-    
+
     setEvaluationResult(result);
     setActiveTab('evaluations');
   };
@@ -122,7 +122,7 @@ const Index = () => {
   const articleGroups = getArticleGroups();
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-theme-pink-light via-theme-yellow-light to-theme-orange-light dark:from-theme-pink-light dark:via-theme-yellow-light dark:to-theme-orange-light">
+    <div className="min-h-screen from-theme-pink-light via-theme-yellow-light to-theme-orange-light dark:from-theme-pink-light dark:via-theme-yellow-light dark:to-theme-orange-light">
       <Header
         apiConfig={apiConfig}
         isApiDialogOpen={isApiDialogOpen}

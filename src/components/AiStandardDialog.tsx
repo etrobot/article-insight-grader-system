@@ -30,7 +30,7 @@ export const AiStandardDialog = ({ apiConfig, onStandardGenerated }: AiStandardD
   return (
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
       <DialogTrigger asChild>
-        <Button className="bg-gradient-to-r from-theme-pink to-theme-orange hover:from-pink-600 hover:to-orange-600">
+        <Button className="bg-gradient-to-r from-theme-pink to-theme-orange hover:from-pink-600 hover:to-orange-600 text-white">
           <Wand2 className="w-4 h-4 mr-2" />
           添加标准
         </Button>

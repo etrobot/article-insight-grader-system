@@ -97,9 +97,9 @@ export const ApiSettings = ({ config, onConfigChange }: ApiSettingsProps) => {
 
   return (
     <div className="space-y-6">
-      <Card className="bg-white border-gray-200 dark:bg-gray-800 dark:border-gray-700">
+      <Card className="border-gray-200 dark:bg-gray-800 dark:border-gray-700">
         <CardHeader>
-          <CardTitle className="text-gray-900 dark:text-gray-100 flex items-center space-x-2">
+          <CardTitle className="dark:text-gray-100 flex items-center space-x-2">
             <Settings className="w-5 h-5" />
             <span>{t('api.title')}</span>
           </CardTitle>
@@ -134,7 +134,7 @@ export const ApiSettings = ({ config, onConfigChange }: ApiSettingsProps) => {
                 value={localConfig.baseUrl}
                 onChange={(e) => handleInputChange('baseUrl', e.target.value)}
                 placeholder={t('api.baseUrlPlaceholder')}
-                className="bg-white border-gray-300 text-gray-900 placeholder:text-gray-400 dark:bg-gray-700 dark:border-gray-600 dark:text-gray-100 dark:placeholder:text-gray-500"
+                className="border-gray-300 placeholder:text-gray-400 dark:bg-gray-700 dark:border-gray-600 dark:text-gray-100 dark:placeholder:text-gray-500"
               />
               <p className="text-xs text-gray-500 dark:text-gray-400">
                 {t('api.baseUrlHelp')}
@@ -149,7 +149,7 @@ export const ApiSettings = ({ config, onConfigChange }: ApiSettingsProps) => {
                 value={localConfig.apiKey}
                 onChange={(e) => handleInputChange('apiKey', e.target.value)}
                 placeholder={t('api.apiKeyPlaceholder')}
-                className="bg-white border-gray-300 text-gray-900 placeholder:text-gray-400 dark:bg-gray-700 dark:border-gray-600 dark:text-gray-100 dark:placeholder:text-gray-500"
+                className="border-gray-300 placeholder:text-gray-400 dark:bg-gray-700 dark:border-gray-600 dark:text-gray-100 dark:placeholder:text-gray-500"
               />
               <p className="text-xs text-gray-500 dark:text-gray-400">
                 {t('api.apiKeyHelp')}
@@ -164,7 +164,7 @@ export const ApiSettings = ({ config, onConfigChange }: ApiSettingsProps) => {
                 value={localConfig.model}
                 onChange={(e) => handleInputChange('model', e.target.value)}
                 placeholder={t('api.modelPlaceholder')}
-                className="bg-white border-gray-300 text-gray-900 placeholder:text-gray-400 dark:bg-gray-700 dark:border-gray-600 dark:text-gray-100 dark:placeholder:text-gray-500"
+                className="border-gray-300 placeholder:text-gray-400 dark:bg-gray-700 dark:border-gray-600 dark:text-gray-100 dark:placeholder:text-gray-500"
               />
               <p className="text-xs text-gray-500 dark:text-gray-400">
                 {t('api.modelHelp')}
@@ -186,7 +186,7 @@ export const ApiSettings = ({ config, onConfigChange }: ApiSettingsProps) => {
 
             <Button
               onClick={handleSave}
-              className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700"
+              className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white"
             >
               {t('api.saveConfig')}
             </Button>
@@ -195,16 +195,16 @@ export const ApiSettings = ({ config, onConfigChange }: ApiSettingsProps) => {
       </Card>
 
       {/* Feature description */}
-      <Card className="bg-white border-gray-200 dark:bg-gray-800 dark:border-gray-700">
+      <Card className="border-gray-200 dark:bg-gray-800 dark:border-gray-700">
         <CardHeader>
-          <CardTitle className="text-gray-900 dark:text-gray-100">{t('api.aiFeatures')}</CardTitle>
+          <CardTitle className="dark:text-gray-100">{t('api.aiFeatures')}</CardTitle>
         </CardHeader>
         <CardContent>
           <div className="space-y-3 text-gray-700 dark:text-gray-300">
             <div className="flex items-start space-x-3">
               <div className="w-2 h-2 bg-blue-400 rounded-full mt-2"></div>
               <div>
-                <h5 className="text-gray-900 dark:text-gray-100 font-medium">{t('api.feature1')}</h5>
+                <h5 className="dark:text-gray-100 font-medium">{t('api.feature1')}</h5>
                 <p className="text-sm text-gray-600 dark:text-gray-400">
                   {t('api.feature1Desc')}
                 </p>
@@ -213,7 +213,7 @@ export const ApiSettings = ({ config, onConfigChange }: ApiSettingsProps) => {
             <div className="flex items-start space-x-3">
               <div className="w-2 h-2 bg-purple-400 rounded-full mt-2"></div>
               <div>
-                <h5 className="text-gray-900 dark:text-gray-100 font-medium">{t('api.feature2')}</h5>
+                <h5 className="dark:text-gray-100 font-medium">{t('api.feature2')}</h5>
                 <p className="text-sm text-gray-600 dark:text-gray-400">
                   {t('api.feature2Desc')}
                 </p>
@@ -222,7 +222,7 @@ export const ApiSettings = ({ config, onConfigChange }: ApiSettingsProps) => {
             <div className="flex items-start space-x-3">
               <div className="w-2 h-2 bg-green-400 rounded-full mt-2"></div>
               <div>
-                <h5 className="text-gray-900 dark:text-gray-100 font-medium">{t('api.feature3')}</h5>
+                <h5 className="dark:text-gray-100 font-medium">{t('api.feature3')}</h5>
                 <p className="text-sm text-gray-600 dark:text-gray-400">
                   {t('api.feature3Desc')}
                 </p>

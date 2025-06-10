@@ -32,7 +32,7 @@ export const AiStandardForm = ({ onGenerate, isGenerating }: AiStandardFormProps
           value={systemName}
           onChange={(e) => setSystemName(e.target.value)}
           placeholder="如：AI内容质量评估系统"
-          className="bg-white border-gray-300"
+          className="border-gray-300"
         />
       </div>
       <div className="space-y-2">
@@ -42,7 +42,7 @@ export const AiStandardForm = ({ onGenerate, isGenerating }: AiStandardFormProps
           value={systemDescription}
           onChange={(e) => setSystemDescription(e.target.value)}
           placeholder="描述评估系统的用途和特点..."
-          className="bg-white border-gray-300"
+          className="border-gray-300"
           rows={3}
         />
       </div>

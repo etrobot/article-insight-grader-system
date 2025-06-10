@@ -90,7 +90,7 @@ export const EvaluationQueueItem = ({ item, index }: EvaluationQueueItemProps) =
             <div className="flex-1">
               <div className="flex items-center space-x-2">
                 <FileText className="w-4 h-4 text-gray-400" />
-                <h4 className="font-medium text-gray-900 truncate">
+                <h4 className="font-medium truncate">
                   {item.standard.name}
                 </h4>
               </div>

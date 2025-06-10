@@ -67,7 +67,7 @@ export const TabsContainer = ({
         onBackToArticleList();
       }
     }} className="space-y-6">
-      <TabsList className="grid grid-cols-3 w-full max-w-lg mx-auto bg-white border border-gray-200 shadow-sm">
+      <TabsList className="grid grid-cols-3 w-full max-w-lg mx-auto border border-gray-200 shadow-sm">
         <TabsTrigger value="builder" className="data-[state=active]:bg-theme-pink data-[state=active]:text-white">
           <FileText className="w-4 h-4 mr-2" />
           {t('tabs.builder')}

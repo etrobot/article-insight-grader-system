@@ -38,7 +38,7 @@ export const Header = ({
               <Sparkles className="w-6 h-6 text-white" />
             </div>
             <div>
-              <h1 className="text-2xl font-bold text-gray-900 dark:text-gray-100">{t('app.title')}</h1>
+              <h1 className="text-2xl font-bold dark:text-gray-100">{t('app.title')}</h1>
               <p className="text-gray-600 dark:text-gray-400 text-sm">{t('app.subtitle')}</p>
             </div>
           </div>
@@ -63,9 +63,9 @@ export const Header = ({
 
             <Button
               onClick={() => setIsEvaluationDialogOpen(true)}
-              className="bg-gradient-to-r from-theme-orange to-theme-yellow hover:from-orange-600 hover:to-yellow-600"
+              className="bg-gradient-to-r from-theme-orange to-theme-yellow hover:from-orange-600 hover:to-yellow-600 text-white"
             >
-              <BarChart3 className="w-4 h-4 mr-2" />
+              <BarChart3 className="w-4 h-4 mr-2 text-white" />
               {t('header.evaluate')}
             </Button>
 
