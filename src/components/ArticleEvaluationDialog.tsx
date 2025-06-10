@@ -50,7 +50,7 @@ export const ArticleEvaluationDialog = ({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-4xl max-h-[80vh] overflow-y-auto">
+      <DialogContent className="max-w-4xl max-h-[80vh] overflow-y-auto bg-gray-100 dark:bg-gray-900">
         <DialogHeader>
           <DialogTitle className="flex items-center space-x-2">
             <FileText className="w-5 h-5" />
@@ -93,6 +93,7 @@ export const ArticleEvaluationDialog = ({
               onClick={handleCancel}
               variant="outline"
               disabled={false}
+              className="text-foreground hover:text-foreground"
             >
               {isEvaluating ? '停止并关闭' : '取消'}
             </Button>
@@ -100,7 +101,7 @@ export const ArticleEvaluationDialog = ({
               <Button
                 onClick={handleEvaluate}
                 disabled={selectedStandardIds.length === 0 || !articleContent.trim()}
-                className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700"
+                className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white hover:text-white"
               >
                 <Sparkles className="w-4 h-4 mr-2" />
                 开始评估
