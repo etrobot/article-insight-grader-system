@@ -3,6 +3,7 @@ import { useState, useRef } from 'react';
 import { useToast } from '@/hooks/use-toast';
 import { Standard } from '@/hooks/useStandards';
 import { evaluateSingleStandard } from './evaluationApi';
+import { EvaluationQueueItemData, EvaluationStatus } from './EvaluationQueueItem';
 
 interface UseEvaluationLogicProps {
   standards: Standard[];
@@ -24,9 +25,8 @@ export const useEvaluationLogic = ({
   const [selectedStandardIds, setSelectedStandardIds] = useState<string[]>([]);
   const [articleContent, setArticleContent] = useState('');
   const [isEvaluating, setIsEvaluating] = useState(false);
-  const [currentEvaluationIndex, setCurrentEvaluationIndex] = useState(-1);
-  const [completedEvaluations, setCompletedEvaluations] = useState<any[]>([]);
-  const [evaluationProgress, setEvaluationProgress] = useState(0);
+  const [queueItems, setQueueItems] = useState<EvaluationQueueItemData[]>([]);
+  const [overallProgress, setOverallProgress] = useState(0);
   const { toast } = useToast();
   const isEvaluatingRef = useRef(false);
 
@@ -38,11 +38,31 @@ export const useEvaluationLogic = ({
     );
   };
 
+  const createQueueItems = (selectedStandards: Standard[]): EvaluationQueueItemData[] => {
+    return selectedStandards.map(standard => ({
+      id: `${standard.id}-${Date.now()}`,
+      standard,
+      status: 'queued' as EvaluationStatus
+    }));
+  };
+
+  const updateQueueItem = (id: string, updates: Partial<EvaluationQueueItemData>) => {
+    setQueueItems(prev => prev.map(item => 
+      item.id === id ? { ...item, ...updates } : item
+    ));
+  };
+
   const stopEvaluation = () => {
     isEvaluatingRef.current = false;
     setIsEvaluating(false);
-    setCurrentEvaluationIndex(-1);
-    setEvaluationProgress(0);
+    
+    // 更新所有排队中和评估中的项目状态为部分完成
+    setQueueItems(prev => prev.map(item => 
+      item.status === 'queued' || item.status === 'evaluating' 
+        ? { ...item, status: 'partial' as EvaluationStatus }
+        : item
+    ));
+    
     toast({
       title: "评估已停止",
       description: "评估过程已被中断",
@@ -83,41 +103,55 @@ export const useEvaluationLogic = ({
 
   const handleEvaluate = async () => {
     console.log('开始评估按钮被点击');
-    console.log('选中的标准数量:', selectedStandardIds.length);
-    console.log('文章内容长度:', articleContent.trim().length);
-    console.log('API配置:', apiConfig);
-
+    
     if (!validateInputs()) {
       return;
     }
 
+    const selectedStandards = standards.filter(s => selectedStandardIds.includes(s.id));
+    
+    // 初始化队列
+    const initialQueue = createQueueItems(selectedStandards);
+    setQueueItems(initialQueue);
     setIsEvaluating(true);
     isEvaluatingRef.current = true;
-    setCurrentEvaluationIndex(0);
-    setCompletedEvaluations([]);
-    setEvaluationProgress(0);
+    setOverallProgress(0);
 
-    const selectedStandards = standards.filter(s => selectedStandardIds.includes(s.id));
     const results: any[] = [];
 
     try {
       for (let i = 0; i < selectedStandards.length; i++) {
-        // 使用 ref 来检查是否应该停止评估
         if (!isEvaluatingRef.current) {
           console.log('评估被用户停止');
           break;
         }
 
-        setCurrentEvaluationIndex(i);
-        setEvaluationProgress((i / selectedStandards.length) * 100);
-
         const standard = selectedStandards[i];
+        const queueItem = initialQueue[i];
+        
+        // 更新当前项目状态为评估中
+        updateQueueItem(queueItem.id, { 
+          status: 'evaluating',
+          progress: 0
+        });
+
         console.log(`开始评估标准: ${standard.name}`);
 
         try {
           const result = await evaluateSingleStandard(standard, articleContent, apiConfig);
           results.push(result);
-          setCompletedEvaluations([...results]);
+          
+          // 更新为已完成
+          updateQueueItem(queueItem.id, { 
+            status: 'completed',
+            progress: 100,
+            result
+          });
+          
+          // 更新总体进度
+          setOverallProgress(((i + 1) / selectedStandards.length) * 100);
+          
+          onEvaluationComplete(result);
           
           toast({
             title: "评估完成",
@@ -125,6 +159,13 @@ export const useEvaluationLogic = ({
           });
         } catch (error) {
           console.error(`评估标准"${standard.name}"失败:`, error);
+          
+          // 更新为失败状态
+          updateQueueItem(queueItem.id, { 
+            status: 'failed',
+            error: error instanceof Error ? error.message : '未知错误'
+          });
+          
           toast({
             title: "评估失败",
             description: `标准"${standard.name}"评估失败: ${error instanceof Error ? error.message : '未知错误'}`,
@@ -139,21 +180,15 @@ export const useEvaluationLogic = ({
       }
 
       if (results.length > 0) {
-        results.forEach(result => {
-          onEvaluationComplete(result);
-        });
-
-        setEvaluationProgress(100);
-        
         toast({
-          title: "所有评估完成",
+          title: "评估流程完成",
           description: `成功完成 ${results.length} 个标准的评估`,
         });
 
         setTimeout(() => {
           onClose();
           resetState();
-        }, 1500);
+        }, 3000);
       }
 
     } catch (error) {
@@ -172,9 +207,8 @@ export const useEvaluationLogic = ({
   const resetState = () => {
     setSelectedStandardIds([]);
     setArticleContent('');
-    setCurrentEvaluationIndex(-1);
-    setCompletedEvaluations([]);
-    setEvaluationProgress(0);
+    setQueueItems([]);
+    setOverallProgress(0);
     isEvaluatingRef.current = false;
   };
 
@@ -186,13 +220,15 @@ export const useEvaluationLogic = ({
     resetState();
   };
 
+  const completedCount = queueItems.filter(item => item.status === 'completed').length;
+
   return {
     selectedStandardIds,
     articleContent,
     isEvaluating,
-    currentEvaluationIndex,
-    completedEvaluations,
-    evaluationProgress,
+    queueItems,
+    overallProgress,
+    completedCount,
     setArticleContent,
     handleStandardToggle,
     handleEvaluate,

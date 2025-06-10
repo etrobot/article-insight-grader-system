@@ -3,7 +3,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/u
 import { Button } from '@/components/ui/button';
 import { FileText, Sparkles } from 'lucide-react';
 import { Standard } from '@/hooks/useStandards';
-import { EvaluationProgress } from './evaluation-dialog/EvaluationProgress';
+import { EvaluationQueue } from './evaluation-dialog/EvaluationQueue';
 import { StandardSelector } from './evaluation-dialog/StandardSelector';
 import { ArticleContentInput } from './evaluation-dialog/ArticleContentInput';
 import { useEvaluationLogic } from './evaluation-dialog/useEvaluationLogic';
@@ -31,9 +31,9 @@ export const ArticleEvaluationDialog = ({
     selectedStandardIds,
     articleContent,
     isEvaluating,
-    currentEvaluationIndex,
-    completedEvaluations,
-    evaluationProgress,
+    queueItems,
+    overallProgress,
+    completedCount,
     setArticleContent,
     handleStandardToggle,
     handleEvaluate,
@@ -48,14 +48,6 @@ export const ArticleEvaluationDialog = ({
 
   const selectedStandards = standards.filter(s => selectedStandardIds.includes(s.id));
 
-  // 添加调试日志
-  console.log('ArticleEvaluationDialog - 当前状态:', {
-    selectedStandardIds,
-    articleContentLength: articleContent.length,
-    isEvaluating,
-    standardsCount: standards.length
-  });
-
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-w-4xl max-h-[80vh] overflow-y-auto">
@@ -67,27 +59,34 @@ export const ArticleEvaluationDialog = ({
         </DialogHeader>
 
         <div className="space-y-6">
-          <EvaluationProgress
+          {/* 评估队列 - 在评估开始后显示 */}
+          <EvaluationQueue
+            queueItems={queueItems}
+            overallProgress={overallProgress}
             isEvaluating={isEvaluating}
-            evaluationProgress={evaluationProgress}
-            currentEvaluationIndex={currentEvaluationIndex}
-            selectedStandards={selectedStandards}
-            completedEvaluations={completedEvaluations}
             onStop={stopEvaluation}
+            totalStandards={selectedStandards.length}
+            completedCount={completedCount}
           />
 
-          <StandardSelector
-            standards={standards}
-            selectedStandardIds={selectedStandardIds}
-            onStandardToggle={handleStandardToggle}
-            isEvaluating={isEvaluating}
-          />
+          {/* 标准选择器 - 仅在未开始评估时显示 */}
+          {!isEvaluating && queueItems.length === 0 && (
+            <StandardSelector
+              standards={standards}
+              selectedStandardIds={selectedStandardIds}
+              onStandardToggle={handleStandardToggle}
+              isEvaluating={isEvaluating}
+            />
+          )}
 
-          <ArticleContentInput
-            articleContent={articleContent}
-            onContentChange={setArticleContent}
-            isEvaluating={isEvaluating}
-          />
+          {/* 文章内容输入 - 仅在未开始评估时显示 */}
+          {!isEvaluating && queueItems.length === 0 && (
+            <ArticleContentInput
+              articleContent={articleContent}
+              onContentChange={setArticleContent}
+              isEvaluating={isEvaluating}
+            />
+          )}
 
           <div className="flex justify-end space-x-3">
             <Button
@@ -97,26 +96,16 @@ export const ArticleEvaluationDialog = ({
             >
               {isEvaluating ? '停止并关闭' : '取消'}
             </Button>
-            <Button
-              onClick={() => {
-                console.log('评估按钮被点击 - 在组件中');
-                handleEvaluate();
-              }}
-              disabled={isEvaluating || selectedStandardIds.length === 0 || !articleContent.trim()}
-              className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700"
-            >
-              {isEvaluating ? (
-                <>
-                  <Sparkles className="w-4 h-4 mr-2 animate-spin" />
-                  评估中...
-                </>
-              ) : (
-                <>
-                  <Sparkles className="w-4 h-4 mr-2" />
-                  开始评估
-                </>
-              )}
-            </Button>
+            {(!isEvaluating && queueItems.length === 0) && (
+              <Button
+                onClick={handleEvaluate}
+                disabled={selectedStandardIds.length === 0 || !articleContent.trim()}
+                className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700"
+              >
+                <Sparkles className="w-4 h-4 mr-2" />
+                开始评估
+              </Button>
+            )}
           </div>
         </div>
       </DialogContent>
