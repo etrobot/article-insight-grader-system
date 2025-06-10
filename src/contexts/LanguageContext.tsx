@@ -11,9 +11,9 @@ interface LanguageContextType {
 const translations = {
   zh: {
     // Header
-    'app.title': '文章质量评估标准生成器',
+    'app.title': 'AI评估标准生成系统',
     'app.subtitle': '智能生成定制化的内容评估体系',
-    'header.evaluate': '评估文章',
+    'header.evaluate': '评估内容',
     'header.apiSettings': 'API设置',
     'header.apiConfig': 'API配置',
     'header.language': '语言',

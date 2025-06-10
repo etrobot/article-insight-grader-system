@@ -82,8 +82,8 @@ export const useEvaluationLogic = ({
 
     if (!articleContent.trim()) {
       toast({
-        title: "请输入文章内容",
-        description: "请输入要评估的文章内容",
+        title: "请输入内容内容",
+        description: "请输入要评估的内容内容",
         variant: "destructive",
       });
       return false;

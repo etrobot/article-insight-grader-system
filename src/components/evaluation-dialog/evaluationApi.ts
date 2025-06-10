@@ -12,15 +12,15 @@ export const evaluateSingleStandard = async (
   articleContent: string, 
   apiConfig: ApiConfig
 ) => {
-  const evaluationPrompt = `请根据以下评估标准对文章进行详细评估：
+  const evaluationPrompt = `请根据以下评估标准对内容进行详细评估：
 
 评估标准：
 ${JSON.stringify(standard.evaluation_system, null, 2)}
 
-文章内容：
+内容内容：
 ${articleContent}
 
-请按照评估标准的结构，对文章进行逐项打分和评价，并给出总分和详细的评估报告。返回JSON格式的评估结果，包含：
+请按照评估标准的结构，对内容进行逐项打分和评价，并给出总分和详细的评估报告。返回JSON格式的评估结果，包含：
 - 各类别的得分和评价
 - 各标准的得分和评价  
 - 总分
@@ -29,7 +29,7 @@ ${articleContent}
 
 请严格按照以下JSON结构返回：
 {
-  "article_title": "文章标题（从内容中提取或生成）",
+  "article_title": "内容标题（从内容中提取或生成）",
   "total_score": 总分数字,
   "evaluation_date": "${new Date().toISOString()}",
   "categories": [

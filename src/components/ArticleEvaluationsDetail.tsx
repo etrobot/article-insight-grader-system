@@ -72,7 +72,7 @@ export const ArticleEvaluationsDetail = ({
         </div>
       </div>
 
-      {/* 文章概览 */}
+      {/* 内容概览 */}
       <Card className="bg-card backdrop-blur-sm border-border">
         <CardHeader>
           <CardTitle className="text-foreground flex items-center space-x-2">

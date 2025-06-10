@@ -15,10 +15,10 @@ export const ArticleContentInput = ({
 }: ArticleContentInputProps) => {
   return (
     <div className="space-y-3">
-      <Label htmlFor="article-content" className="text-base font-medium">文章内容</Label>
+      <Label htmlFor="article-content" className="text-base font-medium">内容内容</Label>
       <Textarea
         id="article-content"
-        placeholder="请粘贴要评估的文章内容..."
+        placeholder="请粘贴要评估的内容内容..."
         value={articleContent}
         onChange={(e) => onContentChange(e.target.value)}
         className="min-h-[200px] resize-none"

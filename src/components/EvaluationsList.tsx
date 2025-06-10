@@ -44,7 +44,7 @@ export const EvaluationsList = ({ evaluations, onView, onDelete }: EvaluationsLi
           <div className="text-center">
             <h3 className="text-foreground text-lg font-medium">暂无评估记录</h3>
             <p className="text-muted-foreground text-sm mt-2">
-              使用"评估文章"功能来创建您的第一个评估记录
+              使用"评估内容"功能来创建您的第一个评估记录
             </p>
           </div>
         </CardContent>
@@ -55,8 +55,8 @@ export const EvaluationsList = ({ evaluations, onView, onDelete }: EvaluationsLi
   return (
     <div className="space-y-6">
       <div>
-        <h2 className="text-foreground text-2xl font-bold mb-2">文章评估记录</h2>
-        <p className="text-muted-foreground">查看和管理您的文章评估历史</p>
+        <h2 className="text-foreground text-2xl font-bold mb-2">内容评估记录</h2>
+        <p className="text-muted-foreground">查看和管理您的内容评估历史</p>
       </div>
 
       <div className="grid gap-6">

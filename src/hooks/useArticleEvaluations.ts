@@ -21,7 +21,7 @@ export interface ArticleEvaluationGroup {
   average_score: number;
   evaluation_count: number;
   latest_date: string;
-  id: string; // 基于文章标题生成的唯一ID
+  id: string; // 基于内容标题生成的唯一ID
 }
 
 export const useArticleEvaluations = () => {
@@ -81,7 +81,7 @@ export const useArticleEvaluations = () => {
     return evaluations.find(e => e.id === id);
   };
 
-  // 生成文章分组数据
+  // 生成内容分组数据
   const getArticleGroups = (): ArticleEvaluationGroup[] => {
     const groups = new Map<string, ArticleEvaluationGroup>();
 

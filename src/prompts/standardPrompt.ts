@@ -2,7 +2,7 @@
 
 export const standardPromptExampleJson = {
   "name": "AI内容质量评估系统",
-  "description": "用于评估文章内容质量的多维度标准体系",
+  "description": "用于评估内容内容质量的多维度标准体系",
   "version": "1.0",
   "total_weight": 100,
   "categories": [
@@ -10,7 +10,7 @@ export const standardPromptExampleJson = {
       "id": "content_quality",
       "name": "内容质量",
       "weight": 40,
-      "description": "评估文章的专业性、准确性和深度",
+      "description": "评估内容的专业性、准确性和深度",
       "criteria": [
         {
           "id": "accuracy",
@@ -39,19 +39,19 @@ export const standardPromptExampleJson = {
       "id": "structure_clarity",
       "name": "结构清晰度",
       "weight": 30,
-      "description": "评估文章的组织结构和逻辑性",
+      "description": "评估内容的组织结构和逻辑性",
       "criteria": [
         {
           "id": "logic",
           "name": "逻辑性",
-          "description": "文章逻辑清晰，论证有力",
+          "description": "内容逻辑清晰，论证有力",
           "weight": 15,
           "score_range": [1, 5]
         },
         {
           "id": "organization",
           "name": "组织结构",
-          "description": "文章结构合理，层次分明",
+          "description": "内容结构合理，层次分明",
           "weight": 15,
           "score_range": [1, 5]
         }
@@ -61,7 +61,7 @@ export const standardPromptExampleJson = {
       "id": "readability",
       "name": "可读性",
       "weight": 30,
-      "description": "评估文章的表达和阅读体验",
+      "description": "评估内容的表达和阅读体验",
       "criteria": [
         {
           "id": "language",
@@ -98,7 +98,7 @@ const standardPrompt = `请根据以下需求生成一个完整的内容质量�
 - 每个类别下的具体评估标准（数组）
 - 每个标准的权重和评分范围
 
-请确保权重分配合理，覆盖全面，适合对文章内容进行客观评估。
+请确保权重分配合理，覆盖全面，适合对内容内容进行客观评估。
 
 以下是JSON结构示例：
 ${JSON.stringify(standardPromptExampleJson, null, 2)}

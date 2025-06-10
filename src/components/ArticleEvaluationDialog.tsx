@@ -54,7 +54,7 @@ export const ArticleEvaluationDialog = ({
         <DialogHeader>
           <DialogTitle className="flex items-center space-x-2">
             <FileText className="w-5 h-5" />
-            <span>文章评估</span>
+            <span>内容评估</span>
           </DialogTitle>
         </DialogHeader>
 
@@ -79,7 +79,7 @@ export const ArticleEvaluationDialog = ({
             />
           )}
 
-          {/* 文章内容输入 - 仅在未开始评估时显示 */}
+          {/* 内容内容输入 - 仅在未开始评估时显示 */}
           {!isEvaluating && queueItems.length === 0 && (
             <ArticleContentInput
               articleContent={articleContent}
