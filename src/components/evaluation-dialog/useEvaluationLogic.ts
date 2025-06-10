@@ -1,9 +1,10 @@
 
-import { useState, useRef } from 'react';
 import { useToast } from '@/hooks/use-toast';
 import { Standard } from '@/hooks/useStandards';
-import { evaluateSingleStandard } from './evaluationApi';
-import { EvaluationQueueItemData, EvaluationStatus } from './EvaluationQueueItem';
+import { useEvaluationState } from './useEvaluationState';
+import { useEvaluationQueue } from './useEvaluationQueue';
+import { useEvaluationValidation } from './useEvaluationValidation';
+import { useEvaluationProcess } from './useEvaluationProcess';
 
 interface UseEvaluationLogicProps {
   standards: Standard[];
@@ -22,13 +23,31 @@ export const useEvaluationLogic = ({
   onEvaluationComplete,
   onClose
 }: UseEvaluationLogicProps) => {
-  const [selectedStandardIds, setSelectedStandardIds] = useState<string[]>([]);
-  const [articleContent, setArticleContent] = useState('');
-  const [isEvaluating, setIsEvaluating] = useState(false);
-  const [queueItems, setQueueItems] = useState<EvaluationQueueItemData[]>([]);
-  const [overallProgress, setOverallProgress] = useState(0);
   const { toast } = useToast();
-  const isEvaluatingRef = useRef(false);
+  
+  const {
+    selectedStandardIds,
+    setSelectedStandardIds,
+    articleContent,
+    setArticleContent,
+    isEvaluating,
+    setIsEvaluating,
+    queueItems,
+    setQueueItems,
+    overallProgress,
+    setOverallProgress,
+    isEvaluatingRef,
+    resetState
+  } = useEvaluationState();
+
+  const { createQueueItems, updateQueueItem } = useEvaluationQueue(setQueueItems);
+  const { validateInputs } = useEvaluationValidation();
+  const { processEvaluations } = useEvaluationProcess({
+    updateQueueItem,
+    setOverallProgress,
+    onEvaluationComplete,
+    isEvaluatingRef
+  });
 
   const handleStandardToggle = (standardId: string) => {
     setSelectedStandardIds(prev => 
@@ -38,20 +57,6 @@ export const useEvaluationLogic = ({
     );
   };
 
-  const createQueueItems = (selectedStandards: Standard[]): EvaluationQueueItemData[] => {
-    return selectedStandards.map(standard => ({
-      id: `${standard.id}-${Date.now()}`,
-      standard,
-      status: 'queued' as EvaluationStatus
-    }));
-  };
-
-  const updateQueueItem = (id: string, updates: Partial<EvaluationQueueItemData>) => {
-    setQueueItems(prev => prev.map(item => 
-      item.id === id ? { ...item, ...updates } : item
-    ));
-  };
-
   const stopEvaluation = () => {
     isEvaluatingRef.current = false;
     setIsEvaluating(false);
@@ -59,7 +64,7 @@ export const useEvaluationLogic = ({
     // 更新所有排队中和评估中的项目状态为部分完成
     setQueueItems(prev => prev.map(item => 
       item.status === 'queued' || item.status === 'evaluating' 
-        ? { ...item, status: 'partial' as EvaluationStatus }
+        ? { ...item, status: 'partial' }
         : item
     ));
     
@@ -70,41 +75,10 @@ export const useEvaluationLogic = ({
     });
   };
 
-  const validateInputs = () => {
-    if (selectedStandardIds.length === 0) {
-      toast({
-        title: "请选择评估标准",
-        description: "请至少选择一个评估标准",
-        variant: "destructive",
-      });
-      return false;
-    }
-
-    if (!articleContent.trim()) {
-      toast({
-        title: "请输入内容内容",
-        description: "请输入要评估的内容内容",
-        variant: "destructive",
-      });
-      return false;
-    }
-
-    if (!apiConfig.baseUrl || !apiConfig.apiKey || !apiConfig.model) {
-      toast({
-        title: "请配置API设置",
-        description: "请先在API设置中配置完整的API信息",
-        variant: "destructive",
-      });
-      return false;
-    }
-
-    return true;
-  };
-
   const handleEvaluate = async () => {
     console.log('开始评估按钮被点击');
     
-    if (!validateInputs()) {
+    if (!validateInputs({ selectedStandardIds, articleContent, apiConfig })) {
       return;
     }
 
@@ -117,67 +91,8 @@ export const useEvaluationLogic = ({
     isEvaluatingRef.current = true;
     setOverallProgress(0);
 
-    const results: any[] = [];
-
     try {
-      for (let i = 0; i < selectedStandards.length; i++) {
-        if (!isEvaluatingRef.current) {
-          console.log('评估被用户停止');
-          break;
-        }
-
-        const standard = selectedStandards[i];
-        const queueItem = initialQueue[i];
-        
-        // 更新当前项目状态为评估中
-        updateQueueItem(queueItem.id, { 
-          status: 'evaluating',
-          progress: 0
-        });
-
-        console.log(`开始评估标准: ${standard.name}`);
-
-        try {
-          const result = await evaluateSingleStandard(standard, articleContent, apiConfig);
-          results.push(result);
-          
-          // 更新为已完成
-          updateQueueItem(queueItem.id, { 
-            status: 'completed',
-            progress: 100,
-            result
-          });
-          
-          // 更新总体进度
-          setOverallProgress(((i + 1) / selectedStandards.length) * 100);
-          
-          onEvaluationComplete(result);
-          
-          toast({
-            title: "评估完成",
-            description: `已完成标准"${standard.name}"的评估`,
-          });
-        } catch (error) {
-          console.error(`评估标准"${standard.name}"失败:`, error);
-          
-          // 更新为失败状态
-          updateQueueItem(queueItem.id, { 
-            status: 'failed',
-            error: error instanceof Error ? error.message : '未知错误'
-          });
-          
-          toast({
-            title: "评估失败",
-            description: `标准"${standard.name}"评估失败: ${error instanceof Error ? error.message : '未知错误'}`,
-            variant: "destructive",
-          });
-          
-          const shouldContinue = confirm(`标准"${standard.name}"评估失败，是否继续评估其他标准？`);
-          if (!shouldContinue) {
-            break;
-          }
-        }
-      }
+      const results = await processEvaluations(selectedStandards, initialQueue, articleContent, apiConfig);
 
       if (results.length > 0) {
         toast({
@@ -202,14 +117,6 @@ export const useEvaluationLogic = ({
       isEvaluatingRef.current = false;
       setIsEvaluating(false);
     }
-  };
-
-  const resetState = () => {
-    setSelectedStandardIds([]);
-    setArticleContent('');
-    setQueueItems([]);
-    setOverallProgress(0);
-    isEvaluatingRef.current = false;
   };
 
   const handleCancel = () => {

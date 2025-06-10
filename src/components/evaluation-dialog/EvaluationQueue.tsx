@@ -29,9 +29,9 @@ export const EvaluationQueue = ({
   const successCount = queueItems.filter(item => item.status === 'completed').length;
 
   return (
-    <Card className="border-blue-200 bg-gradient-to-r from-blue-50 to-indigo-50">
+    <Card className="border-border bg-gradient-to-r from-muted to-muted/50 dark:from-muted dark:to-muted/50">
       <CardHeader className="pb-4">
-        <CardTitle className="text-lg text-blue-800 flex items-center space-x-2">
+        <CardTitle className="text-lg text-foreground flex items-center space-x-2">
           <List className="w-5 h-5" />
           <span>评估队列</span>
           <div className="ml-auto flex items-center space-x-2">
@@ -40,7 +40,7 @@ export const EvaluationQueue = ({
                 onClick={onStop}
                 variant="outline"
                 size="sm"
-                className="text-red-600 border-red-300 hover:bg-red-50"
+                className="text-destructive border-destructive/30 hover:bg-destructive/10"
               >
                 <X className="w-4 h-4 mr-2" />
                 停止评估
@@ -53,8 +53,8 @@ export const EvaluationQueue = ({
         {/* 总体进度 */}
         <div className="space-y-2">
           <div className="flex items-center justify-between text-sm">
-            <span className="text-blue-700">总体进度</span>
-            <span className="text-blue-700 font-medium">
+            <span className="text-muted-foreground">总体进度</span>
+            <span className="text-foreground font-medium">
               {completedCount} / {totalStandards} 已完成
             </span>
           </div>
@@ -63,25 +63,25 @@ export const EvaluationQueue = ({
 
         {/* 统计信息 */}
         <div className="grid grid-cols-3 gap-4 text-center">
-          <div className="bg-white rounded-lg p-3 border border-blue-200">
+          <div className="bg-card rounded-lg p-3 border border-border">
             <div className="text-lg font-semibold text-green-600">{successCount}</div>
-            <div className="text-xs text-gray-600">已完成</div>
+            <div className="text-xs text-muted-foreground">已完成</div>
           </div>
-          <div className="bg-white rounded-lg p-3 border border-blue-200">
-            <div className="text-lg font-semibold text-red-600">{failedCount}</div>
-            <div className="text-xs text-gray-600">失败</div>
+          <div className="bg-card rounded-lg p-3 border border-border">
+            <div className="text-lg font-semibold text-destructive">{failedCount}</div>
+            <div className="text-xs text-muted-foreground">失败</div>
           </div>
-          <div className="bg-white rounded-lg p-3 border border-blue-200">
-            <div className="text-lg font-semibold text-blue-600">
+          <div className="bg-card rounded-lg p-3 border border-border">
+            <div className="text-lg font-semibold text-primary">
               {queueItems.filter(item => item.status === 'queued' || item.status === 'evaluating').length}
             </div>
-            <div className="text-xs text-gray-600">进行中</div>
+            <div className="text-xs text-muted-foreground">进行中</div>
           </div>
         </div>
 
         {/* 队列列表 */}
         <div className="space-y-2">
-          <h4 className="text-sm font-medium text-blue-800 flex items-center space-x-2">
+          <h4 className="text-sm font-medium text-foreground flex items-center space-x-2">
             <BarChart3 className="w-4 h-4" />
             <span>评估详情</span>
           </h4>
