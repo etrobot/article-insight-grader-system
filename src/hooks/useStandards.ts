@@ -1,12 +1,12 @@
-
 import { useState, useEffect } from 'react';
+import { DEFAULT_STANDARDS } from '@/lib/standards';
 
 export interface Standard {
   id: string;
   name: string;
   description: string;
   createdAt: string;
-  evaluation_system: any;
+  evaluation_system: unknown;
 }
 
 export const useStandards = () => {
@@ -17,14 +17,27 @@ export const useStandards = () => {
   }, []);
 
   const loadStandards = () => {
-    try {
-      const saved = localStorage.getItem('evaluationStandards');
-      if (saved) {
-        const parsedStandards = JSON.parse(saved);
-        setStandards(parsedStandards);
-      }
-    } catch (error) {
-      console.error('Failed to load standards from localStorage:', error);
+    // 加载标准时详细打 log
+    console.log("useStandards.loadStandards: 尝试从 localStorage 读取 evaluationStandards");
+    const saved = localStorage.getItem('evaluationStandards');
+    console.log("useStandards.loadStandards: localStorage 原始内容:", saved);
+    if (saved === null) {
+      // 只有 key 不存在时才初始化默认标准
+      const arr = DEFAULT_STANDARDS.map(std => ({
+        id: Date.now().toString() + Math.random().toString().slice(2, 8),
+        name: std.name,
+        description: std.description,
+        createdAt: new Date().toISOString(),
+        evaluation_system: std,
+      }));
+      localStorage.setItem('evaluationStandards', JSON.stringify(arr));
+      setStandards(arr);
+      console.log("useStandards.loadStandards: 首次初始化全部标准，内容:", arr);
+    } else {
+      // key 存在（无论内容如何）都直接用
+      const parsedStandards = JSON.parse(saved);
+      console.log("useStandards.loadStandards: 解析后标准:", parsedStandards);
+      setStandards(parsedStandards);
     }
   };
 

@@ -1,13 +1,13 @@
-
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { 
-  FileText, 
-  Trash2, 
-  Eye, 
+import {
+  FileText,
+  Trash2,
+  Eye,
   Calendar,
-  Settings2
+  Settings2,
+  Copy
 } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { Standard } from '@/hooks/useStandards';
@@ -39,6 +39,27 @@ export const StandardsList = ({ standards, onDelete, onView }: StandardsListProp
     });
   };
 
+  // 复制全部标准到剪贴板
+  const handleCopyAll = () => {
+    const mergedArray = standards.map(s => ({ ...s }));
+    console.log('[复制全部标准] 合并后的数组:', mergedArray);
+    const jsonStr = JSON.stringify(mergedArray, null, 2);
+    navigator.clipboard.writeText(jsonStr).then(() => {
+      console.log('[复制全部标准] 复制成功');
+      toast({
+        title: '复制成功',
+        description: `已将${standards.length}个标准合并为数组并复制到剪贴板`,
+      });
+    }).catch((err) => {
+      console.log('[复制全部标准] 复制失败', err);
+      toast({
+        title: '复制失败',
+        description: '请检查浏览器权限或控制台日志',
+        variant: 'destructive',
+      });
+    });
+  };
+
   if (standards.length === 0) {
     return (
       <Card className="bg-card backdrop-blur-sm border-border">
@@ -61,11 +82,22 @@ export const StandardsList = ({ standards, onDelete, onView }: StandardsListProp
     <div className="space-y-4">
       <div className="flex items-center justify-between">
         <h2 className="text-foreground text-2xl font-bold">评估标准列表</h2>
-        <Badge variant="secondary" className="bg-blue-500/20 text-blue-300">
-          共 {standards.length} 个标准
-        </Badge>
+        <div className="flex items-center space-x-2">
+          <Badge variant="secondary" className="bg-blue-500/20 text-blue-300">
+            共 {standards.length} 个标准
+          </Badge>
+          <Button
+            onClick={handleCopyAll}
+            size="sm"
+            variant="outline"
+            className="border-blue-400 text-blue-500 hover:bg-blue-50"
+          >
+            <Copy className="w-4 h-4 mr-1" />
+            复制全部
+          </Button>
+        </div>
       </div>
-      
+
       <div className="space-y-4">
         {standards.map((standard) => (
           <Card key={standard.id} className="bg-card backdrop-blur-sm border-border hover:shadow-md transition-shadow">
