@@ -53,7 +53,7 @@ export const useStandards = () => {
         name: std.name,
         description: std.description,
         createdAt: new Date().toISOString(),
-        evaluation_system: std,
+        evaluation_system: std.evaluation_system, // Extract the actual evaluation system
       }));
       localStorage.setItem('evaluationStandards', JSON.stringify(arr));
       setStandards(arr);
