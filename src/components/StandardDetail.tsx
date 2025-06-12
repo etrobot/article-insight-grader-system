@@ -1,3 +1,5 @@
+
+import { useState } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -11,14 +13,19 @@ import {
   BarChart3,
   Settings2,
   CheckCircle2,
-  Clock
+  Clock,
+  Edit3,
+  Save,
+  X
 } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { Standard } from '@/hooks/useStandards';
+import { JsonEditor } from '@/components/JsonEditor';
 
 interface StandardDetailProps {
   standard: Standard;
   onBack: () => void;
+  onUpdate?: (updatedStandard: Standard) => void;
 }
 
 interface Criterion {
@@ -37,8 +44,10 @@ interface Category {
   criteria: Criterion[];
 }
 
-export const StandardDetail = ({ standard, onBack }: StandardDetailProps) => {
+export const StandardDetail = ({ standard, onBack, onUpdate }: StandardDetailProps) => {
   const { toast } = useToast();
+  const [isEditing, setIsEditing] = useState(false);
+  const [editedJson, setEditedJson] = useState(standard.evaluation_system);
 
   const copyToClipboard = () => {
     const jsonString = JSON.stringify(standard.evaluation_system, null, 2);
@@ -64,6 +73,36 @@ export const StandardDetail = ({ standard, onBack }: StandardDetailProps) => {
       title: "导出成功",
       description: "评估标准已保存为JSON文件",
     });
+  };
+
+  const handleEditToggle = () => {
+    if (isEditing) {
+      setEditedJson(standard.evaluation_system);
+    }
+    setIsEditing(!isEditing);
+  };
+
+  const handleSave = () => {
+    try {
+      if (onUpdate) {
+        const updatedStandard = {
+          ...standard,
+          evaluation_system: editedJson
+        };
+        onUpdate(updatedStandard);
+      }
+      setIsEditing(false);
+      toast({
+        title: "保存成功",
+        description: "评估标准已更新",
+      });
+    } catch (error) {
+      toast({
+        title: "保存失败",
+        description: "JSON格式有误，请检查语法",
+        variant: "destructive",
+      });
+    }
   };
 
   const formatJson = (obj: object) => {
@@ -167,23 +206,56 @@ export const StandardDetail = ({ standard, onBack }: StandardDetailProps) => {
               </CardDescription>
             </div>
             <div className="flex space-x-2">
-              <Button
-                onClick={copyToClipboard}
-                variant="outline"
-                size="sm"
-                className="border-border text-foreground hover:bg-secondary"
-              >
-                <Copy className="w-4 h-4 mr-2" />
-                复制
-              </Button>
-              <Button
-                onClick={exportJson}
-                size="sm"
-                className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700"
-              >
-                <Download className="w-4 h-4 mr-2" />
-                导出JSON
-              </Button>
+              {isEditing ? (
+                <>
+                  <Button
+                    onClick={handleSave}
+                    size="sm"
+                    className="bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700"
+                  >
+                    <Save className="w-4 h-4 mr-2" />
+                    保存
+                  </Button>
+                  <Button
+                    onClick={handleEditToggle}
+                    variant="outline"
+                    size="sm"
+                    className="border-border text-foreground hover:bg-secondary"
+                  >
+                    <X className="w-4 h-4 mr-2" />
+                    取消
+                  </Button>
+                </>
+              ) : (
+                <>
+                  <Button
+                    onClick={handleEditToggle}
+                    variant="outline"
+                    size="sm"
+                    className="border-border text-foreground hover:bg-secondary"
+                  >
+                    <Edit3 className="w-4 h-4 mr-2" />
+                    编辑
+                  </Button>
+                  <Button
+                    onClick={copyToClipboard}
+                    variant="outline"
+                    size="sm"
+                    className="border-border text-foreground hover:bg-secondary"
+                  >
+                    <Copy className="w-4 h-4 mr-2" />
+                    复制
+                  </Button>
+                  <Button
+                    onClick={exportJson}
+                    size="sm"
+                    className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700"
+                  >
+                    <Download className="w-4 h-4 mr-2" />
+                    导出JSON
+                  </Button>
+                </>
+              )}
             </div>
           </div>
         </CardHeader>
@@ -271,11 +343,26 @@ export const StandardDetail = ({ standard, onBack }: StandardDetailProps) => {
             </TabsContent>
 
             <TabsContent value="json">
-              <ScrollArea className="h-96 w-full">
-                <pre className="text-muted-foreground text-sm bg-secondary p-4 rounded border border-border overflow-x-auto">
-                  {formatJson(standard.evaluation_system)}
-                </pre>
-              </ScrollArea>
+              {isEditing ? (
+                <div className="space-y-3">
+                  <div className="text-sm text-muted-foreground">
+                    编辑模式 - 请确保JSON格式正确
+                  </div>
+                  <JsonEditor
+                    value={editedJson}
+                    onChange={setEditedJson}
+                    height="400px"
+                  />
+                </div>
+              ) : (
+                <ScrollArea className="h-96 w-full">
+                  <JsonEditor
+                    value={standard.evaluation_system}
+                    readOnly={true}
+                    height="400px"
+                  />
+                </ScrollArea>
+              )}
             </TabsContent>
           </Tabs>
         </CardContent>

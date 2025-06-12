@@ -1,3 +1,4 @@
+
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -16,9 +17,10 @@ interface StandardsListProps {
   standards: Standard[];
   onDelete: (id: string) => void;
   onView: (id: string) => void;
+  onUpdate?: (updatedStandard: Standard) => void;
 }
 
-export const StandardsList = ({ standards, onDelete, onView }: StandardsListProps) => {
+export const StandardsList = ({ standards, onDelete, onView, onUpdate }: StandardsListProps) => {
   const { toast } = useToast();
 
   const handleDelete = (id: string, name: string) => {

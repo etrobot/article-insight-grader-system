@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from 'react';
 import { DEFAULT_STANDARDS } from '@/lib/standards';
 
@@ -61,6 +62,13 @@ export const useStandards = () => {
     return newStandard.id;
   };
 
+  const updateStandard = (updatedStandard: Standard) => {
+    const newStandards = standards.map(s => 
+      s.id === updatedStandard.id ? updatedStandard : s
+    );
+    saveStandards(newStandards);
+  };
+
   const deleteStandard = (id: string) => {
     const newStandards = standards.filter(s => s.id !== id);
     saveStandards(newStandards);
@@ -73,6 +81,7 @@ export const useStandards = () => {
   return {
     standards,
     addStandard,
+    updateStandard,
     deleteStandard,
     getStandard,
   };
