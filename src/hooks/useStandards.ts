@@ -2,12 +2,36 @@
 import { useState, useEffect } from 'react';
 import { DEFAULT_STANDARDS } from '@/lib/standards';
 
+export interface Criterion {
+  id: string;
+  name: string;
+  weight: number;
+  score_range?: [number, number];
+  description?: string;
+}
+
+export interface Category {
+  id: string;
+  name: string;
+  weight: number;
+  description?: string;
+  criteria: Criterion[];
+}
+
+export interface EvaluationSystem {
+  name: string;
+  description?: string;
+  version: string;
+  total_weight: number;
+  categories: Category[];
+}
+
 export interface Standard {
   id: string;
   name: string;
   description: string;
   createdAt: string;
-  evaluation_system: unknown;
+  evaluation_system: EvaluationSystem;
 }
 
 export const useStandards = () => {

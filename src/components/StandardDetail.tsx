@@ -19,29 +19,13 @@ import {
   X
 } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
-import { Standard } from '@/hooks/useStandards';
+import { Standard, Category, Criterion } from '@/hooks/useStandards';
 import { JsonEditor } from '@/components/JsonEditor';
 
 interface StandardDetailProps {
   standard: Standard;
   onBack: () => void;
   onUpdate?: (updatedStandard: Standard) => void;
-}
-
-interface Criterion {
-  id: string;
-  name: string;
-  weight: number;
-  score_range?: [number, number];
-  description?: string;
-}
-
-interface Category {
-  id: string;
-  name: string;
-  weight: number;
-  description?: string;
-  criteria: Criterion[];
 }
 
 export const StandardDetail = ({ standard, onBack, onUpdate }: StandardDetailProps) => {
