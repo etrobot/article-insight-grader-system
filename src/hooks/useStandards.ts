@@ -6,7 +6,7 @@ export interface Criterion {
   id: string;
   name: string;
   weight: number;
-  score_range?: [number, number];
+  score_range?: number[];
   description?: string;
 }
 
