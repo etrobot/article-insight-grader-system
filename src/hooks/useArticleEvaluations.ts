@@ -88,7 +88,16 @@ export const useArticleEvaluations = () => {
       evaluation_date: new Date().toISOString(),
     }));
     setEvaluations(prevEvaluations => {
-      const allEvaluations = [...newEvaluations, ...prevEvaluations];
+      const combinedEvaluations = [...newEvaluations, ...prevEvaluations];
+      const uniqueEvaluationsMap = new Map<string, ArticleEvaluation>();
+      combinedEvaluations.forEach(evaluation => {
+        const key = `${evaluation.article_title}|${evaluation.standard_id}`;
+        if (!uniqueEvaluationsMap.has(key)) {
+          uniqueEvaluationsMap.set(key, evaluation);
+        }
+      });
+      const allEvaluations = Array.from(uniqueEvaluationsMap.values());
+
       try {
         console.log('批量保存到localStorage的新评估列表:', allEvaluations);
         localStorage.setItem('articleEvaluations', JSON.stringify(allEvaluations));
@@ -123,7 +132,7 @@ export const useArticleEvaluations = () => {
     const groups = new Map<string, ArticleEvaluationGroup>();
 
     evaluations.forEach(evaluation => {
-      const key = evaluation.article_title.toLowerCase().trim();
+      const key = evaluation.article_content.trim();
 
       if (groups.has(key)) {
         const group = groups.get(key)!;
@@ -140,7 +149,7 @@ export const useArticleEvaluations = () => {
         }
       } else {
         groups.set(key, {
-          id: key.replace(/\s+/g, '_'),
+          id: evaluation.id,
           article_title: evaluation.article_title,
           article_content: evaluation.article_content,
           evaluations: [evaluation],

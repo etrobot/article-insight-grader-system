@@ -125,11 +125,8 @@ export const ArticleEvaluationsDetail = ({
                   <div className="flex items-start justify-between">
                     <div className="flex-1">
                       <CardTitle className="text-base text-foreground mb-1">
-                        评估 #{sortedEvaluations.length - index}
+                        {evaluation.standard_name}
                       </CardTitle>
-                      <CardDescription className="text-sm">
-                        标准: {evaluation.standard_name}
-                      </CardDescription>
                     </div>
                     <Badge
                       variant={getScoreBadgeVariant(evaluation.total_score)}
