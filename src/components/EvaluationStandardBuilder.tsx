@@ -29,7 +29,7 @@ export const EvaluationStandardBuilder = ({ onStandardGenerated, apiConfig, onTa
             <span>AI智能生成评估标准</span>
           </CardTitle>
           <CardDescription className="text-gray-600">
-            只需填写系统名称和描述，AI将为您生成专业的评估标准体系
+            只需填写标准名称和描述，AI将为您生成专业的评估标准体系
           </CardDescription>
         </CardHeader>
         <CardContent className="text-center space-y-6">
@@ -63,7 +63,7 @@ export const EvaluationStandardBuilder = ({ onStandardGenerated, apiConfig, onTa
                 <span className="text-white text-sm font-bold">2</span>
               </div>
               <h4 className="font-medium mb-2 dark:text-gray-100">填写信息</h4>
-              <p className="text-sm text-gray-600 dark:text-gray-300">点击"添加标准"按钮，填写系统名称和描述</p>
+              <p className="text-sm text-gray-600 dark:text-gray-300">点击"添加标准"按钮，填写标准名称和描述</p>
             </div>
             <div className="p-4 bg-green-50 rounded-lg border border-green-100 dark:bg-gray-800 dark:border-gray-700">
               <div className="w-8 h-8 bg-green-600 rounded-full flex items-center justify-center mx-auto mb-3">

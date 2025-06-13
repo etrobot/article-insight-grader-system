@@ -26,7 +26,7 @@ export const AiStandardForm = ({ onGenerate, isGenerating }: AiStandardFormProps
   return (
     <div className="space-y-4">
       <div className="space-y-2">
-        <Label htmlFor="name" className="text-gray-700">系统名称</Label>
+        <Label htmlFor="name" className="text-gray-700">标准名称</Label>
         <Input
           id="name"
           value={systemName}
@@ -36,7 +36,7 @@ export const AiStandardForm = ({ onGenerate, isGenerating }: AiStandardFormProps
         />
       </div>
       <div className="space-y-2">
-        <Label htmlFor="description" className="text-gray-700">系统描述</Label>
+        <Label htmlFor="description" className="text-gray-700">标准描述</Label>
         <Textarea
           id="description"
           value={systemDescription}

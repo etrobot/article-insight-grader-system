@@ -1,10 +1,8 @@
-
 import { useState } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { ScrollArea } from '@/components/ui/scroll-area';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import {
   ArrowLeft,
   Download,
@@ -19,7 +17,7 @@ import {
   X
 } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
-import { Standard, Category, Criterion } from '@/hooks/useStandards';
+import { Standard, Criterion } from '@/hooks/useStandards';
 import { JsonEditor } from '@/components/JsonEditor';
 
 interface StandardDetailProps {
@@ -95,11 +93,9 @@ export const StandardDetail = ({ standard, onBack, onUpdate }: StandardDetailPro
 
   const getSystemStats = () => {
     const system = standard.evaluation_system;
-    const categories: Category[] = Array.isArray(system.categories) ? system.categories : [];
-    const totalCriteria = categories.reduce((sum, cat) => sum + cat.criteria.length, 0);
+    const criteria: Criterion[] = Array.isArray(system.criteria) ? system.criteria : [];
     return {
-      categoriesCount: categories.length,
-      criteriaCount: totalCriteria,
+      criteriaCount: criteria.length,
       totalWeight: system.total_weight || 100,
       version: system.version || "1.0"
     };
@@ -126,19 +122,7 @@ export const StandardDetail = ({ standard, onBack, onUpdate }: StandardDetailPro
       </div>
 
       {/* 统计概览 */}
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-        <Card className="bg-card backdrop-blur-sm border-border">
-          <CardContent className="p-4">
-            <div className="flex items-center space-x-2">
-              <BarChart3 className="w-5 h-5 text-blue-400" />
-              <div>
-                <p className="text-foreground font-medium">{stats.categoriesCount}</p>
-                <p className="text-muted-foreground text-sm">评估类别</p>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-
+      <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
         <Card className="bg-card backdrop-blur-sm border-border">
           <CardContent className="p-4">
             <div className="flex items-center space-x-2">
@@ -244,111 +228,91 @@ export const StandardDetail = ({ standard, onBack, onUpdate }: StandardDetailPro
           </div>
         </CardHeader>
         <CardContent>
-          <Tabs defaultValue="structured" className="space-y-4">
-            <TabsList className="grid grid-cols-2 w-full max-w-md bg-secondary border border-border">
-              <TabsTrigger value="structured" className="data-[state=active]:bg-blue-600 data-[state=active]:text-white">
-                结构化视图
-              </TabsTrigger>
-              <TabsTrigger value="json" className="data-[state=active]:bg-blue-600 data-[state=active]:text-white">
-                JSON格式
-              </TabsTrigger>
-            </TabsList>
+          {isEditing ? (
+            <div className="w-full">
+              <JsonEditor
+                value={editedJson}
+                onChange={setEditedJson}
+                height="600px"
+              />
+            </div>
+          ) : (
+            <ScrollArea className="h-[600px] rounded-md border border-border">
+              <div className="p-4 space-y-6">
+                {standard.evaluation_system && (
+                  <div className="space-y-4">
+                    <div className="space-y-2">
+                      <h3 className="text-lg font-semibold">{standard.evaluation_system.name}</h3>
+                      {standard.evaluation_system.description && (
+                        <p className="text-muted-foreground">
+                          {standard.evaluation_system.description}
+                        </p>
+                      )}
+                      <div className="flex items-center space-x-4 text-sm text-muted-foreground">
+                        <span>版本 {standard.evaluation_system.version}</span>
+                        <span>总权重 {standard.evaluation_system.total_weight}</span>
+                      </div>
+                    </div>
 
-            <TabsContent value="structured" className="space-y-4">
-              {standard.evaluation_system && (
-                <div className="space-y-6">
-                  {/* 系统信息 */}
-                  <div className="p-4 bg-secondary rounded-lg border border-border">
-                    <h3 className="text-foreground font-semibold text-lg mb-2">
-                      {standard.evaluation_system.name}
-                    </h3>
-                    {standard.evaluation_system.description && (
-                      <p className="text-muted-foreground text-sm mb-3">
-                        {standard.evaluation_system.description}
-                      </p>
-                    )}
-                    <div className="flex flex-wrap gap-2">
-                      <Badge variant="secondary" className="bg-blue-500/20 text-blue-300">
-                        版本 {standard.evaluation_system.version}
-                      </Badge>
-                      <Badge variant="secondary" className="bg-purple-500/20 text-purple-300">
-                        总权重 {standard.evaluation_system.total_weight}
-                      </Badge>
+                    <div className="space-y-4">
+                      <h4 className="text-md font-semibold">评估标准</h4>
+                      {Array.isArray(standard.evaluation_system.criteria) && standard.evaluation_system.criteria.map((criterion: Criterion) => (
+                        <Card key={criterion.id} className="bg-card/50 border-border">
+                          <CardContent className="p-4">
+                            <div className="flex justify-between items-start">
+                              <div className="space-y-1">
+                                <div className="flex items-center space-x-2">
+                                  <h5 className="font-medium">{criterion.name}</h5>
+                                  <Badge variant="secondary" className="text-xs">
+                                    权重: {criterion.weight}
+                                  </Badge>
+                                </div>
+                                <div className="space-y-2">
+                                  {Object.entries(criterion.description).map(([score, desc]) => (
+                                    <div key={score} className="flex items-start space-x-2">
+                                      <Badge variant="outline" className="text-xs whitespace-nowrap">
+                                        {score}分
+                                      </Badge>
+                                      <p className="text-sm text-muted-foreground">{desc}</p>
+                                    </div>
+                                  ))}
+                                </div>
+                              </div>
+                              <Badge variant="outline" className="text-xs">
+                                评分范围: {criterion.score_range[0]}-{criterion.score_range[1]}
+                              </Badge>
+                            </div>
+                          </CardContent>
+                        </Card>
+                      ))}
+                    </div>
+
+                    <div className="space-y-2">
+                      <h4 className="text-md font-semibold">评分算法</h4>
+                      <Card className="bg-card/50 border-border">
+                        <CardContent className="p-4">
+                          <div className="space-y-2">
+                            <p className="text-sm text-muted-foreground">
+                              {standard.evaluation_system.scoring_algorithm.description}
+                            </p>
+                            <div className="flex items-center space-x-2 text-sm">
+                              <span className="font-medium">计算公式：</span>
+                              <code className="bg-secondary px-2 py-1 rounded">
+                                {standard.evaluation_system.scoring_algorithm.formula}
+                              </code>
+                            </div>
+                            <p className="text-sm text-muted-foreground">
+                              {standard.evaluation_system.scoring_algorithm.normalization}
+                            </p>
+                          </div>
+                        </CardContent>
+                      </Card>
                     </div>
                   </div>
-
-                  {/* 评估类别 */}
-                  <div className="space-y-4">
-                    <h4 className="text-foreground font-medium">评估类别详情</h4>
-                    {Array.isArray(standard.evaluation_system.categories) && standard.evaluation_system.categories.length > 0 ? (
-                      standard.evaluation_system.categories.map((category: Category) => (
-                        <div key={category.id} className="p-4 bg-secondary rounded-lg border border-border space-y-3">
-                          <div className="flex items-center justify-between">
-                            <h5 className="text-foreground font-medium">{category.name}</h5>
-                            <Badge variant="outline" className="border-border text-muted-foreground">
-                              权重 {category.weight}%
-                            </Badge>
-                          </div>
-                          {category.description && (
-                            <p className="text-muted-foreground text-sm">{category.description}</p>
-                          )}
-                          {/* 评估标准 */}
-                          {Array.isArray(category.criteria) && category.criteria.length > 0 && (
-                            <div className="space-y-2">
-                              <h6 className="text-muted-foreground text-sm font-medium">评估标准:</h6>
-                              {category.criteria.map((criterion: Criterion) => (
-                                <div key={criterion.id} className="p-3 bg-background rounded border border-border">
-                                  <div className="flex items-center justify-between mb-1">
-                                    <span className="text-foreground text-sm font-medium">{criterion.name}</span>
-                                    <div className="flex space-x-2">
-                                      <Badge variant="outline" className="border-border text-muted-foreground text-xs">
-                                        权重 {criterion.weight}
-                                      </Badge>
-                                      <Badge variant="outline" className="border-border text-muted-foreground text-xs">
-                                        {criterion.score_range?.[0]}-{criterion.score_range?.[1]}分
-                                      </Badge>
-                                    </div>
-                                  </div>
-                                  {criterion.description && (
-                                    <p className="text-muted-foreground text-xs">{criterion.description}</p>
-                                  )}
-                                </div>
-                              ))}
-                            </div>
-                          )}
-                        </div>
-                      ))
-                    ) : (
-                      <div className="text-muted-foreground text-sm">暂无评估类别</div>
-                    )}
-                  </div>
-                </div>
-              )}
-            </TabsContent>
-
-            <TabsContent value="json">
-              {isEditing ? (
-                <div className="space-y-3">
-                  <div className="text-sm text-muted-foreground">
-                    编辑模式 - 请确保JSON格式正确
-                  </div>
-                  <JsonEditor
-                    value={editedJson}
-                    onChange={setEditedJson}
-                    height="400px"
-                  />
-                </div>
-              ) : (
-                <ScrollArea className="h-96 w-full">
-                  <JsonEditor
-                    value={standard.evaluation_system}
-                    readOnly={true}
-                    height="400px"
-                  />
-                </ScrollArea>
-              )}
-            </TabsContent>
-          </Tabs>
+                )}
+              </div>
+            </ScrollArea>
+          )}
         </CardContent>
       </Card>
     </div>

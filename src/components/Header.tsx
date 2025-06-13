@@ -30,7 +30,7 @@ export const Header = ({
   const { theme, toggleTheme } = useTheme();
 
   return (
-    <div className="bg-white/80 backdrop-blur-sm border-b border-gray-200 shadow-sm dark:bg-gray-900/80 dark:border-gray-700">
+    <div className="bg-white/80 backdrop-blur-sm border-b border-gray-200 dark:bg-gray-900/80 dark:border-gray-700">
       <div className="container mx-auto px-6 py-4">
         <div className="flex items-center justify-between">
           <div className="flex items-center space-x-3">

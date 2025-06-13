@@ -5,6 +5,9 @@ import { ArticleEvaluationDialog } from '@/components/ArticleEvaluationDialog';
 import { useStandards } from '@/hooks/useStandards';
 import { useArticleEvaluations } from '@/hooks/useArticleEvaluations';
 import { useToast } from '@/hooks/use-toast';
+import { EvaluationResult } from '@/components/evaluation-dialog/types';
+import { Standard } from '@/hooks/useStandards';
+import { ArticleEvaluation } from '@/hooks/useArticleEvaluations';
 
 const Index = () => {
   const { standards, addStandard, deleteStandard, getStandard } = useStandards();
@@ -15,7 +18,8 @@ const Index = () => {
     deleteArticleGroup,
     getEvaluation,
     getArticleGroups,
-    getArticleGroup
+    getArticleGroup,
+    addEvaluations
   } = useArticleEvaluations();
 
   const [apiConfig, setApiConfig] = useState(() => {
@@ -46,7 +50,7 @@ const Index = () => {
   const [selectedStandardId, setSelectedStandardId] = useState<string | null>(null);
   const [selectedEvaluationId, setSelectedEvaluationId] = useState<string | null>(null);
   const [selectedArticleGroupId, setSelectedArticleGroupId] = useState<string | null>(null);
-  const [evaluationResult, setEvaluationResult] = useState<any>(null);
+  const [evaluationResult, setEvaluationResult] = useState<EvaluationResult | null>(null);
   const { toast } = useToast();
 
   useEffect(() => {
@@ -56,7 +60,7 @@ const Index = () => {
     }
   }, [apiConfig]);
 
-  const handleStandardGenerated = (standardData: any) => {
+  const handleStandardGenerated = (standardData: Omit<Standard, 'id' | 'createdAt'>) => {
     const newStandardId = addStandard(standardData);
     setActiveTab('preview');
     setSelectedStandardId(newStandardId);
@@ -100,19 +104,20 @@ const Index = () => {
     setSelectedEvaluationId(null);
   };
 
-  const handleEvaluationComplete = (result: any) => {
-    addEvaluation({
+  const handleEvaluationComplete = (results: EvaluationResult | EvaluationResult[]) => {
+    const resultArr = Array.isArray(results) ? results : [results];
+    console.log('Index.tsx: 批量保存评估结果:', resultArr);
+    const evaluations = resultArr.map(result => ({
       article_title: result.article_title,
       article_content: result.article_content || '',
       standard_id: result.standard?.id || '',
       standard_name: result.standard?.name || '',
       total_score: result.total_score,
-      categories: result.categories,
       summary: result.summary,
-      suggestions: result.suggestions
-    });
-
-    setEvaluationResult(result);
+      criteria: result.criteria,
+    }));
+    addEvaluations(evaluations);
+    setEvaluationResult(resultArr[0]);
     setActiveTab('evaluations');
   };
 
@@ -122,7 +127,7 @@ const Index = () => {
   const articleGroups = getArticleGroups();
 
   return (
-    <div className="min-h-screen from-theme-pink-light via-theme-yellow-light to-theme-orange-light dark:from-theme-pink-light dark:via-theme-yellow-light dark:to-theme-orange-light">
+    <div className="min-h-screen max-w-5xl mx-auto from-theme-pink-light via-theme-yellow-light to-theme-orange-light dark:from-theme-pink-light dark:via-theme-yellow-light dark:to-theme-orange-light">
       <Header
         apiConfig={apiConfig}
         isApiDialogOpen={isApiDialogOpen}

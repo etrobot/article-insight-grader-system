@@ -1,4 +1,3 @@
-
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { FileText, Sparkles } from 'lucide-react';
@@ -7,6 +6,8 @@ import { EvaluationQueue } from './evaluation-dialog/EvaluationQueue';
 import { StandardSelector } from './evaluation-dialog/StandardSelector';
 import { ArticleContentInput } from './evaluation-dialog/ArticleContentInput';
 import { useEvaluationLogic } from './evaluation-dialog/useEvaluationLogic';
+import { EvaluationResult } from './EvaluationResult';
+import { EvaluationResult as EvaluationResultType } from './evaluation-dialog/types';
 
 interface ArticleEvaluationDialogProps {
   open: boolean;
@@ -17,7 +18,7 @@ interface ArticleEvaluationDialogProps {
     apiKey: string;
     model: string;
   };
-  onEvaluationComplete: (evaluationResult: any) => void;
+  onEvaluationComplete: (evaluationResult: EvaluationResultType | EvaluationResultType[]) => void;
 }
 
 export const ArticleEvaluationDialog = ({
@@ -38,7 +39,8 @@ export const ArticleEvaluationDialog = ({
     handleStandardToggle,
     handleEvaluate,
     handleCancel,
-    stopEvaluation
+    stopEvaluation,
+    evaluationResults
   } = useEvaluationLogic({
     standards,
     apiConfig,

@@ -70,9 +70,9 @@ const translations = {
   },
   en: {
     // Header
-    'app.title': 'Article Quality Assessment Standard Generator',
+    'app.title': 'Quality Assessment Standard Generator',
     'app.subtitle': 'Intelligently generate customized content evaluation systems',
-    'header.evaluate': 'Evaluate Article',
+    'header.evaluate': 'Evaluate',
     'header.apiSettings': 'API Settings',
     'header.apiConfig': 'API Configuration',
     'header.language': 'Language',

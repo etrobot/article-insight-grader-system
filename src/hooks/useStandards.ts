@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { DEFAULT_STANDARDS } from '@/lib/standards';
 
@@ -6,24 +5,27 @@ export interface Criterion {
   id: string;
   name: string;
   weight: number;
-  score_range?: number[];
-  description?: string;
-}
-
-export interface Category {
-  id: string;
-  name: string;
-  weight: number;
-  description?: string;
-  criteria: Criterion[];
+  score_range: number[];
+  description: {
+    "1": string;
+    "2": string;
+    "3": string;
+    "4": string;
+    "5": string;
+  };
 }
 
 export interface EvaluationSystem {
   name: string;
-  description?: string;
+  description: string;
   version: string;
   total_weight: number;
-  categories: Category[];
+  criteria: Criterion[];
+  scoring_algorithm: {
+    description: string;
+    formula: string;
+    normalization: string;
+  };
 }
 
 export interface Standard {
@@ -87,7 +89,7 @@ export const useStandards = () => {
   };
 
   const updateStandard = (updatedStandard: Standard) => {
-    const newStandards = standards.map(s => 
+    const newStandards = standards.map(s =>
       s.id === updatedStandard.id ? updatedStandard : s
     );
     saveStandards(newStandards);

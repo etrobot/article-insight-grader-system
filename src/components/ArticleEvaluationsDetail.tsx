@@ -1,15 +1,14 @@
-
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { 
-  ArrowLeft, 
-  FileText, 
-  Calendar, 
-  BarChart3, 
-  Eye, 
+import {
+  ArrowLeft,
+  FileText,
+  Calendar,
+  BarChart3,
+  Eye,
   Trash2,
-  TrendingUp 
+  TrendingUp
 } from 'lucide-react';
 import { ArticleEvaluationGroup, ArticleEvaluation } from '@/hooks/useArticleEvaluations';
 
@@ -20,11 +19,11 @@ interface ArticleEvaluationsDetailProps {
   onDeleteEvaluation: (evaluationId: string) => void;
 }
 
-export const ArticleEvaluationsDetail = ({ 
-  articleGroup, 
-  onBack, 
+export const ArticleEvaluationsDetail = ({
+  articleGroup,
+  onBack,
   onViewEvaluation,
-  onDeleteEvaluation 
+  onDeleteEvaluation
 }: ArticleEvaluationsDetailProps) => {
   const getScoreColor = (score: number) => {
     if (score >= 80) return 'text-green-500';
@@ -49,7 +48,7 @@ export const ArticleEvaluationsDetail = ({
   };
 
   // 按评估日期排序
-  const sortedEvaluations = [...articleGroup.evaluations].sort((a, b) => 
+  const sortedEvaluations = [...articleGroup.evaluations].sort((a, b) =>
     new Date(b.evaluation_date).getTime() - new Date(a.evaluation_date).getTime()
   );
 
@@ -132,7 +131,7 @@ export const ArticleEvaluationsDetail = ({
                         标准: {evaluation.standard_name}
                       </CardDescription>
                     </div>
-                    <Badge 
+                    <Badge
                       variant={getScoreBadgeVariant(evaluation.total_score)}
                       className="text-lg px-3 py-1"
                     >

@@ -1,4 +1,3 @@
-
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Progress } from '@/components/ui/progress';
 import { Button } from '@/components/ui/button';
@@ -87,13 +86,16 @@ export const EvaluationQueue = ({
           </h4>
           <ScrollArea className="h-64">
             <div className="space-y-2 pr-4">
-              {queueItems.map((item, index) => (
-                <EvaluationQueueItem
-                  key={item.id}
-                  item={item}
-                  index={index}
-                />
-              ))}
+              {queueItems.map((item, index) => {
+                console.log(`渲染队列项 ${index}:`, item);
+                return (
+                  <EvaluationQueueItem
+                    key={`${item.id}-${item.status}`}
+                    item={item}
+                    index={index}
+                  />
+                );
+              })}
             </div>
           </ScrollArea>
         </div>

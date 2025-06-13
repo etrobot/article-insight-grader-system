@@ -1,4 +1,3 @@
-
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -14,18 +13,39 @@ import {
   AlertCircle,
   Lightbulb
 } from 'lucide-react';
+import { Standard } from '@/hooks/useStandards';
+
+interface EvaluationCriterion {
+  id: string;
+  name: string;
+  score: number;
+  max_score: number;
+  comment: string;
+  standard?: Standard;
+}
+
+interface EvaluationResult {
+  article_title: string;
+  total_score: number;
+  evaluation_date: string;
+  criteria: EvaluationCriterion[];
+  summary: string;
+  standard?: Standard;
+  id?: string;
+  article_content?: string;
+}
 
 interface EvaluationResultProps {
-  result: any;
+  result: EvaluationResult;
   onBack: () => void;
 }
 
 export const EvaluationResult = ({ result, onBack }: EvaluationResultProps) => {
   const getScoreColor = (score: number, maxScore: number) => {
     const percentage = (score / maxScore) * 100;
-    if (percentage >= 80) return 'text-green-500';
-    if (percentage >= 60) return 'text-yellow-500';
-    return 'text-red-500';
+    if (percentage >= 80) return 'text-green-600';
+    if (percentage >= 60) return 'text-yellow-600';
+    return 'text-red-600';
   };
 
   const getScoreBadgeVariant = (score: number, maxScore: number) => {
@@ -96,7 +116,7 @@ export const EvaluationResult = ({ result, onBack }: EvaluationResultProps) => {
         </CardContent>
       </Card>
 
-      {/* 分类评估详情 */}
+      {/* 详细评分 */}
       <Card className="bg-card backdrop-blur-sm border-border">
         <CardHeader>
           <CardTitle className="text-foreground flex items-center space-x-2">
@@ -106,36 +126,37 @@ export const EvaluationResult = ({ result, onBack }: EvaluationResultProps) => {
         </CardHeader>
         <CardContent>
           <div className="space-y-6">
-            {result.categories?.map((category: any) => (
-              <div key={category.id} className="space-y-4">
-                <div className="flex items-center justify-between p-4 bg-secondary rounded-lg border border-border">
-                  <div>
-                    <h3 className="text-foreground font-semibold text-lg">{category.name}</h3>
-                    <p className="text-muted-foreground text-sm">{category.comment}</p>
-                  </div>
-                  <Badge 
-                    variant={getScoreBadgeVariant(category.score, category.max_score)}
-                    className="text-lg px-3 py-1"
+            {result.criteria?.map((criterion: EvaluationCriterion) => (
+              <div key={criterion.id} className="p-4 bg-secondary rounded-lg border border-border">
+                <div className="flex items-center justify-between mb-2">
+                  <h3 className="font-semibold text-lg">{criterion.name}</h3>
+                  <Badge
+                    variant={getScoreBadgeVariant(criterion.score, criterion.max_score)}
+                    className={`text-lg px-3 py-1 hover:bg-none ${
+                      getScoreBadgeVariant(criterion.score, criterion.max_score) === 'default'
+                        ? 'bg-green-600 text-white hover:bg-green-600'
+                        : getScoreBadgeVariant(criterion.score, criterion.max_score) === 'secondary'
+                        ? 'bg-yellow-600 text-white hover:bg-yellow-600'
+                        : 'bg-red-600 text-white hover:bg-red-600'
+                    }`}
                   >
-                    {category.score}/{category.max_score}
+                    {criterion.score}/{criterion.max_score}
                   </Badge>
                 </div>
-
-                {/* 标准详情 */}
-                {category.criteria?.map((criterion: any) => (
-                  <div key={criterion.id} className="ml-4 p-3 bg-background rounded border border-border">
-                    <div className="flex items-center justify-between mb-2">
-                      <h4 className="text-foreground font-medium">{criterion.name}</h4>
-                      <Badge 
-                        variant="outline" 
-                        className={`${getScoreColor(criterion.score, criterion.max_score)} border-current`}
-                      >
-                        {criterion.score}/{criterion.max_score}
-                      </Badge>
+                <div className="space-y-2">
+                  <p className="text-muted-foreground text-sm">{criterion.comment}</p>
+                  {criterion.standard?.evaluation_system?.criteria?.find((c) => c.id === criterion.id)?.description && (
+                    <div className="mt-2 p-2 bg-secondary/50 rounded text-xs text-muted-foreground">
+                      <p className="font-medium mb-1">评分标准参考：</p>
+                      {Object.entries(criterion.standard.evaluation_system.criteria.find((c) => c.id === criterion.id)?.description || {}).map(([score, desc]) => (
+                        <div key={score} className="flex items-start space-x-2 mb-1">
+                          <span className="font-medium">{score}分：</span>
+                          <span>{desc as string}</span>
+                        </div>
+                      ))}
                     </div>
-                    <p className="text-muted-foreground text-sm">{criterion.comment}</p>
-                  </div>
-                ))}
+                  )}
+                </div>
               </div>
             ))}
           </div>
@@ -157,27 +178,6 @@ export const EvaluationResult = ({ result, onBack }: EvaluationResultProps) => {
         </CardContent>
       </Card>
 
-      {/* 改进建议 */}
-      {result.suggestions && result.suggestions.length > 0 && (
-        <Card className="bg-card backdrop-blur-sm border-border">
-          <CardHeader>
-            <CardTitle className="text-foreground flex items-center space-x-2">
-              <Lightbulb className="w-5 h-5" />
-              <span>改进建议</span>
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-3">
-              {result.suggestions.map((suggestion: string, index: number) => (
-                <div key={index} className="flex items-start space-x-3 p-3 bg-secondary rounded-lg border border-border">
-                  <AlertCircle className="w-5 h-5 text-blue-400 mt-0.5 flex-shrink-0" />
-                  <p className="text-foreground text-sm">{suggestion}</p>
-                </div>
-              ))}
-            </div>
-          </CardContent>
-        </Card>
-      )}
     </div>
   );
 };

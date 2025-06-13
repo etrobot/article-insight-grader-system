@@ -1,10 +1,11 @@
-
-import { useToast } from '@/hooks/use-toast';
+import { useState, useRef } from 'react';
+import { useToast } from '@/components/ui/use-toast';
 import { Standard } from '@/hooks/useStandards';
 import { useEvaluationState } from './useEvaluationState';
 import { useEvaluationQueue } from './useEvaluationQueue';
 import { useEvaluationValidation } from './useEvaluationValidation';
 import { useEvaluationProcess } from './useEvaluationProcess';
+import type { EvaluationQueueItemData, EvaluationResult } from './types';
 
 interface UseEvaluationLogicProps {
   standards: Standard[];
@@ -13,7 +14,7 @@ interface UseEvaluationLogicProps {
     apiKey: string;
     model: string;
   };
-  onEvaluationComplete: (evaluationResult: any) => void;
+  onEvaluationComplete: (evaluationResult: EvaluationResult) => void;
   onClose: () => void;
 }
 
@@ -24,7 +25,7 @@ export const useEvaluationLogic = ({
   onClose
 }: UseEvaluationLogicProps) => {
   const { toast } = useToast();
-  
+
   const {
     selectedStandardIds,
     setSelectedStandardIds,
@@ -40,18 +41,40 @@ export const useEvaluationLogic = ({
     resetState
   } = useEvaluationState();
 
+  const [evaluationResults, setEvaluationResults] = useState<EvaluationResult[]>([]);
+
   const { createQueueItems, updateQueueItem } = useEvaluationQueue(setQueueItems);
   const { validateInputs } = useEvaluationValidation();
   const { processEvaluations } = useEvaluationProcess({
     updateQueueItem,
     setOverallProgress,
-    onEvaluationComplete,
+    onEvaluationComplete: (result) => {
+      console.log('评估完成，更新结果:', result);
+      onEvaluationComplete(result);
+      setEvaluationResults(prev => {
+        console.log('更新前的评估结果:', prev);
+        // 检查是否已存在相同id的结果
+        const existingIndex = prev.findIndex(r => r.id === result.id);
+        if (existingIndex !== -1) {
+          // 如果存在，则更新该结果
+          const newResults = [...prev];
+          newResults[existingIndex] = result;
+          console.log('更新已存在的结果:', newResults);
+          return newResults;
+        } else {
+          // 如果不存在，则添加新结果
+          const newResults = [...prev, result];
+          console.log('添加新结果:', newResults);
+          return newResults;
+        }
+      });
+    },
     isEvaluatingRef
   });
 
   const handleStandardToggle = (standardId: string) => {
-    setSelectedStandardIds(prev => 
-      prev.includes(standardId) 
+    setSelectedStandardIds(prev =>
+      prev.includes(standardId)
         ? prev.filter(id => id !== standardId)
         : [...prev, standardId]
     );
@@ -60,14 +83,14 @@ export const useEvaluationLogic = ({
   const stopEvaluation = () => {
     isEvaluatingRef.current = false;
     setIsEvaluating(false);
-    
+
     // 更新所有排队中和评估中的项目状态为部分完成
-    setQueueItems(prev => prev.map(item => 
-      item.status === 'queued' || item.status === 'evaluating' 
+    setQueueItems(prev => prev.map(item =>
+      item.status === 'queued' || item.status === 'evaluating'
         ? { ...item, status: 'partial' }
         : item
     ));
-    
+
     toast({
       title: "评估已停止",
       description: "评估过程已被中断",
@@ -77,13 +100,13 @@ export const useEvaluationLogic = ({
 
   const handleEvaluate = async () => {
     console.log('开始评估按钮被点击');
-    
+
     if (!validateInputs({ selectedStandardIds, articleContent, apiConfig })) {
       return;
     }
 
     const selectedStandards = standards.filter(s => selectedStandardIds.includes(s.id));
-    
+
     // 初始化队列
     const initialQueue = createQueueItems(selectedStandards);
     setQueueItems(initialQueue);
@@ -100,10 +123,12 @@ export const useEvaluationLogic = ({
           description: `成功完成 ${results.length} 个标准的评估`,
         });
 
-        setTimeout(() => {
-          onClose();
-          resetState();
-        }, 3000);
+        // 批量回调，便于批量保存
+        onEvaluationComplete(results);
+
+        // 立即关闭对话框并重置状态
+        onClose();
+        resetState();
       }
 
     } catch (error) {
@@ -136,6 +161,7 @@ export const useEvaluationLogic = ({
     queueItems,
     overallProgress,
     completedCount,
+    evaluationResults,
     setArticleContent,
     handleStandardToggle,
     handleEvaluate,
