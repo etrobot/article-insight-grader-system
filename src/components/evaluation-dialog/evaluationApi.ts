@@ -23,6 +23,7 @@ interface EvaluationResult {
   standard?: Standard;
   id: string;
   article_content?: string;
+  weight_in_parent: number;
 }
 
 export const evaluateSingleStandard = async (
@@ -134,6 +135,6 @@ ${articleContent}
   evaluationResult.standard = standard;
   evaluationResult.id = Date.now().toString() + Math.random().toString(36).substr(2, 9);
   evaluationResult.article_content = articleContent;
-
+  evaluationResult.weight_in_parent = standard.weight_in_parent;
   return evaluationResult;
 };

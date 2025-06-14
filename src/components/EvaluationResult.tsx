@@ -33,6 +33,7 @@ interface EvaluationResult {
   standard?: Standard;
   id?: string;
   article_content?: string;
+  standard_name: string;
 }
 
 interface EvaluationResultProps {
@@ -102,7 +103,7 @@ export const EvaluationResult = ({ result, onBack }: EvaluationResultProps) => {
             </div>
             <div className="text-center">
               <div className="text-2xl font-semibold text-foreground">
-                {result.standard?.name}
+                {result.standard_name}
               </div>
               <p className="text-muted-foreground text-sm">评估标准</p>
             </div>

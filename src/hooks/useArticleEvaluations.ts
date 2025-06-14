@@ -9,6 +9,7 @@ export interface ArticleEvaluation {
   standard_name: string;
   total_score: number;
   evaluation_date: string;
+  weight_in_parent?: number;
   categories?: string[];
   summary?: string;
   criteria?: EvaluationCriterion[];
@@ -42,7 +43,7 @@ export const useArticleEvaluations = () => {
 
   const loadEvaluations = () => {
     try {
-      const saved = localStorage.getItem('articleEvaluations');
+      const saved = localStorage.getItem('articleEvaluations_v1');
       if (saved) {
         const parsedEvaluations = JSON.parse(saved);
         setEvaluations(parsedEvaluations);
@@ -54,7 +55,7 @@ export const useArticleEvaluations = () => {
 
   const saveEvaluations = (newEvaluations: ArticleEvaluation[]) => {
     try {
-      localStorage.setItem('articleEvaluations', JSON.stringify(newEvaluations));
+      localStorage.setItem('articleEvaluations_v1', JSON.stringify(newEvaluations));
       setEvaluations(newEvaluations);
     } catch (error) {
       console.error('Failed to save evaluations to localStorage:', error);
@@ -71,7 +72,7 @@ export const useArticleEvaluations = () => {
       const newEvaluations = [newEvaluation, ...prevEvaluations];
       try {
         console.log('保存到localStorage的新评估列表:', newEvaluations);
-        localStorage.setItem('articleEvaluations', JSON.stringify(newEvaluations));
+        localStorage.setItem('articleEvaluations_v1', JSON.stringify(newEvaluations));
       } catch (error) {
         console.error('Failed to save evaluations to localStorage:', error);
       }
@@ -100,7 +101,7 @@ export const useArticleEvaluations = () => {
 
       try {
         console.log('批量保存到localStorage的新评估列表:', allEvaluations);
-        localStorage.setItem('articleEvaluations', JSON.stringify(allEvaluations));
+        localStorage.setItem('articleEvaluations_v1', JSON.stringify(allEvaluations));
       } catch (error) {
         console.error('Failed to save evaluations to localStorage:', error);
       }

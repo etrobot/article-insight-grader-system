@@ -3,11 +3,13 @@ import { Button } from '@/components/ui/button';
 import { FileText, Sparkles } from 'lucide-react';
 import { Standard } from '@/hooks/useStandards';
 import { EvaluationQueue } from './evaluation-dialog/EvaluationQueue';
-import { StandardSelector } from './evaluation-dialog/StandardSelector';
+import { StandardSelector, StandardSelectorRef } from './evaluation-dialog/StandardSelector';
 import { ArticleContentInput } from './evaluation-dialog/ArticleContentInput';
 import { useEvaluationLogic } from './evaluation-dialog/useEvaluationLogic';
 import { EvaluationResult } from './EvaluationResult';
 import { EvaluationResult as EvaluationResultType } from './evaluation-dialog/types';
+import React, { useRef } from 'react';
+import { useStandards } from '@/hooks/useStandards';
 
 interface ArticleEvaluationDialogProps {
   open: boolean;
@@ -50,6 +52,23 @@ export const ArticleEvaluationDialog = ({
 
   const selectedStandards = standards.filter(s => selectedStandardIds.includes(s.id));
 
+  // 新增：用于获取和保存权重
+  const standardSelectorRef = useRef<StandardSelectorRef>(null);
+  const { updateStandard } = useStandards();
+
+  // 包装 handleEvaluate，先保存权重
+  const handleEvaluateWithWeight = () => {
+    if (standardSelectorRef.current) {
+      const weights = standardSelectorRef.current.getWeights();
+      selectedStandards.forEach(std => {
+        if (weights[std.id] !== undefined) {
+          updateStandard({ ...std, weight_in_parent: weights[std.id] });
+        }
+      });
+    }
+    handleEvaluate();
+  };
+
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-w-4xl max-h-[80vh] overflow-y-auto bg-gray-100 dark:bg-gray-900">
@@ -74,6 +93,7 @@ export const ArticleEvaluationDialog = ({
           {/* 标准选择器 - 仅在未开始评估时显示 */}
           {!isEvaluating && queueItems.length === 0 && (
             <StandardSelector
+              ref={standardSelectorRef}
               standards={standards}
               selectedStandardIds={selectedStandardIds}
               onStandardToggle={handleStandardToggle}
@@ -101,7 +121,7 @@ export const ArticleEvaluationDialog = ({
             </Button>
             {(!isEvaluating && queueItems.length === 0) && (
               <Button
-                onClick={handleEvaluate}
+                onClick={handleEvaluateWithWeight}
                 disabled={selectedStandardIds.length === 0 || !articleContent.trim()}
                 className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white hover:text-white"
               >

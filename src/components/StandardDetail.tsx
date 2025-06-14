@@ -217,7 +217,7 @@ export const StandardDetail = ({ standard, onBack, onUpdate }: StandardDetailPro
                   <Button
                     onClick={exportJson}
                     size="sm"
-                    className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700"
+                    className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white"
                   >
                     <Download className="w-4 h-4 mr-2" />
                     导出JSON

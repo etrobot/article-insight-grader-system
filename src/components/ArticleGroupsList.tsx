@@ -1,4 +1,3 @@
-
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -54,75 +53,76 @@ export const ArticleGroupsList = ({ articleGroups, onView, onDelete }: ArticleGr
 
   return (
     <div className="space-y-6">
-      <div>
-        <h2 className="text-foreground text-2xl font-bold mb-2">内容评估记录</h2>
-        <p className="text-muted-foreground">查看和管理您的内容评估历史</p>
-      </div>
-
       <div className="grid gap-6">
-        {articleGroups.map((group) => (
-          <Card key={group.id} className="bg-card backdrop-blur-sm border-border">
-            <CardHeader>
-              <div className="flex items-start justify-between">
-                <div className="flex-1">
-                  <CardTitle className="text-foreground text-lg mb-2">
-                    {group.article_title}
-                  </CardTitle>
-                  <CardDescription className="text-muted-foreground">
-                    共 {group.evaluation_count} 个评估记录
-                  </CardDescription>
-                </div>
-                <div className="flex flex-col items-end space-y-2">
-                  <Badge 
-                    variant={getScoreBadgeVariant(group.average_score)}
-                    className="text-lg px-3 py-1"
-                  >
-                    平均 {group.average_score}分
-                  </Badge>
-                  <Badge variant="outline" className="text-xs">
-                    {group.evaluation_count} 次评估
-                  </Badge>
-                </div>
-              </div>
-            </CardHeader>
-            <CardContent>
-              <div className="flex items-center justify-between">
-                <div className="flex items-center space-x-4 text-sm text-muted-foreground">
-                  <div className="flex items-center space-x-1">
-                    <Calendar className="w-4 h-4" />
-                    <span>最新: {formatDate(group.latest_date)}</span>
+        {articleGroups.map((group) => {
+          // 计算加权总分
+          let weightedTotalScore = 0;
+          if (group.evaluations && group.evaluations.length > 0) {
+            weightedTotalScore = group.evaluations.reduce((sum, evaluation) => {
+              const weight = evaluation.weight_in_parent !== undefined ? evaluation.weight_in_parent : (1 / group.evaluations.length);
+              return sum + (evaluation.total_score * weight);
+            }, 0);
+          }
+          console.log('group:', group.article_title, 'weightedTotalScore:', weightedTotalScore);
+          return (
+            <Card key={group.id} className="bg-card backdrop-blur-sm border-border">
+              <CardHeader>
+                <div className="flex items-start justify-between">
+                  <div className="flex-1">
+                    <CardTitle className="text-foreground text-lg mb-2">
+                      {group.article_title}
+                    </CardTitle>
+                    <CardDescription className="text-muted-foreground flex items-center">
+                    <Calendar className="w-4 h-4 mr-1" />{formatDate(group.latest_date)}
+                    </CardDescription>
                   </div>
-                  <div className="flex items-center space-x-1">
-                    <TrendingUp className="w-4 h-4" />
-                    <span className={getScoreColor(group.average_score)}>
-                      {group.average_score >= 80 ? '优秀' : group.average_score >= 60 ? '良好' : '需改进'}
-                    </span>
+                  <div className="flex flex-col items-end space-y-2">
+                    <Badge 
+                      variant={getScoreBadgeVariant(weightedTotalScore)}
+                      className="text-lg px-3 py-1"
+                    >
+                      {weightedTotalScore.toFixed(0)}分
+                    </Badge>
                   </div>
                 </div>
-                <div className="flex space-x-2">
-                  <Button
-                    onClick={() => onView(group.id)}
-                    variant="outline"
-                    size="sm"
-                    className="border-border text-foreground hover:bg-secondary"
-                  >
-                    <Eye className="w-4 h-4 mr-2" />
-                    查看评估
-                  </Button>
-                  <Button
-                    onClick={() => onDelete(group.id)}
-                    variant="outline"
-                    size="sm"
-                    className="border-red-300 text-red-500 hover:bg-red-50"
-                  >
-                    <Trash2 className="w-4 h-4 mr-2" />
-                    删除
-                  </Button>
+              </CardHeader>
+              <CardContent>
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center space-x-4 text-sm text-muted-foreground">
+                    <div className="flex items-center space-x-1">
+                      <span>共 {group.evaluation_count} 个评估</span>
+                    </div>
+                    <div className="flex items-center space-x-1">
+                      <TrendingUp className="w-4 h-4" />
+                      <span className={getScoreColor(weightedTotalScore)}>
+                        {weightedTotalScore >= 80 ? '优秀' : weightedTotalScore >= 60 ? '良好' : '需改进'}
+                      </span>
+                    </div>
+                  </div>
+                  <div className="flex space-x-2">
+                    <Button
+                      onClick={() => onView(group.id)}
+                      variant="outline"
+                      size="sm"
+                      className="border-border text-foreground hover:bg-secondary"
+                    >
+                      <Eye className="w-4 h-4 mr-2" />
+                      详情
+                    </Button>
+                    <Button
+                      onClick={() => onDelete(group.id)}
+                      variant="outline"
+                      size="sm"
+                      className="border-red-300 text-red-500 hover:bg-red-50"
+                    >
+                      <Trash2 className="w-4 h-4 mr-2" />
+                    </Button>
+                  </div>
                 </div>
-              </div>
-            </CardContent>
-          </Card>
-        ))}
+              </CardContent>
+            </Card>
+          );
+        })}
       </div>
     </div>
   );

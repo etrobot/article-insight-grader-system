@@ -83,7 +83,7 @@ export const StandardsList = ({ standards, onDelete, onView, onUpdate }: Standar
   return (
     <div className="space-y-4">
       <div className="flex items-center justify-between">
-        <h2 className="text-foreground text-2xl font-bold">评估标准列表</h2>
+        <h2 className="text-foreground text-2xl font-bold">评估标准管理</h2>
         <div className="flex items-center space-x-2">
           <Badge variant="secondary" className="bg-blue-500/20 text-blue-300">
             共 {standards.length} 个标准
@@ -122,7 +122,7 @@ export const StandardsList = ({ standards, onDelete, onView, onUpdate }: Standar
                   <Button
                     onClick={() => onView(standard.id)}
                     size="sm"
-                    className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700"
+                    className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white"
                   >
                     <Eye className="w-4 h-4 mr-2" />
                     查看详情

@@ -99,7 +99,7 @@ export const EvaluationsList = ({ evaluations, onView, onDelete }: EvaluationsLi
                     onClick={() => onView(evaluation.id)}
                     variant="outline"
                     size="sm"
-                    className="border-border text-foreground hover:bg-secondary"
+                    className="border-border text-white hover:bg-secondary"
                   >
                     <Eye className="w-4 h-4 mr-2" />
                     查看详情
@@ -111,7 +111,6 @@ export const EvaluationsList = ({ evaluations, onView, onDelete }: EvaluationsLi
                     className="border-red-300 text-red-500 hover:bg-red-50"
                   >
                     <Trash2 className="w-4 h-4 mr-2" />
-                    删除
                   </Button>
                 </div>
               </div>

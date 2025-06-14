@@ -32,7 +32,7 @@ export const Header = ({
   return (
     <div className="bg-white/80 backdrop-blur-sm border-b border-gray-200 dark:bg-gray-900/80 dark:border-gray-700">
       <div className="container mx-auto px-6 py-4">
-        <div className="flex items-center justify-between">
+        <div className="md:flex items-center justify-between">
           <div className="flex items-center space-x-3">
             <div className="p-2 bg-gradient-to-r from-theme-pink to-theme-orange rounded-lg">
               <Sparkles className="w-6 h-6 text-white" />
@@ -47,8 +47,7 @@ export const Header = ({
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <Button variant="outline" className="border-gray-300 dark:border-gray-600">
-                  <Globe className="w-4 h-4 mr-2" />
-                  {t('header.language')}
+                  <Globe className="w-4 h-4" />
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent>

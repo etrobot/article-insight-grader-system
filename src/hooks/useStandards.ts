@@ -34,6 +34,7 @@ export interface Standard {
   description: string;
   createdAt: string;
   evaluation_system: EvaluationSystem;
+  weight_in_parent?:number
 }
 
 export const useStandards = () => {
@@ -45,8 +46,8 @@ export const useStandards = () => {
 
   const loadStandards = () => {
     // 加载标准时详细打 log
-    console.log("useStandards.loadStandards: 尝试从 localStorage 读取 evaluationStandards");
-    const saved = localStorage.getItem('evaluationStandards');
+    console.log("useStandards.loadStandards: 尝试从 localStorage 读取 evaluationStandards_v1");
+    const saved = localStorage.getItem('evaluationStandards_v1');
     console.log("useStandards.loadStandards: localStorage 原始内容:", saved);
     if (saved === null) {
       // 只有 key 不存在时才初始化默认标准
@@ -57,7 +58,7 @@ export const useStandards = () => {
         createdAt: new Date().toISOString(),
         evaluation_system: std.evaluation_system, // Extract the actual evaluation system
       }));
-      localStorage.setItem('evaluationStandards', JSON.stringify(arr));
+      localStorage.setItem('evaluationStandards_v1', JSON.stringify(arr));
       setStandards(arr);
       console.log("useStandards.loadStandards: 首次初始化全部标准，内容:", arr);
     } else {
@@ -70,7 +71,7 @@ export const useStandards = () => {
 
   const saveStandards = (newStandards: Standard[]) => {
     try {
-      localStorage.setItem('evaluationStandards', JSON.stringify(newStandards));
+      localStorage.setItem('evaluationStandards_v1', JSON.stringify(newStandards));
       setStandards(newStandards);
     } catch (error) {
       console.error('Failed to save standards to localStorage:', error);

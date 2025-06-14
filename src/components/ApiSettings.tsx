@@ -5,7 +5,6 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Alert, AlertDescription } from '@/components/ui/alert';
-import { Badge } from '@/components/ui/badge';
 import { Settings, TestTube, CheckCircle, XCircle, Info } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { useLanguage } from '@/contexts/LanguageContext';
@@ -194,43 +193,6 @@ export const ApiSettings = ({ config, onConfigChange }: ApiSettingsProps) => {
         </CardContent>
       </Card>
 
-      {/* Feature description */}
-      <Card className="border-gray-200 dark:bg-gray-800 dark:border-gray-700">
-        <CardHeader>
-          <CardTitle className="dark:text-gray-100">{t('api.aiFeatures')}</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="space-y-3 text-gray-700 dark:text-gray-300">
-            <div className="flex items-start space-x-3">
-              <div className="w-2 h-2 bg-blue-400 rounded-full mt-2"></div>
-              <div>
-                <h5 className="dark:text-gray-100 font-medium">{t('api.feature1')}</h5>
-                <p className="text-sm text-gray-600 dark:text-gray-400">
-                  {t('api.feature1Desc')}
-                </p>
-              </div>
-            </div>
-            <div className="flex items-start space-x-3">
-              <div className="w-2 h-2 bg-purple-400 rounded-full mt-2"></div>
-              <div>
-                <h5 className="dark:text-gray-100 font-medium">{t('api.feature2')}</h5>
-                <p className="text-sm text-gray-600 dark:text-gray-400">
-                  {t('api.feature2Desc')}
-                </p>
-              </div>
-            </div>
-            <div className="flex items-start space-x-3">
-              <div className="w-2 h-2 bg-green-400 rounded-full mt-2"></div>
-              <div>
-                <h5 className="dark:text-gray-100 font-medium">{t('api.feature3')}</h5>
-                <p className="text-sm text-gray-600 dark:text-gray-400">
-                  {t('api.feature3Desc')}
-                </p>
-              </div>
-            </div>
-          </div>
-        </CardContent>
-      </Card>
     </div>
   );
 };

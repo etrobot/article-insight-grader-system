@@ -13,7 +13,7 @@ const translations = {
     // Header
     'app.title': 'AI评估标准生成系统',
     'app.subtitle': '智能生成定制化的内容评估体系',
-    'header.evaluate': '评估内容',
+    'header.evaluate': '开始评估',
     'header.apiSettings': 'API设置',
     'header.apiConfig': 'API配置',
     'header.language': '语言',
@@ -52,13 +52,6 @@ const translations = {
     'api.connectionErrorDesc': '无法连接到API服务器',
     'api.settingsSaved': '设置已保存',
     'api.settingsSavedDesc': 'API配置已更新',
-    'api.aiFeatures': 'AI增强功能',
-    'api.feature1': '智能标准生成',
-    'api.feature1Desc': '根据您的需求自动生成专业的评估标准体系',
-    'api.feature2': '标准优化建议',
-    'api.feature2Desc': '分析评估标准的合理性并提供改进建议',
-    'api.feature3': '自动权重调整',
-    'api.feature3Desc': '根据评估目标智能调整各项指标的权重分配',
     
     // Other common translations
     'common.close': '关闭',
@@ -111,14 +104,7 @@ const translations = {
     'api.connectionErrorDesc': 'Unable to connect to API server',
     'api.settingsSaved': 'Settings Saved',
     'api.settingsSavedDesc': 'API configuration updated',
-    'api.aiFeatures': 'AI Enhanced Features',
-    'api.feature1': 'Intelligent Standard Generation',
-    'api.feature1Desc': 'Automatically generate professional evaluation standard systems based on your needs',
-    'api.feature2': 'Standard Optimization Suggestions',
-    'api.feature2Desc': 'Analyze the rationality of evaluation standards and provide improvement suggestions',
-    'api.feature3': 'Automatic Weight Adjustment',
-    'api.feature3Desc': 'Intelligently adjust the weight allocation of various indicators based on evaluation objectives',
-    
+
     // Other common translations
     'common.close': 'Close',
     'common.save': 'Save',
