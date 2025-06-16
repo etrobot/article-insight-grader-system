@@ -30,7 +30,6 @@ export const EvaluationQueueItem = ({ item, index }: EvaluationQueueItemProps) =
   console.log(`渲染队列项 ${index}:`, item);
 
   const getStatusIcon = () => {
-    console.log(`获取状态图标: ${item.status}`);
     switch (item.status) {
       case 'queued':
         return <Clock className="w-4 h-4 text-gray-500" />;
@@ -48,7 +47,6 @@ export const EvaluationQueueItem = ({ item, index }: EvaluationQueueItemProps) =
   };
 
   const getStatusBadge = () => {
-    console.log(`获取状态徽章: ${item.status}`);
     switch (item.status) {
       case 'queued':
         return <Badge variant="secondary">排队中</Badge>;

@@ -66,6 +66,11 @@ export const ArticleEvaluationDialog = ({
       }));
       console.log('handleEvaluateWithWeight: 权重map:', weights);
       console.log('handleEvaluateWithWeight: 带权重的标准:', weightedStandards);
+      // 存储到localStorage
+      const ids = selectedStandards.map(std => std.id);
+      const key = 'std_w8s_' + ids.slice().sort().join('_');
+      localStorage.setItem(key, JSON.stringify(weights));
+      console.log('[ArticleEvaluationDialog] 评估时存储权重到localStorage', key, weights);
     }
     const groupKey = Date.now().toString();
     handleEvaluate(weightedStandards, groupKey);

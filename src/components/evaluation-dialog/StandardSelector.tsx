@@ -2,7 +2,7 @@ import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { FileText, Calendar, CheckCircle2 } from 'lucide-react';
 
-import React, { useState, useEffect, forwardRef, useImperativeHandle } from 'react';
+import { useState, useEffect, forwardRef, useImperativeHandle } from 'react';
 import { EvaluationSystem } from '@/hooks/useStandards';
 
 interface StandardSelectorProps {
@@ -15,6 +15,31 @@ interface StandardSelectorProps {
 export interface StandardSelectorRef {
   getWeights: () => { [id: string]: number };
 }
+
+// localStorage key前缀
+const LS_KEY_PREFIX = 'std_w8s_';
+
+// 生成标准组合key，保证顺序一致
+function getStandardKey(ids: string[]) {
+  return LS_KEY_PREFIX + ids.slice().sort().join('_');
+}
+
+// 从localStorage读取权重
+function loadWeightsFromStorage(ids: string[]): { [id: string]: number } | null {
+  const key = getStandardKey(ids);
+  const str = localStorage.getItem(key);
+  if (str) {
+    try {
+      const obj = JSON.parse(str);
+      console.log('[StandardSelector] 从localStorage读取权重', key, obj);
+      return obj;
+    } catch (e) {
+      console.log('[StandardSelector] 解析localStorage权重失败', key, str);
+    }
+  }
+  return null;
+}
+
 
 export const StandardSelector = forwardRef<StandardSelectorRef, StandardSelectorProps>(
   ({
@@ -38,29 +63,34 @@ export const StandardSelector = forwardRef<StandardSelectorRef, StandardSelector
 
     // 初始化权重，已选标准没有权重时默认 1/已选标准数
     useEffect(() => {
+      // 只处理已选标准
       const selected = standards.filter(s => selectedStandardIds.includes(s.id));
       const defaultWeight = selected.length > 0 ? 1 / selected.length : 1;
-      const newWeights: { [id: string]: number } = { ...standardWeights };
-      selected.forEach(s => {
-        if (newWeights[s.id] === undefined) {
+      let newWeights: { [id: string]: number } = {};
+      // 优先从localStorage加载
+      const storageWeights = loadWeightsFromStorage(selectedStandardIds);
+      if (storageWeights) {
+        newWeights = { ...storageWeights };
+        console.log('[StandardSelector] useEffect: 使用localStorage权重', newWeights);
+      } else {
+        // 没有存储则用默认
+        selected.forEach(s => {
           newWeights[s.id] = s.weight_in_parent !== undefined ? s.weight_in_parent : defaultWeight;
-        }
-      });
-      // 移除未选中的权重
-      Object.keys(newWeights).forEach(id => {
-        if (!selectedStandardIds.includes(id)) {
-          delete newWeights[id];
-        }
-      });
+        });
+        console.log('[StandardSelector] useEffect: 使用默认权重', newWeights);
+      }
       setStandardWeights(newWeights);
-      // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [selectedStandardIds, standards]);
 
     // 权重输入变化
     const handleWeightChange = (id: string, value: string) => {
       let num = parseFloat(value);
       if (isNaN(num) || num < 0) num = 0;
-      setStandardWeights(prev => ({ ...prev, [id]: num }));
+      setStandardWeights(prev => {
+        const updated = { ...prev, [id]: num };
+        console.log('[StandardSelector] handleWeightChange', id, value, updated);
+        return updated;
+      });
     };
 
     // 暴露 getWeights 方法
