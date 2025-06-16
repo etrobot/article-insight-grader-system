@@ -33,6 +33,7 @@ export interface EvaluationCriterion {
   score: number;
   max_score: number;
   comment: string;
+  cite?: string[];
   standard?: EvaluationSystem;
 }
 

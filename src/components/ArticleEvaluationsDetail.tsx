@@ -84,25 +84,86 @@ export const ArticleEvaluationsDetail = ({
   };
 
   const copyToClipboard = () => {
-    if (cardRef.current) {
-      let textToCopy = cardRef.current.innerText;
-      textToCopy = textToCopy.replace(/\n\//g, '/'); // 将\n/替换为顿号
-      navigator.clipboard.writeText(textToCopy)
-        .then(() => {
-          toast({
-            className: "py-10",
-            description: <div className="flex items-center text-lg"><CheckCircle className="h-5 w-5 text-green-500 mr-2" /><strong>内容已复制到剪贴板！</strong></div>,
+    // 组装文本内容
+    let textToCopy = '';
+    try {
+      textToCopy += `文章标题：${articleGroup.article_title}\n`;
+      textToCopy += `评估数：${articleGroup.evaluation_count}\n`;
+      textToCopy += `加权总分：${weightedTotalScore.toFixed(2)}\n`;
+      textToCopy += `最高分：${highestScoreEvaluation.standard_name}${Math.max(...articleGroup.evaluations.map(e => e.total_score))}分\n`;
+      textToCopy += `\n`;
+
+      sortedEvaluations.forEach((evaluation, idx) => {
+        textToCopy += `【评估${idx + 1}】标准：${evaluation.standard_name} 总分：${evaluation.total_score}分 权重：${evaluation.weight_in_parent !== undefined ? evaluation.weight_in_parent.toFixed(2) : '–'}\n`;
+        textToCopy += `评估时间：${formatDate(evaluation.evaluation_date)}\n`;
+        const articleContent = evaluation.article_content || articleGroup.article_content || '';
+        if (evaluation.criteria) {
+          evaluation.criteria.forEach((criterion, cidx) => {
+            textToCopy += `  - ${criterion.name} (${criterion.score}/${criterion.max_score})\n`;
+            const comment = criterion.comment || '';
+            let citeText = '';
+            if (Array.isArray(criterion.cite) && criterion.cite.length > 0) {
+              criterion.cite.forEach((citeStr, citeIdx) => {
+                // 只要 citeStr 里有 ...，就用正则模糊查找
+                let origin = '';
+                if (citeStr.includes('...')) {
+                  // 取开头和结尾
+                  const [start, end] = citeStr.split('...');
+                  if (start && end) {
+                    // 构造正则，允许中间有任意字符（非贪婪）
+                    const reg = new RegExp(start.replace(/[.*+?^${}()|[\]\\]/g, '\\$&') + '[\\s\\S]*?' + end.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'g');
+                    const match = articleContent.match(reg);
+                    if (match && match.length > 0) {
+                      origin = match[0];
+                      console.log(`cite正则命中:`, { citeStr, reg, origin });
+                    } else {
+                      origin = `未找到原文片段（cite: ${citeStr}）`;
+                      console.warn(`cite正则未命中:`, { citeStr, reg });
+                    }
+                  } else {
+                    origin = `cite格式异常: ${citeStr}`;
+                    console.warn('cite格式异常', citeStr);
+                  }
+                } else {
+                  // 没有...，直接全文查找
+                  if (articleContent.includes(citeStr)) {
+                    origin = citeStr;
+                    console.log('cite全文直接命中', citeStr);
+                  } else {
+                    origin = `未找到原文片段（cite: ${citeStr}）`;
+                    console.warn('cite全文未命中', citeStr);
+                  }
+                }
+                citeText += `    【引用原文${citeIdx + 1}】：${origin}\n`;
+              });
+            }
+            textToCopy += `    评语：${comment}\n`;
+            if (citeText) {
+              textToCopy += citeText;
+            }
           });
-        })
-        .catch(err => {
-          console.error('复制失败:', err);
-          toast({
-            title: "复制失败",
-            description: "复制失败，请检查浏览器权限。",
-            variant: "destructive",
-          });
-        });
+        }
+        textToCopy += `\n`;
+      });
+    } catch (err) {
+      console.error('组装复制文本失败:', err);
+      textToCopy = '复制失败，请联系开发排查。';
     }
+    navigator.clipboard.writeText(textToCopy)
+      .then(() => {
+        toast({
+          className: "py-10",
+          description: <div className="flex items-center text-lg"><CheckCircle className="h-5 w-5 text-green-500 mr-2" /><strong>内容已复制到剪贴板！</strong></div>,
+        });
+      })
+      .catch(err => {
+        console.error('复制失败:', err);
+        toast({
+          title: "复制失败",
+          description: "复制失败，请检查浏览器权限。",
+          variant: "destructive",
+        });
+      });
   };
 
   const { toast } = useToast();
