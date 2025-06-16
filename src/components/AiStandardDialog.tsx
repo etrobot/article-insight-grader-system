@@ -1,10 +1,10 @@
-
 import { useState } from 'react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { Wand2 } from 'lucide-react';
 import { AiStandardForm } from '@/components/AiStandardForm';
 import { useAiStandardGeneration } from '@/hooks/useAiStandardGeneration';
+import { EvaluationSystem } from '@/hooks/useStandards';
 
 interface AiStandardDialogProps {
   apiConfig: {
@@ -12,7 +12,7 @@ interface AiStandardDialogProps {
     apiKey: string;
     model: string;
   };
-  onStandardGenerated: (standardData: any) => void;
+  onStandardGenerated: (standardData: EvaluationSystem) => void;
 }
 
 export const AiStandardDialog = ({ apiConfig, onStandardGenerated }: AiStandardDialogProps) => {
@@ -21,8 +21,10 @@ export const AiStandardDialog = ({ apiConfig, onStandardGenerated }: AiStandardD
 
   const handleGenerate = async (systemName: string, systemDescription: string) => {
     const standard = await generateStandard(systemName, systemDescription);
+    console.log('[AiStandardDialog] generateStandard 返回:', standard);
     if (standard) {
       onStandardGenerated(standard);
+      console.log('[AiStandardDialog] onStandardGenerated 入参:', standard);
       setIsOpen(false);
     }
   };

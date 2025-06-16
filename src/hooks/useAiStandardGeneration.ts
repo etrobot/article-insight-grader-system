@@ -1,4 +1,3 @@
-
 import { useState } from 'react';
 import { useToast } from '@/hooks/use-toast';
 import standardPrompt from '@/prompts/standardPrompt';
@@ -73,21 +72,20 @@ export const useAiStandardGeneration = (apiConfig: ApiConfig) => {
           throw new Error('未找到有效的JSON格式');
         }
       } catch (parseError) {
+        console.error('解析AI返回内容失败:', content, parseError);
         throw new Error('AI返回内容无法解析为JSON，请检查提示词或稍后重试');
       }
 
-      const standardForStorage = {
-        name: systemName,
-        description: systemDescription,
-        evaluation_system: parsedStandard
-      };
+      // 记录解析后的标准结构
+      console.log('[useAiStandardGeneration] parsedStandard:', parsedStandard);
 
       toast({
         title: "生成成功",
         description: "AI已为您生成评估标准，正在跳转到详情页面",
       });
 
-      return standardForStorage;
+      // 直接返回解析后的标准对象
+      return parsedStandard;
 
     } catch (error) {
       console.error('生成标准失败:', error);
