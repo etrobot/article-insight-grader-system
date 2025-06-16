@@ -2,11 +2,10 @@ import { useState, useEffect } from 'react';
 import { Header } from '@/components/Header';
 import { TabsContainer } from '@/components/TabsContainer';
 import { ArticleEvaluationDialog } from '@/components/ArticleEvaluationDialog';
-import { useStandards } from '@/hooks/useStandards';
+import { useStandards, EvaluationSystem } from '@/hooks/useStandards';
 import { useArticleEvaluations } from '@/hooks/useArticleEvaluations';
 import { useToast } from '@/hooks/use-toast';
 import { EvaluationResult } from '@/components/evaluation-dialog/types';
-import { Standard } from '@/hooks/useStandards';
 import { ArticleEvaluation } from '@/hooks/useArticleEvaluations';
 
 const Index = () => {
@@ -60,7 +59,7 @@ const Index = () => {
     }
   }, [apiConfig]);
 
-  const handleStandardGenerated = (standardData: Omit<Standard, 'id' | 'createdAt'>) => {
+  const handleStandardGenerated = (standardData: Omit<EvaluationSystem, 'id' | 'createdAt'>) => {
     const newStandardId = addStandard(standardData);
     setActiveTab('preview');
     setSelectedStandardId(newStandardId);
@@ -104,9 +103,9 @@ const Index = () => {
     setSelectedEvaluationId(null);
   };
 
-  const handleEvaluationComplete = (results: EvaluationResult | EvaluationResult[]) => {
+  const handleEvaluationComplete = (results: EvaluationResult | EvaluationResult[], groupKey?: string) => {
     const resultArr = Array.isArray(results) ? results : [results];
-    console.log('Index.tsx: 批量保存评估结果:', resultArr);
+    console.log('Index.tsx: 批量保存评估结果:', resultArr, 'groupKey:', groupKey);
     const evaluations = resultArr.map(result => ({
       article_title: result.article_title,
       article_content: result.article_content || '',
@@ -115,9 +114,16 @@ const Index = () => {
       total_score: result.total_score,
       summary: result.summary,
       criteria: result.criteria,
+      group_key: groupKey,
+      weight_in_parent: result.weight_in_parent ?? result.standard?.weight_in_parent ?? 0,
     }));
-    addEvaluations(evaluations);
-    setEvaluationResult(resultArr[0]);
+    console.log('Index.tsx: evaluations待保存的weight_in_parent:', evaluations.map(e => e.weight_in_parent));
+    const ids = addEvaluations(evaluations);
+    const groupId = groupKey || ids[0];
+    console.log('Index.tsx: 评估完成后跳转到文章评估详情, groupId:', groupId);
+    setEvaluationResult(null);
+    setSelectedEvaluationId(null);
+    setSelectedArticleGroupId(groupId || null);
     setActiveTab('evaluations');
   };
 

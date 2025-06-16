@@ -1,19 +1,13 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { ScrollArea } from '@/components/ui/scroll-area';
-import { Separator } from '@/components/ui/separator';
 import {
   ArrowLeft,
-  FileText,
   BarChart3,
-  Calendar,
   TrendingUp,
-  CheckCircle2,
-  AlertCircle,
-  Lightbulb
+  CheckCircle2
 } from 'lucide-react';
-import { Standard } from '@/hooks/useStandards';
+import { EvaluationSystem } from '@/hooks/useStandards';
 
 interface EvaluationCriterion {
   id: string;
@@ -21,7 +15,7 @@ interface EvaluationCriterion {
   score: number;
   max_score: number;
   comment: string;
-  standard?: Standard;
+  standard?: EvaluationSystem;
 }
 
 interface EvaluationResult {
@@ -30,7 +24,7 @@ interface EvaluationResult {
   evaluation_date: string;
   criteria: EvaluationCriterion[];
   summary: string;
-  standard?: Standard;
+  standard?: EvaluationSystem;
   id?: string;
   article_content?: string;
   standard_name: string;
@@ -146,10 +140,10 @@ export const EvaluationResult = ({ result, onBack }: EvaluationResultProps) => {
                 </div>
                 <div className="space-y-2">
                   <p className="text-muted-foreground text-sm">{criterion.comment}</p>
-                  {criterion.standard?.evaluation_system?.criteria?.find((c) => c.id === criterion.id)?.description && (
+                  {criterion.standard?.criteria?.find((c) => c.id === criterion.id)?.description && (
                     <div className="mt-2 p-2 bg-secondary/50 rounded text-xs text-muted-foreground">
                       <p className="font-medium mb-1">评分标准参考：</p>
-                      {Object.entries(criterion.standard.evaluation_system.criteria.find((c) => c.id === criterion.id)?.description || {}).map(([score, desc]) => (
+                      {Object.entries(criterion.standard.criteria.find((c) => c.id === criterion.id)?.description || {}).map(([score, desc]) => (
                         <div key={score} className="flex items-start space-x-2 mb-1">
                           <span className="font-medium">{score}分：</span>
                           <span>{desc as string}</span>

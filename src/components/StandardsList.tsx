@@ -1,4 +1,3 @@
-
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -11,13 +10,13 @@ import {
   Copy
 } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
-import { Standard } from '@/hooks/useStandards';
+import { EvaluationSystem } from '@/hooks/useStandards';
 
 interface StandardsListProps {
-  standards: Standard[];
+  standards: EvaluationSystem[];
   onDelete: (id: string) => void;
   onView: (id: string) => void;
-  onUpdate?: (updatedStandard: Standard) => void;
+  onUpdate?: (updatedStandard: EvaluationSystem) => void;
 }
 
 export const StandardsList = ({ standards, onDelete, onView, onUpdate }: StandardsListProps) => {

@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Standard } from '@/hooks/useStandards';
+import { EvaluationSystem } from '@/hooks/useStandards';
 
 export interface ArticleEvaluation {
   id: string;
@@ -13,6 +13,8 @@ export interface ArticleEvaluation {
   categories?: string[];
   summary?: string;
   criteria?: EvaluationCriterion[];
+  standard?: EvaluationSystem;
+  group_key?: string;
 }
 
 export interface ArticleEvaluationGroup {
@@ -22,7 +24,7 @@ export interface ArticleEvaluationGroup {
   average_score: number;
   evaluation_count: number;
   latest_date: string;
-  id: string; // 基于内容标题生成的唯一ID
+  id: string;
 }
 
 export interface EvaluationCriterion {
@@ -31,7 +33,7 @@ export interface EvaluationCriterion {
   score: number;
   max_score: number;
   comment: string;
-  standard?: Standard;
+  standard?: EvaluationSystem;
 }
 
 export const useArticleEvaluations = () => {
@@ -63,11 +65,15 @@ export const useArticleEvaluations = () => {
   };
 
   const addEvaluation = (evaluation: Omit<ArticleEvaluation, 'id' | 'evaluation_date'>) => {
+    const weight_in_parent = evaluation.weight_in_parent ?? 0;
     const newEvaluation: ArticleEvaluation = {
       ...evaluation,
+      weight_in_parent,
       id: Date.now().toString() + Math.random().toString(36).substr(2, 9),
       evaluation_date: new Date().toISOString(),
     };
+    console.log('addEvaluation入参:', evaluation);
+    console.log('addEvaluation生成的新对象:', newEvaluation);
     setEvaluations(prevEvaluations => {
       const newEvaluations = [newEvaluation, ...prevEvaluations];
       try {
@@ -83,22 +89,29 @@ export const useArticleEvaluations = () => {
   };
 
   const addEvaluations = (evaluationsToAdd: Omit<ArticleEvaluation, 'id' | 'evaluation_date'>[]) => {
-    const newEvaluations = evaluationsToAdd.map(evaluation => ({
-      ...evaluation,
-      id: Date.now().toString() + Math.random().toString(36).substr(2, 9),
-      evaluation_date: new Date().toISOString(),
-    }));
+    const newEvaluations = evaluationsToAdd.map(evaluation => {
+      const weight_in_parent = evaluation.weight_in_parent ?? 0;
+      const obj = {
+        ...evaluation,
+        weight_in_parent,
+        id: Date.now().toString() + Math.random().toString(36).substr(2, 9),
+        evaluation_date: new Date().toISOString(),
+        group_key: evaluation.group_key,
+      };
+      console.log('addEvaluations单条入参:', evaluation);
+      console.log('addEvaluations生成的新对象:', obj);
+      return obj;
+    });
     setEvaluations(prevEvaluations => {
       const combinedEvaluations = [...newEvaluations, ...prevEvaluations];
       const uniqueEvaluationsMap = new Map<string, ArticleEvaluation>();
       combinedEvaluations.forEach(evaluation => {
-        const key = `${evaluation.article_title}|${evaluation.standard_id}`;
+        const key = `${evaluation.article_title}|${evaluation.standard_id}|${evaluation.group_key}`;
         if (!uniqueEvaluationsMap.has(key)) {
           uniqueEvaluationsMap.set(key, evaluation);
         }
       });
       const allEvaluations = Array.from(uniqueEvaluationsMap.values());
-
       try {
         console.log('批量保存到localStorage的新评估列表:', allEvaluations);
         localStorage.setItem('articleEvaluations_v1', JSON.stringify(allEvaluations));
@@ -107,7 +120,7 @@ export const useArticleEvaluations = () => {
       }
       return allEvaluations;
     });
-    return newEvaluations.map(e => e.id);
+    return newEvaluations.map(e => e.group_key!);
   };
 
   const deleteEvaluation = (id: string) => {
@@ -128,29 +141,22 @@ export const useArticleEvaluations = () => {
     return evaluations.find(e => e.id === id);
   };
 
-  // 生成内容分组数据
   const getArticleGroups = (): ArticleEvaluationGroup[] => {
     const groups = new Map<string, ArticleEvaluationGroup>();
-
     evaluations.forEach(evaluation => {
-      const key = evaluation.article_content.trim();
-
+      const key = evaluation.group_key || 'unknown';
       if (groups.has(key)) {
         const group = groups.get(key)!;
         group.evaluations.push(evaluation);
         group.evaluation_count++;
-
-        // 更新平均分
         const totalScore = group.evaluations.reduce((sum, e) => sum + e.total_score, 0);
         group.average_score = Math.round(totalScore / group.evaluation_count);
-
-        // 更新最新日期
         if (evaluation.evaluation_date > group.latest_date) {
           group.latest_date = evaluation.evaluation_date;
         }
       } else {
         groups.set(key, {
-          id: evaluation.id,
+          id: key,
           article_title: evaluation.article_title,
           article_content: evaluation.article_content,
           evaluations: [evaluation],
@@ -160,8 +166,6 @@ export const useArticleEvaluations = () => {
         });
       }
     });
-
-    // 按最新日期排序
     return Array.from(groups.values()).sort((a, b) =>
       new Date(b.latest_date).getTime() - new Date(a.latest_date).getTime()
     );

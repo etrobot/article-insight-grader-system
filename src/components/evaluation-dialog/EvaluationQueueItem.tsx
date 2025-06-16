@@ -1,21 +1,20 @@
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
-import { 
-  Clock, 
-  Sparkles, 
-  CheckCircle, 
+import {
+  Clock,
+  Sparkles,
+  CheckCircle,
   AlertCircle,
-  FileText 
 } from 'lucide-react';
-import { Standard } from '@/hooks/useStandards';
+import { EvaluationSystem } from '@/hooks/useStandards'
 import { EvaluationResult } from './types';
 
 export type EvaluationStatus = 'queued' | 'evaluating' | 'completed' | 'failed' | 'partial';
 
 export interface EvaluationQueueItemData {
   id: string;
-  standard: Standard;
+  standard: EvaluationSystem;
   status: EvaluationStatus;
   progress?: number;
   result?: EvaluationResult;
@@ -79,7 +78,7 @@ export const EvaluationQueueItem = ({ item, index }: EvaluationQueueItemProps) =
 
   return (
     <Card className={`transition-all duration-200 ${
-      item.status === 'evaluating' ? 'border-blue-300 bg-blue-50' : 
+      item.status === 'evaluating' ? 'border-blue-300 bg-blue-50' :
       item.status === 'completed' ? 'border-green-300 bg-green-50' :
       item.status === 'failed' ? 'border-red-300 bg-red-50' :
       'border-gray-200'
@@ -92,33 +91,22 @@ export const EvaluationQueueItem = ({ item, index }: EvaluationQueueItemProps) =
             </div>
             {getStatusIcon()}
             <div className="flex-1">
-              <div className="flex items-center space-x-2">
-                <FileText className="w-4 h-4 text-gray-400" />
+              <div className="flex items-center space-x-2 justify-between">
                 <h4 className="font-medium truncate">
                   {item.standard.name}
                 </h4>
+                <div className="flex items-center space-x-3">
+                  {getScoreDisplay()}
+                  {getStatusBadge()}
+                </div>
               </div>
               <p className="text-sm text-gray-500 truncate">
                 {item.standard.description}
               </p>
             </div>
           </div>
-          
-          <div className="flex items-center space-x-3">
-            {getScoreDisplay()}
-            {getStatusBadge()}
-          </div>
         </div>
 
-        {/* 进度条 - 仅在评估中时显示 */}
-        {item.status === 'evaluating' && item.progress !== undefined && (
-          <div className="mt-3">
-            <Progress value={item.progress} className="h-2" />
-            <p className="text-xs text-blue-600 mt-1">
-              评估进度: {Math.round(item.progress)}%
-            </p>
-          </div>
-        )}
 
         {/* 错误信息 */}
         {item.status === 'failed' && item.error && (

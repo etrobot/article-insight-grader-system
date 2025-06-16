@@ -1,11 +1,12 @@
 import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { FileText, Calendar, CheckCircle2 } from 'lucide-react';
-import { Standard } from '@/hooks/useStandards';
+
 import React, { useState, useEffect, forwardRef, useImperativeHandle } from 'react';
+import { EvaluationSystem } from '@/hooks/useStandards';
 
 interface StandardSelectorProps {
-  standards: Standard[];
+  standards: EvaluationSystem[];
   selectedStandardIds: string[];
   onStandardToggle: (standardId: string) => void;
   isEvaluating: boolean;
@@ -86,13 +87,38 @@ export const StandardSelector = forwardRef<StandardSelectorRef, StandardSelector
 
     return (
       <div className="space-y-3">
-        <Label className="text-base font-medium">选择评估标准（可多选）</Label>
+        <div className="flex items-center space-x-2">
+          <Label className="text-base font-medium">选择评估标准</Label>
+          <button
+            type="button"
+            className="px-2 py-0.5 text-xs border rounded bg-gray-100 text-gray-700 hover:bg-gray-200 transition disabled:opacity-50"
+            disabled={isEvaluating || standards.length === selectedStandardIds.length}
+            onClick={e => {
+              e.stopPropagation();
+              if (isEvaluating) return;
+              const toSelect = standards.filter(s => !selectedStandardIds.includes(s.id)).map(s => s.id);
+              toSelect.forEach(id => onStandardToggle(id));
+            }}
+          >全选</button>
+          <button
+            type="button"
+            className="px-2 py-0.5 text-xs border rounded bg-gray-100 text-gray-700 hover:bg-gray-200 transition disabled:opacity-50"
+            disabled={isEvaluating || selectedStandardIds.length === 0}
+            onClick={e => {
+              e.stopPropagation();
+              if (isEvaluating) return;
+              console.log('[StandardSelector] 反选按钮点击, 待取消id:', selectedStandardIds);
+              selectedStandardIds.forEach(id => onStandardToggle(id));
+              console.log('[StandardSelector] 反选后已选id:', []);
+            }}
+          >反选</button>
+        </div>
         <div className="space-y-2 max-h-60 overflow-y-auto">
           {standards.map((standard) => (
             <div key={standard.id} className="cursor-pointer" onClick={() => !isEvaluating && onStandardToggle(standard.id)}>
               <Card className={`border transition-colors ${
-                selectedStandardIds.includes(standard.id) 
-                  ? 'border-blue-300 bg-blue-50' 
+                selectedStandardIds.includes(standard.id)
+                  ? 'border-blue-300 bg-blue-50'
                   : 'border-border hover:bg-secondary/50'
               } ${isEvaluating ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}`}>
                 <CardHeader className="p-3">

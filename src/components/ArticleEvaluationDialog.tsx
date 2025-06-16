@@ -1,20 +1,19 @@
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { FileText, Sparkles } from 'lucide-react';
-import { Standard } from '@/hooks/useStandards';
+
 import { EvaluationQueue } from './evaluation-dialog/EvaluationQueue';
 import { StandardSelector, StandardSelectorRef } from './evaluation-dialog/StandardSelector';
 import { ArticleContentInput } from './evaluation-dialog/ArticleContentInput';
 import { useEvaluationLogic } from './evaluation-dialog/useEvaluationLogic';
-import { EvaluationResult } from './EvaluationResult';
 import { EvaluationResult as EvaluationResultType } from './evaluation-dialog/types';
-import React, { useRef } from 'react';
-import { useStandards } from '@/hooks/useStandards';
+import { useRef } from 'react';
+import { useStandards, EvaluationSystem } from '@/hooks/useStandards';
 
 interface ArticleEvaluationDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  standards: Standard[];
+  standards: EvaluationSystem[];
   apiConfig: {
     baseUrl: string;
     apiKey: string;
@@ -58,15 +57,18 @@ export const ArticleEvaluationDialog = ({
 
   // 包装 handleEvaluate，先保存权重
   const handleEvaluateWithWeight = () => {
+    let weightedStandards = selectedStandards;
     if (standardSelectorRef.current) {
       const weights = standardSelectorRef.current.getWeights();
-      selectedStandards.forEach(std => {
-        if (weights[std.id] !== undefined) {
-          updateStandard({ ...std, weight_in_parent: weights[std.id] });
-        }
-      });
+      weightedStandards = selectedStandards.map(std => ({
+        ...std,
+        weight_in_parent: weights[std.id] ?? 0
+      }));
+      console.log('handleEvaluateWithWeight: 权重map:', weights);
+      console.log('handleEvaluateWithWeight: 带权重的标准:', weightedStandards);
     }
-    handleEvaluate();
+    const groupKey = Date.now().toString();
+    handleEvaluate(weightedStandards, groupKey);
   };
 
   return (

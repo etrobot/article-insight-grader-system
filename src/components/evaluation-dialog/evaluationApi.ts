@@ -1,4 +1,4 @@
-import { Standard } from '@/hooks/useStandards';
+import { EvaluationSystem } from '@/hooks/useStandards';
 
 interface ApiConfig {
   baseUrl: string;
@@ -20,21 +20,23 @@ interface EvaluationResult {
   evaluation_date: string;
   criteria: EvaluationCriterion[];
   summary: string;
-  standard?: Standard;
+  standard?: EvaluationSystem;
   id: string;
   article_content?: string;
   weight_in_parent: number;
+  group_key?: string;
 }
 
 export const evaluateSingleStandard = async (
-  standard: Standard,
+  standard: EvaluationSystem,
   articleContent: string,
-  apiConfig: ApiConfig
+  apiConfig: ApiConfig,
+  groupKey?: string
 ) => {
   const evaluationPrompt = `请根据以下评估标准对内容进行详细评估：
 
 评估标准：
-${JSON.stringify(standard.evaluation_system, null, 2)}
+${JSON.stringify(standard, null, 2)}
 
 内容内容：
 ${articleContent}
@@ -101,13 +103,13 @@ ${articleContent}
   // 计算总分
   console.log("evaluationApi: 开始计算总分");
   console.log("evaluationApi: 评估结果原始数据:", evaluationResult);
-  console.log("evaluationApi: 标准数据:", standard.evaluation_system);
+  console.log("evaluationApi: 标准数据:", standard);
 
   let totalScore = 0;
   let totalWeight = 0;
 
   evaluationResult.criteria.forEach((criterion: EvaluationCriterion) => {
-    const standardCriterion = standard.evaluation_system.criteria.find(c => c.id === criterion.id);
+    const standardCriterion = standard.criteria.find(c => c.id === criterion.id);
     if (standardCriterion) {
       console.log(`evaluationApi: 计算标准 ${criterion.name} 的得分`);
       console.log(`evaluationApi: 原始得分: ${criterion.score}, 权重: ${standardCriterion.weight}`);
@@ -124,8 +126,8 @@ ${articleContent}
   });
 
   // 确保所有权重都被计算
-  if (totalWeight !== standard.evaluation_system.total_weight) {
-    console.warn(`evaluationApi: 权重总和(${totalWeight})与标准总权重(${standard.evaluation_system.total_weight})不匹配`);
+  if (totalWeight !== standard.total_weight) {
+    console.warn(`evaluationApi: 权重总和(${totalWeight})与标准总权重(${standard.total_weight})不匹配`);
   }
 
   // 更新总分
@@ -135,6 +137,7 @@ ${articleContent}
   evaluationResult.standard = standard;
   evaluationResult.id = Date.now().toString() + Math.random().toString(36).substr(2, 9);
   evaluationResult.article_content = articleContent;
-  evaluationResult.weight_in_parent = standard.weight_in_parent;
+  evaluationResult.weight_in_parent = standard.weight_in_parent || 0;
+  if (groupKey) evaluationResult.group_key = groupKey;
   return evaluationResult;
 };

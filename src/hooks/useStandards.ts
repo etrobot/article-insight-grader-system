@@ -26,79 +26,73 @@ export interface EvaluationSystem {
     formula: string;
     normalization: string;
   };
-}
-
-export interface Standard {
-  id: string;
-  name: string;
-  description: string;
-  createdAt: string;
-  evaluation_system: EvaluationSystem;
-  weight_in_parent?:number
+  createdAt?: string;
+  id?: string;
+  weight_in_parent?: number;
 }
 
 export const useStandards = () => {
-  const [standards, setStandards] = useState<Standard[]>([]);
+  const [standards, setStandards] = useState<EvaluationSystem[]>([]);
 
   useEffect(() => {
     loadStandards();
   }, []);
 
   const loadStandards = () => {
-    // 加载标准时详细打 log
     console.log("useStandards.loadStandards: 尝试从 localStorage 读取 evaluationStandards_v1");
     const saved = localStorage.getItem('evaluationStandards_v1');
     console.log("useStandards.loadStandards: localStorage 原始内容:", saved);
     if (saved === null) {
-      // 只有 key 不存在时才初始化默认标准
+      // 初始化默认标准，补充 id/createdAt 字段
       const arr = DEFAULT_STANDARDS.map(std => ({
+        ...std,
         id: Date.now().toString() + Math.random().toString().slice(2, 8),
-        name: std.name,
-        description: std.description,
         createdAt: new Date().toISOString(),
-        evaluation_system: std.evaluation_system, // Extract the actual evaluation system
       }));
       localStorage.setItem('evaluationStandards_v1', JSON.stringify(arr));
       setStandards(arr);
       console.log("useStandards.loadStandards: 首次初始化全部标准，内容:", arr);
     } else {
-      // key 存在（无论内容如何）都直接用
       const parsedStandards = JSON.parse(saved);
       console.log("useStandards.loadStandards: 解析后标准:", parsedStandards);
       setStandards(parsedStandards);
     }
   };
 
-  const saveStandards = (newStandards: Standard[]) => {
+  const saveStandards = (newStandards: EvaluationSystem[]) => {
     try {
       localStorage.setItem('evaluationStandards_v1', JSON.stringify(newStandards));
       setStandards(newStandards);
+      console.log('useStandards.saveStandards: 保存成功', newStandards);
     } catch (error) {
-      console.error('Failed to save standards to localStorage:', error);
+      console.error('useStandards.saveStandards: 保存失败', error);
     }
   };
 
-  const addStandard = (standard: Omit<Standard, 'id' | 'createdAt'>) => {
-    const newStandard: Standard = {
+  const addStandard = (standard: Omit<EvaluationSystem, 'id' | 'createdAt'>) => {
+    const newStandard: EvaluationSystem = {
       ...standard,
       id: Date.now().toString(),
       createdAt: new Date().toISOString(),
     };
     const newStandards = [newStandard, ...standards];
     saveStandards(newStandards);
+    console.log('useStandards.addStandard: 新增标准', newStandard);
     return newStandard.id;
   };
 
-  const updateStandard = (updatedStandard: Standard) => {
+  const updateStandard = (updatedStandard: EvaluationSystem) => {
     const newStandards = standards.map(s =>
       s.id === updatedStandard.id ? updatedStandard : s
     );
     saveStandards(newStandards);
+    console.log('useStandards.updateStandard: 更新标准', updatedStandard);
   };
 
   const deleteStandard = (id: string) => {
     const newStandards = standards.filter(s => s.id !== id);
     saveStandards(newStandards);
+    console.log('useStandards.deleteStandard: 删除标准', id);
   };
 
   const getStandard = (id: string) => {

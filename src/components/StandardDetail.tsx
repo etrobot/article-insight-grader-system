@@ -17,22 +17,22 @@ import {
   X
 } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
-import { Standard, Criterion } from '@/hooks/useStandards';
+import { EvaluationSystem, Criterion } from '@/hooks/useStandards';
 import { JsonEditor } from '@/components/JsonEditor';
 
 interface StandardDetailProps {
-  standard: Standard;
+  standard: EvaluationSystem;
   onBack: () => void;
-  onUpdate?: (updatedStandard: Standard) => void;
+  onUpdate?: (updatedStandard: EvaluationSystem) => void;
 }
 
 export const StandardDetail = ({ standard, onBack, onUpdate }: StandardDetailProps) => {
   const { toast } = useToast();
   const [isEditing, setIsEditing] = useState(false);
-  const [editedJson, setEditedJson] = useState(standard.evaluation_system);
+  const [editedJson, setEditedJson] = useState(standard);
 
   const copyToClipboard = () => {
-    const jsonString = JSON.stringify(standard.evaluation_system, null, 2);
+    const jsonString = JSON.stringify(standard, null, 2);
     navigator.clipboard.writeText(jsonString);
 
     toast({
@@ -42,7 +42,7 @@ export const StandardDetail = ({ standard, onBack, onUpdate }: StandardDetailPro
   };
 
   const exportJson = () => {
-    const dataStr = JSON.stringify(standard.evaluation_system, null, 2);
+    const dataStr = JSON.stringify(standard, null, 2);
     const dataUri = 'data:application/json;charset=utf-8,'+ encodeURIComponent(dataStr);
     const exportFileDefaultName = `${standard.name.replace(/\s+/g, '_')}_evaluation_standard.json`;
 
@@ -59,7 +59,7 @@ export const StandardDetail = ({ standard, onBack, onUpdate }: StandardDetailPro
 
   const handleEditToggle = () => {
     if (isEditing) {
-      setEditedJson(standard.evaluation_system);
+      setEditedJson(standard);
     }
     setIsEditing(!isEditing);
   };
@@ -67,11 +67,7 @@ export const StandardDetail = ({ standard, onBack, onUpdate }: StandardDetailPro
   const handleSave = () => {
     try {
       if (onUpdate) {
-        const updatedStandard = {
-          ...standard,
-          evaluation_system: editedJson
-        };
-        onUpdate(updatedStandard);
+        onUpdate(editedJson);
       }
       setIsEditing(false);
       toast({
@@ -92,12 +88,11 @@ export const StandardDetail = ({ standard, onBack, onUpdate }: StandardDetailPro
   };
 
   const getSystemStats = () => {
-    const system = standard.evaluation_system;
-    const criteria: Criterion[] = Array.isArray(system.criteria) ? system.criteria : [];
+    const criteria: Criterion[] = Array.isArray(standard.criteria) ? standard.criteria : [];
     return {
       criteriaCount: criteria.length,
-      totalWeight: system.total_weight || 100,
-      version: system.version || "1.0"
+      totalWeight: standard.total_weight || 100,
+      version: standard.version || "1.0"
     };
   };
 
@@ -239,24 +234,24 @@ export const StandardDetail = ({ standard, onBack, onUpdate }: StandardDetailPro
           ) : (
             <ScrollArea className="h-[600px] rounded-md border border-border">
               <div className="p-4 space-y-6">
-                {standard.evaluation_system && (
+                {standard && (
                   <div className="space-y-4">
                     <div className="space-y-2">
-                      <h3 className="text-lg font-semibold">{standard.evaluation_system.name}</h3>
-                      {standard.evaluation_system.description && (
+                      <h3 className="text-lg font-semibold">{standard.name}</h3>
+                      {standard.description && (
                         <p className="text-muted-foreground">
-                          {standard.evaluation_system.description}
+                          {standard.description}
                         </p>
                       )}
                       <div className="flex items-center space-x-4 text-sm text-muted-foreground">
-                        <span>版本 {standard.evaluation_system.version}</span>
-                        <span>总权重 {standard.evaluation_system.total_weight}</span>
+                        <span>版本 {standard.version}</span>
+                        <span>总权重 {standard.total_weight}</span>
                       </div>
                     </div>
 
                     <div className="space-y-4">
                       <h4 className="text-md font-semibold">评估标准</h4>
-                      {Array.isArray(standard.evaluation_system.criteria) && standard.evaluation_system.criteria.map((criterion: Criterion) => (
+                      {Array.isArray(standard.criteria) && standard.criteria.map((criterion: Criterion) => (
                         <Card key={criterion.id} className="bg-card/50 border-border">
                           <CardContent className="p-4">
                             <div className="flex justify-between items-start">
@@ -293,16 +288,16 @@ export const StandardDetail = ({ standard, onBack, onUpdate }: StandardDetailPro
                         <CardContent className="p-4">
                           <div className="space-y-2">
                             <p className="text-sm text-muted-foreground">
-                              {standard.evaluation_system.scoring_algorithm.description}
+                              {standard.scoring_algorithm.description}
                             </p>
                             <div className="flex items-center space-x-2 text-sm">
                               <span className="font-medium">计算公式：</span>
                               <code className="bg-secondary px-2 py-1 rounded">
-                                {standard.evaluation_system.scoring_algorithm.formula}
+                                {standard.scoring_algorithm.formula}
                               </code>
                             </div>
                             <p className="text-sm text-muted-foreground">
-                              {standard.evaluation_system.scoring_algorithm.normalization}
+                              {standard.scoring_algorithm.normalization}
                             </p>
                           </div>
                         </CardContent>

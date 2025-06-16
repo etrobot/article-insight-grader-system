@@ -1,4 +1,4 @@
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import {
@@ -6,16 +6,8 @@ import {
   Copy,
   CheckCircle
 } from 'lucide-react';
-import { ArticleEvaluationGroup, ArticleEvaluation } from '@/hooks/useArticleEvaluations';
-import React, { useRef, useState } from 'react';
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogDescription,
-  DialogClose
-} from '@/components/ui/dialog';
+import { ArticleEvaluationGroup } from '@/hooks/useArticleEvaluations';
+import { useRef } from 'react';
 import { useToast } from '@/hooks/use-toast';
 
 interface ArticleEvaluationsDetailProps {
@@ -169,41 +161,45 @@ export const ArticleEvaluationsDetail = ({
             </div>
           </div>
           <div className="space-y-4">
-            {sortedEvaluations.map((evaluation, index) => (
-              <Card key={evaluation.id} className="border border-border">
-                <CardHeader className="pb-3">
-                  <div className="flex items-start justify-between">
-                    <div className="flex-1">
-                      <CardTitle className="text-base text-foreground mb-1">
-                        {evaluation.standard_name}
-                      </CardTitle>
-                    </div>
-                    <Badge
-                      variant={getScoreBadgeVariant(evaluation.total_score)}
-                      className="text-lg px-3 py-1"
-                    >
-                      {evaluation.total_score}分
-                    </Badge>
-                  </div>
-                </CardHeader>
-                <CardContent className="pt-0">
-                  <div className="mt-4 space-y-1">
-                    {evaluation.criteria && evaluation.criteria.map((criterion) => (
-                      <div key={criterion.id} className="flex flex-col gap-1 border-b pb-2 mb-2 last:border-b-0 last:pb-0 last:mb-0">
-                        <div className="flex items-center text-sm">
-                          <div className={getScoreColorForCriterion(criterion.score)}>{criterion.score}</div>
-                          <div className="text-muted-foreground">/{criterion.max_score}</div>
-                          <div className="font-medium text-foreground ml-1"> {criterion.name}:</div>
-                        </div>
-                        {criterion.comment && (
-                          <div className="text-xs text-muted-foreground pl-2 pt-1">{criterion.comment}</div>
-                        )}
+            {sortedEvaluations.map((evaluation, index) => {
+              console.log(`evaluation id: ${evaluation.id}, weight_in_parent:`, evaluation.weight_in_parent);
+              return (
+                <Card key={evaluation.id} className="border border-border">
+                  <CardHeader className="pb-3">
+                    <div className="flex items-start justify-between">
+                      <div className="flex-1 flex items-center gap-2">
+                        <CardTitle className="text-base text-foreground mb-1">
+                          {evaluation.standard_name}
+                          <p className="text-sm text-muted-foreground">权重: {evaluation.weight_in_parent !== undefined ? evaluation.weight_in_parent.toFixed(2) : '–'}</p>
+                        </CardTitle>
                       </div>
-                    ))}
-                  </div>
-                </CardContent>
-              </Card>
-            ))}
+                      <Badge
+                        variant={getScoreBadgeVariant(evaluation.total_score)}
+                        className="text-lg px-3 py-1"
+                      >
+                        {evaluation.total_score}分
+                      </Badge>
+                    </div>
+                  </CardHeader>
+                  <CardContent className="pt-0">
+                    <div className="mt-4 space-y-1">
+                      {evaluation.criteria && evaluation.criteria.map((criterion) => (
+                        <div key={criterion.id} className="flex flex-col gap-1 border-b pb-2 mb-2 last:border-b-0 last:pb-0 last:mb-0">
+                          <div className="flex items-center text-sm">
+                            <div className={getScoreColorForCriterion(criterion.score)}>{criterion.score}</div>
+                            <div className="text-muted-foreground">/{criterion.max_score}</div>
+                            <div className="font-medium text-foreground ml-1"> {criterion.name}:</div>
+                          </div>
+                          {criterion.comment && (
+                            <div className="text-xs text-muted-foreground pl-2 pt-1">{criterion.comment}</div>
+                          )}
+                        </div>
+                      ))}
+                    </div>
+                  </CardContent>
+                </Card>
+              );
+            })}
           </div>
         </CardContent>
       </Card>

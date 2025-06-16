@@ -1,16 +1,17 @@
-
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Progress } from '@/components/ui/progress';
 import { Button } from '@/components/ui/button';
 import { Sparkles, X } from 'lucide-react';
-import { Standard } from '@/hooks/useStandards';
+import { EvaluationSystem } from '@/hooks/useStandards';
+
+
 
 interface EvaluationProgressProps {
   isEvaluating: boolean;
   evaluationProgress: number;
   currentEvaluationIndex: number;
-  selectedStandards: Standard[];
-  completedEvaluations: any[];
+  selectedStandards: EvaluationSystem[];
+  completedEvaluations: EvaluationSystem[];
   onStop: () => void;
 }
 

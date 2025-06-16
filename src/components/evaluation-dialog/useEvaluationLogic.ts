@@ -1,20 +1,20 @@
 import { useState, useRef } from 'react';
 import { useToast } from '@/components/ui/use-toast';
-import { Standard } from '@/hooks/useStandards';
+import { EvaluationSystem } from '@/hooks/useStandards';
 import { useEvaluationState } from './useEvaluationState';
 import { useEvaluationQueue } from './useEvaluationQueue';
 import { useEvaluationValidation } from './useEvaluationValidation';
-import { useEvaluationProcess } from './useEvaluationProcess';
-import type { EvaluationQueueItemData, EvaluationResult } from './types';
+import { evaluationProcess } from './useEvaluationProcess';
+import type { EvaluationResult } from './types';
 
 interface UseEvaluationLogicProps {
-  standards: Standard[];
+  standards: EvaluationSystem[];
   apiConfig: {
     baseUrl: string;
     apiKey: string;
     model: string;
   };
-  onEvaluationComplete: (evaluationResult: EvaluationResult) => void;
+  onEvaluationComplete: (evaluationResult: EvaluationResult, groupKey?: string) => void;
   onClose: () => void;
 }
 
@@ -45,32 +45,6 @@ export const useEvaluationLogic = ({
 
   const { createQueueItems, updateQueueItem } = useEvaluationQueue(setQueueItems);
   const { validateInputs } = useEvaluationValidation();
-  const { processEvaluations } = useEvaluationProcess({
-    updateQueueItem,
-    setOverallProgress,
-    onEvaluationComplete: (result) => {
-      console.log('评估完成，更新结果:', result);
-      onEvaluationComplete(result);
-      setEvaluationResults(prev => {
-        console.log('更新前的评估结果:', prev);
-        // 检查是否已存在相同id的结果
-        const existingIndex = prev.findIndex(r => r.id === result.id);
-        if (existingIndex !== -1) {
-          // 如果存在，则更新该结果
-          const newResults = [...prev];
-          newResults[existingIndex] = result;
-          console.log('更新已存在的结果:', newResults);
-          return newResults;
-        } else {
-          // 如果不存在，则添加新结果
-          const newResults = [...prev, result];
-          console.log('添加新结果:', newResults);
-          return newResults;
-        }
-      });
-    },
-    isEvaluatingRef
-  });
 
   const handleStandardToggle = (standardId: string) => {
     setSelectedStandardIds(prev =>
@@ -98,39 +72,65 @@ export const useEvaluationLogic = ({
     });
   };
 
-  const handleEvaluate = async () => {
-    console.log('开始评估按钮被点击');
+  // 组装 process 需要的回调，放到 useEvaluationLogic 顶层
+  const onProgress = (progress: number, description: string) => {
+    console.log('评估进度:', progress, description);
+    setOverallProgress(progress);
+  };
+  const onResult = (result: EvaluationResult, groupKey?: string) => {
+    console.log('评估完成，更新结果:', result, 'groupKey:', groupKey);
+    onEvaluationComplete(result, groupKey);
+    setEvaluationResults(prev => {
+      console.log('更新前的评估结果:', prev);
+      const existingIndex = prev.findIndex(r => r.id === result.id);
+      if (existingIndex !== -1) {
+        const newResults = [...prev];
+        newResults[existingIndex] = result;
+        console.log('更新已存在的结果:', newResults);
+        return newResults;
+      } else {
+        const newResults = [...prev, result];
+        console.log('添加新结果:', newResults);
+        return newResults;
+      }
+    });
+  };
+
+  const handleEvaluate = async (externalSelectedStandards?: EvaluationSystem[], groupKey?: string) => {
+    console.log('开始评估按钮被点击, groupKey:', groupKey);
 
     if (!validateInputs({ selectedStandardIds, articleContent, apiConfig })) {
       return;
     }
 
-    const selectedStandards = standards.filter(s => selectedStandardIds.includes(s.id));
+    // 优先用外部传入的标准数组
+    const selectedStandardsToUse = externalSelectedStandards ?? standards.filter(s => selectedStandardIds.includes(s.id!));
+    console.log('handleEvaluate: 使用的标准数组:', selectedStandardsToUse);
 
     // 初始化队列
-    const initialQueue = createQueueItems(selectedStandards);
+    const initialQueue = createQueueItems(selectedStandardsToUse);
     setQueueItems(initialQueue);
     setIsEvaluating(true);
     isEvaluatingRef.current = true;
     setOverallProgress(0);
 
     try {
-      const results = await processEvaluations(selectedStandards, initialQueue, articleContent, apiConfig);
-
-      if (results.length > 0) {
-        toast({
-          title: "评估流程完成",
-          description: `成功完成 ${results.length} 个标准的评估`,
-        });
-
-        // 批量回调，便于批量保存
-        onEvaluationComplete(results);
-
-        // 立即关闭对话框并重置状态
-        onClose();
-        resetState();
-      }
-
+      await evaluationProcess({
+        selectedStandards: selectedStandardsToUse,
+        articleContent,
+        apiConfig,
+        onProgress,
+        onResult: (result) => onResult(result, groupKey),
+        updateQueueItem,
+        queueItems: initialQueue,
+        groupKey
+      });
+      toast({
+        title: "评估流程完成",
+        description: `成功完成 ${selectedStandardsToUse.length} 个标准的评估`,
+      });
+      onClose();
+      resetState();
     } catch (error) {
       console.error('评估过程中出现错误:', error);
       toast({
@@ -155,7 +155,9 @@ export const useEvaluationLogic = ({
   const completedCount = queueItems.filter(item => item.status === 'completed').length;
 
   return {
+    standards,
     selectedStandardIds,
+    setSelectedStandardIds,
     articleContent,
     isEvaluating,
     queueItems,

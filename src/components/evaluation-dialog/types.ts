@@ -1,8 +1,8 @@
-import { Standard } from '@/hooks/useStandards';
+import { EvaluationSystem } from '@/hooks/useStandards';
 
 export interface EvaluationQueueItemData {
   id: string;
-  standard: Standard;
+  standard: EvaluationSystem;
   status: 'queued' | 'evaluating' | 'completed' | 'failed' | 'partial';
   progress?: number;
   error?: string;
@@ -16,8 +16,10 @@ export interface EvaluationResult {
   evaluation_date: string;
   criteria: EvaluationCriterion[];
   summary: string;
-  standard?: Standard;
+  standard?: EvaluationSystem;
   article_content?: string;
+  group_key?: string;
+  weight_in_parent?: number;
 }
 
 export interface EvaluationCriterion {
@@ -26,5 +28,5 @@ export interface EvaluationCriterion {
   score: number;
   max_score: number;
   comment: string;
-  standard?: Standard;
+  standard?: EvaluationSystem;
 }
