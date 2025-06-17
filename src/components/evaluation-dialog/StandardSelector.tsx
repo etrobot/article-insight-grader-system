@@ -143,7 +143,7 @@ export const StandardSelector = forwardRef<StandardSelectorRef, StandardSelector
             }}
           >反选</button>
         </div>
-        <div className="space-y-2 max-h-60 overflow-y-auto">
+        <div className="space-y-2 max-h-[420px] overflow-y-auto">
           {standards.map((standard) => (
             <div key={standard.id} className="cursor-pointer" onClick={() => !isEvaluating && onStandardToggle(standard.id)}>
               <Card className={`border transition-colors ${
@@ -161,10 +161,6 @@ export const StandardSelector = forwardRef<StandardSelectorRef, StandardSelector
                   <CardDescription className="text-xs">
                     {standard.description}
                   </CardDescription>
-                  <div className="flex items-center space-x-2 text-xs text-muted-foreground">
-                    <Calendar className="w-3 h-3" />
-                    <span>{formatDate(standard.createdAt)}</span>
-                  </div>
                   {/* 权重输入框，仅在被选中时显示 */}
                   {selectedStandardIds.includes(standard.id) && (
                     <div className="mt-2 flex items-center space-x-2">

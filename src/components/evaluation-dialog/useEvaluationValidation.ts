@@ -26,8 +26,8 @@ export const useEvaluationValidation = () => {
 
     if (!articleContent.trim()) {
       toast({
-        title: "请输入内容内容",
-        description: "请输入要评估的内容内容",
+        title: "请输入待评内容",
+        description: "请输入要评估的待评内容",
         variant: "destructive",
       });
       return false;

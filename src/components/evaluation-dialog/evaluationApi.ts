@@ -38,7 +38,7 @@ export const evaluateSingleStandard = async (
 评估标准：
 ${JSON.stringify(standard, null, 2)}
 
-内容内容：
+待评内容：
 ${articleContent}
 
 请按照评估标准的结构，对内容进行逐项打分和评价，并给出总分和详细的评估报告。返回JSON格式的评估结果，包含：

@@ -86,7 +86,7 @@ export const ArticleEvaluationDialog = ({
           </DialogTitle>
         </DialogHeader>
 
-        <div className="space-y-6">
+        <div className="flex gap-2">
           {/* 评估队列 - 在评估开始后显示 */}
           <EvaluationQueue
             queueItems={queueItems}
@@ -108,35 +108,36 @@ export const ArticleEvaluationDialog = ({
             />
           )}
 
-          {/* 内容内容输入 - 仅在未开始评估时显示 */}
+          {/* 待评内容输入 - 仅在未开始评估时显示 */}
+          <div className="w-1/2">
           {!isEvaluating && queueItems.length === 0 && (
             <ArticleContentInput
               articleContent={articleContent}
               onContentChange={setArticleContent}
               isEvaluating={isEvaluating}
             />
-          )}
-
-          <div className="flex justify-end space-x-3">
-            <Button
-              onClick={handleCancel}
-              variant="outline"
-              disabled={false}
-              className="text-foreground hover:text-foreground"
-            >
-              {isEvaluating ? '停止并关闭' : '取消'}
-            </Button>
-            {(!isEvaluating && queueItems.length === 0) && (
-              <Button
-                onClick={handleEvaluateWithWeight}
-                disabled={selectedStandardIds.length === 0 || !articleContent.trim()}
-                className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white hover:text-white"
-              >
-                <Sparkles className="w-4 h-4 mr-2" />
-                开始评估
-              </Button>
             )}
           </div>
+        </div>
+        <div className="flex justify-end space-x-3">
+          <Button
+            onClick={handleCancel}
+            variant="outline"
+            disabled={false}
+            className="text-foreground hover:text-foreground"
+          >
+            {isEvaluating ? '停止并关闭' : '取消'}
+          </Button>
+          {(!isEvaluating && queueItems.length === 0) && (
+            <Button
+              onClick={handleEvaluateWithWeight}
+              disabled={selectedStandardIds.length === 0 || !articleContent.trim()}
+              className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white hover:text-white"
+            >
+              <Sparkles className="w-4 h-4 mr-2" />
+              开始评估
+            </Button>
+          )}
         </div>
       </DialogContent>
     </Dialog>
