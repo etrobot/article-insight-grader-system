@@ -49,7 +49,7 @@ export const ArticleEvaluationsDetail = ({
 
   // 按评估日期排序
   const sortedEvaluations = [...articleGroup.evaluations].sort((a, b) =>
-    new Date(b.evaluation_date).getTime() - new Date(a.evaluation_date).getTime()
+    new Date(a.evaluation_date).getTime() - new Date(b.evaluation_date).getTime()
   );
 
   // 计算加权总分
