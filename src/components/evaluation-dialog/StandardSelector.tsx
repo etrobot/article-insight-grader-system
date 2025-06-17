@@ -143,7 +143,7 @@ export const StandardSelector = forwardRef<StandardSelectorRef, StandardSelector
             }}
           >反选</button>
         </div>
-        <div className="space-y-2 max-h-[420px] overflow-y-auto">
+        <div className="space-y-2 max-h- overflow-y-auto">
           {standards.map((standard) => (
             <div key={standard.id} className="cursor-pointer" onClick={() => !isEvaluating && onStandardToggle(standard.id)}>
               <Card className={`border transition-colors ${

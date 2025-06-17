@@ -49,7 +49,7 @@ export const AiStandardForm = ({ onGenerate, isGenerating }: AiStandardFormProps
       <Button
         onClick={handleSubmit}
         disabled={isGenerating || !isValid}
-        className="w-full bg-gradient-to-r from-theme-yellow to-theme-orange hover:from-yellow-600 hover:to-orange-600"
+        className="w-full text-white bg-gradient-to-r from-theme-yellow to-theme-orange hover:from-yellow-600 hover:to-orange-600"
       >
         {isGenerating ? (
           <>

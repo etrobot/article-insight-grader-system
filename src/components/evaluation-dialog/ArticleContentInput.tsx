@@ -1,6 +1,7 @@
-
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
+import { Button } from '@/components/ui/button';
+import { useToast } from '@/components/ui/use-toast';
 
 interface ArticleContentInputProps {
   articleContent: string;
@@ -13,9 +14,24 @@ export const ArticleContentInput = ({
   onContentChange,
   isEvaluating
 }: ArticleContentInputProps) => {
+  const { toast } = useToast();
   return (
     <div className="space-y-3">
-      <Label htmlFor="article-content" className="text-base font-medium">待评内容</Label>
+      <div className="flex items-center justify-between">
+        <Label htmlFor="article-content" className="text-base font-medium">待评内容</Label>
+        <Button
+          variant="outline"
+          size="sm"
+          onClick={() => {
+            toast({
+              title: "功能开发中",
+              description: "敬请期待",
+            });
+          }}
+        >
+          上传文档(pdf/word)
+        </Button>
+      </div>
       <Textarea
         id="article-content"
         placeholder="请粘贴要评估的待评内容..."
