@@ -1,4 +1,3 @@
-
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { FileText, List, History } from 'lucide-react';
 import { EvaluationStandardBuilder } from '@/components/EvaluationStandardBuilder';
@@ -8,17 +7,18 @@ import { EvaluationResult } from '@/components/EvaluationResult';
 import { ArticleGroupsList } from '@/components/ArticleGroupsList';
 import { ArticleEvaluationsDetail } from '@/components/ArticleEvaluationsDetail';
 import { useLanguage } from '@/contexts/LanguageContext';
+import { EvaluationSystem } from '@/hooks/useStandards';
 
 interface TabsContainerProps {
   activeTab: string;
   setActiveTab: (tab: string) => void;
-  standards: any[];
-  evaluations: any[];
-  selectedStandard: any;
-  selectedEvaluation: any;
-  evaluationResult: any;
-  apiConfig: any;
-  onStandardGenerated: (data: any) => void;
+  standards: EvaluationSystem[];
+  evaluations: unknown[];
+  selectedStandard: EvaluationSystem | null;
+  selectedEvaluation: unknown;
+  evaluationResult: unknown;
+  apiConfig: unknown;
+  onStandardGenerated: (data: EvaluationSystem) => void;
   onViewStandard: (id: string) => void;
   onViewEvaluation: (id: string) => void;
   onBackToList: () => void;
@@ -26,11 +26,13 @@ interface TabsContainerProps {
   deleteStandard: (id: string) => void;
   deleteEvaluation: (id: string) => void;
   // 新增的props
-  articleGroups: any[];
-  selectedArticleGroup: any;
+  articleGroups: unknown[];
+  selectedArticleGroup: unknown;
   onViewArticleGroup: (articleId: string) => void;
   onBackToArticleList: () => void;
   deleteArticleGroup: (articleId: string) => void;
+  // 新增onUpdateStandard
+  onUpdateStandard: (std: EvaluationSystem) => void;
 }
 
 export const TabsContainer = ({
@@ -53,7 +55,8 @@ export const TabsContainer = ({
   selectedArticleGroup,
   onViewArticleGroup,
   onBackToArticleList,
-  deleteArticleGroup
+  deleteArticleGroup,
+  onUpdateStandard
 }: TabsContainerProps) => {
   const { t } = useLanguage();
 
@@ -95,6 +98,7 @@ export const TabsContainer = ({
           <StandardDetail
             standard={selectedStandard}
             onBack={onBackToList}
+            onUpdate={onUpdateStandard}
           />
         ) : (
           <StandardsList

@@ -39,17 +39,21 @@ export const useStandards = () => {
   }, []);
 
   const loadStandards = () => {
-    console.log("useStandards.loadStandards: 尝试从 localStorage 读取 evaluationStandards_v1");
-    const saved = localStorage.getItem('evaluationStandards_v1');
+    console.log("useStandards.loadStandards: 尝试从 localStorage 读取 evaluationStandards_v2");
+    const saved = localStorage.getItem('evaluationStandards_v2');
     console.log("useStandards.loadStandards: localStorage 原始内容:", saved);
     if (saved === null) {
       // 初始化默认标准，补充 id/createdAt 字段
-      const arr = DEFAULT_STANDARDS.map(std => ({
-        ...std,
-        id: Date.now().toString() + Math.random().toString().slice(2, 8),
-        createdAt: new Date().toISOString(),
-      }));
-      localStorage.setItem('evaluationStandards_v1', JSON.stringify(arr));
+      const arr = DEFAULT_STANDARDS.map(std => {
+        const newId = Math.random().toString(36).slice(2);
+        console.log("useStandards.loadStandards: 生成新标准ID:", newId);
+        return {
+          ...std,
+          id: newId,
+          createdAt: new Date().toISOString(),
+        };
+      });
+      localStorage.setItem('evaluationStandards_v2', JSON.stringify(arr));
       setStandards(arr);
       console.log("useStandards.loadStandards: 首次初始化全部标准，内容:", arr);
     } else {
@@ -61,7 +65,7 @@ export const useStandards = () => {
 
   const saveStandards = (newStandards: EvaluationSystem[]) => {
     try {
-      localStorage.setItem('evaluationStandards_v1', JSON.stringify(newStandards));
+      localStorage.setItem('evaluationStandards_v2', JSON.stringify(newStandards));
       setStandards(newStandards);
       console.log('useStandards.saveStandards: 保存成功', newStandards);
     } catch (error) {
@@ -70,9 +74,11 @@ export const useStandards = () => {
   };
 
   const addStandard = (standard: Omit<EvaluationSystem, 'id' | 'createdAt'>) => {
+    const newId = Math.random().toString(36).slice(2);
+    console.log("useStandards.addStandard: 生成新标准ID:", newId);
     const newStandard: EvaluationSystem = {
       ...standard,
-      id: Date.now().toString(),
+      id: newId,
       createdAt: new Date().toISOString(),
     };
     const newStandards = [newStandard, ...standards];

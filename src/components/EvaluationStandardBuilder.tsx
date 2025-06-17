@@ -1,15 +1,10 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Sparkles } from 'lucide-react';
 import { AiStandardDialog } from '@/components/AiStandardDialog';
-
-interface StandardData {
-  title: string;
-  description: string;
-  dimensions: { name: string; description: string; weight: number; }[]; // You might want to refine this type further based on actual data structure
-}
+import { EvaluationSystem } from '@/hooks/useStandards';
 
 interface EvaluationStandardBuilderProps {
-  onStandardGenerated: (standardData: StandardData) => void;
+  onStandardGenerated: (standardData: EvaluationSystem) => void;
   onTabChange: (tab: string) => void;
   apiConfig: {
     baseUrl: string;
@@ -19,6 +14,12 @@ interface EvaluationStandardBuilderProps {
 }
 
 export const EvaluationStandardBuilder = ({ onStandardGenerated, apiConfig, onTabChange }: EvaluationStandardBuilderProps) => {
+  const handleStandardGenerated = (standardData: EvaluationSystem) => {
+    console.log('EvaluationStandardBuilder onStandardGenerated 入参:', standardData);
+    onStandardGenerated(standardData);
+    console.log('EvaluationStandardBuilder onStandardGenerated 出参:', standardData);
+  };
+
   return (
     <div className="space-y-6">
       {/* AI生成区域 */}
@@ -44,7 +45,7 @@ export const EvaluationStandardBuilder = ({ onStandardGenerated, apiConfig, onTa
               </p>
               <AiStandardDialog
                 apiConfig={apiConfig}
-                onStandardGenerated={onStandardGenerated}
+                onStandardGenerated={handleStandardGenerated}
               />
             </div>
           </div>

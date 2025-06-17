@@ -9,7 +9,7 @@ import { EvaluationResult } from '@/components/evaluation-dialog/types';
 import { ArticleEvaluation } from '@/hooks/useArticleEvaluations';
 
 const Index = () => {
-  const { standards, addStandard, deleteStandard, getStandard } = useStandards();
+  const { standards, addStandard, deleteStandard, getStandard, updateStandard } = useStandards();
   const {
     evaluations,
     addEvaluation,
@@ -164,6 +164,7 @@ const Index = () => {
           onViewArticleGroup={handleViewArticleGroup}
           onBackToArticleList={handleBackToArticleList}
           deleteArticleGroup={deleteArticleGroup}
+          onUpdateStandard={updateStandard}
         />
       </div>
 

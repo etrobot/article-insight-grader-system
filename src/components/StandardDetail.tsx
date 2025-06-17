@@ -1,8 +1,7 @@
-import { useState } from 'react';
+import { useState, useRef } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { ScrollArea } from '@/components/ui/scroll-area';
 import {
   ArrowLeft,
   Download,
@@ -30,6 +29,7 @@ export const StandardDetail = ({ standard, onBack, onUpdate }: StandardDetailPro
   const { toast } = useToast();
   const [isEditing, setIsEditing] = useState(false);
   const [editedJson, setEditedJson] = useState(standard);
+  const jsonEditorRef = useRef<{ getValue: () => any }>(null);
 
   const copyToClipboard = () => {
     const jsonString = JSON.stringify(standard, null, 2);
@@ -58,16 +58,44 @@ export const StandardDetail = ({ standard, onBack, onUpdate }: StandardDetailPro
   };
 
   const handleEditToggle = () => {
+    console.log('StandardDetail.handleEditToggle: isEditing=', isEditing, 'standard=', standard);
     if (isEditing) {
       setEditedJson(standard);
+      console.log('StandardDetail.handleEditToggle: 取消编辑，重置editedJson为standard', standard);
     }
     setIsEditing(!isEditing);
+    console.log('StandardDetail.handleEditToggle: 切换isEditing为', !isEditing);
+  };
+
+  const handleJsonEditorChange = (value: EvaluationSystem) => {
+    console.log('StandardDetail.handleJsonEditorChange: 收到JsonEditor变更 value=', value);
+    setEditedJson((prev) => {
+      console.log('StandardDetail.setEditedJson: 旧值=', prev, '新值=', value);
+      return value;
+    });
   };
 
   const handleSave = () => {
+    let latestJson = editedJson;
+    if (jsonEditorRef.current && jsonEditorRef.current.getValue) {
+      const raw = jsonEditorRef.current.getValue();
+      if (raw && raw.jsObject) {
+        latestJson = raw.jsObject;
+        setEditedJson(latestJson);
+        console.log('StandardDetail.handleSave: 主动从JsonEditor取值 latestJson=', latestJson);
+      }
+    }
+    console.log('StandardDetail.handleSave: 尝试保存，latestJson=', latestJson, 'onUpdate=', onUpdate);
+    if (!latestJson.id) {
+      console.error('StandardDetail.handleSave: latestJson缺少id，无法更新', latestJson);
+    }
+    const beforeSave = JSON.stringify(latestJson);
     try {
       if (onUpdate) {
-        onUpdate(editedJson);
+        onUpdate(latestJson);
+        console.log('StandardDetail.handleSave: 已调用onUpdate，传递内容=', beforeSave);
+      } else {
+        console.warn('StandardDetail.handleSave: onUpdate未传入');
       }
       setIsEditing(false);
       toast({
@@ -75,6 +103,7 @@ export const StandardDetail = ({ standard, onBack, onUpdate }: StandardDetailPro
         description: "评估标准已更新",
       });
     } catch (error) {
+      console.error('StandardDetail.handleSave: 保存异常', error);
       toast({
         title: "保存失败",
         description: "JSON格式有误，请检查语法",
@@ -158,7 +187,7 @@ export const StandardDetail = ({ standard, onBack, onUpdate }: StandardDetailPro
       {/* 详细内容 */}
       <Card className="bg-card backdrop-blur-sm border-border">
         <CardHeader>
-          <div className="flex items-center justify-between">
+          <div className="md:flex items-center justify-between">
             <div>
               <CardTitle className="text-foreground flex items-center space-x-2">
                 <FileJson className="w-5 h-5" />
@@ -226,13 +255,13 @@ export const StandardDetail = ({ standard, onBack, onUpdate }: StandardDetailPro
           {isEditing ? (
             <div className="w-full">
               <JsonEditor
+                ref={jsonEditorRef}
                 value={editedJson}
-                onChange={setEditedJson}
+                onChange={handleJsonEditorChange}
                 height="600px"
               />
             </div>
           ) : (
-            <ScrollArea className="h-[600px] rounded-md border border-border">
               <div className="p-4 space-y-6">
                 {standard && (
                   <div className="space-y-4">
@@ -306,7 +335,6 @@ export const StandardDetail = ({ standard, onBack, onUpdate }: StandardDetailPro
                   </div>
                 )}
               </div>
-            </ScrollArea>
           )}
         </CardContent>
       </Card>
