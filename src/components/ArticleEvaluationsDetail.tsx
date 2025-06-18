@@ -97,19 +97,8 @@ export const ArticleEvaluationsDetail = ({
       const summary = (evaluation.summary || '').replace(/\t/g, ' ').replace(/\r?\n/g, '\n');
       console.log(`原始summary:`, evaluation.summary);
       console.log(`处理后summary:`, summary);
-      // criterion.comment如有换行也替换为\n
-      let criteriaStr = '';
-      if (evaluation.criteria && Array.isArray(evaluation.criteria)) {
-        criteriaStr = evaluation.criteria.map((criterion, cidx) => {
-          const comment = (criterion.comment || '').replace(/\r?\n/g, '\n');
-          if (criterion.comment) {
-            console.log(`原始criterion[${cidx}].comment:`, criterion.comment);
-            console.log(`处理后criterion[${cidx}].comment:`, comment);
-          }
-          return `${criterion.name}:${criterion.score}/${criterion.max_score}${comment ? ' ' + comment : ''}`;
-        }).join('; ');
-      }
-      textToCopy += `${fullScore}\t${score}\t${summary}${criteriaStr ? '\t' + criteriaStr : ''}\n`;
+      // 只拼接summary，不拼接criteriaStr
+      textToCopy += `${fullScore}\t${score}\t${summary}\n`;
     });
 
     navigator.clipboard.writeText(textToCopy.slice(0,-1))
