@@ -7,7 +7,6 @@ import {
   Download,
   Copy,
   FileJson,
-  BarChart3,
   Settings2,
   CheckCircle2,
   Clock,
@@ -29,7 +28,7 @@ export const StandardDetail = ({ standard, onBack, onUpdate }: StandardDetailPro
   const { toast } = useToast();
   const [isEditing, setIsEditing] = useState(false);
   const [editedJson, setEditedJson] = useState(standard);
-  const jsonEditorRef = useRef<{ getValue: () => any }>(null);
+  const jsonEditorRef = useRef<{ getValue: () => { jsObject: EvaluationSystem } | null }>(null);
 
   const copyToClipboard = () => {
     const jsonString = JSON.stringify(standard, null, 2);
@@ -288,7 +287,7 @@ export const StandardDetail = ({ standard, onBack, onUpdate }: StandardDetailPro
                                 <div className="flex items-center space-x-2">
                                   <h5 className="font-medium">{criterion.name}</h5>
                                   <Badge variant="secondary" className="text-xs">
-                                    权重: {criterion.weight}
+                                    权重: {criterion.weight}%
                                   </Badge>
                                 </div>
                                 <div className="space-y-2">

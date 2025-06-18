@@ -31,10 +31,34 @@ function loadWeightsFromStorage(ids: string[]): { [id: string]: number } | null 
   if (str) {
     try {
       const obj = JSON.parse(str);
-      console.log('[StandardSelector] 从localStorage读取权重', key, obj);
-      return obj;
+      const convertedWeights: { [id: string]: number } = {};
+      let needsConversion = false;
+      for (const id in obj) {
+        let weight = obj[id];
+        if (typeof weight === 'number') {
+          // 如果存储的值可能是旧的浮点数（例如，0.1 到 1.0）
+          // 并且还不是 100 的整数倍 (即小数部分不为0)
+          if (weight >= 0 && weight <= 1.001 && Math.abs(weight * 100 - Math.round(weight * 100)) > 0.001) {
+              weight = Math.round(weight * 100);
+              needsConversion = true;
+          } else if (weight > 100) { // 如果是异常大的数字，钳制它
+              weight = 100;
+              needsConversion = true;
+          }
+          convertedWeights[id] = Math.min(Math.max(0, Math.round(weight)), 100); // 确保是整数并钳制在 0-100
+        } else {
+            convertedWeights[id] = 0; // 无效类型默认为 0
+            needsConversion = true;
+        }
+      }
+      if (needsConversion) {
+        console.log(`[StandardSelector] 从localStorage读取并转换旧权重 (key: ${key}, 原始: ${JSON.stringify(obj)}, 转换后: ${JSON.stringify(convertedWeights)})`);
+      } else {
+        console.log(`[StandardSelector] 从localStorage读取权重 (key: ${key}, 原始: ${JSON.stringify(obj)})`);
+      }
+      return convertedWeights;
     } catch (e) {
-      console.log('[StandardSelector] 解析localStorage权重失败', key, str);
+      console.log(`[StandardSelector] 解析localStorage权重失败 (key: ${key}, 内容: ${str})`, e);
     }
   }
   return null;
@@ -65,7 +89,8 @@ export const StandardSelector = forwardRef<StandardSelectorRef, StandardSelector
     useEffect(() => {
       // 只处理已选标准
       const selected = standards.filter(s => selectedStandardIds.includes(s.id));
-      const defaultWeight = selected.length > 0 ? 1 / selected.length : 1;
+      // 默认权重调整为100分制
+      const defaultWeight = selected.length > 0 ? Math.round(100 / selected.length) : 100;
       let newWeights: { [id: string]: number } = {};
       // 优先从localStorage加载
       const storageWeights = loadWeightsFromStorage(selectedStandardIds);
@@ -75,7 +100,11 @@ export const StandardSelector = forwardRef<StandardSelectorRef, StandardSelector
       } else {
         // 没有存储则用默认
         selected.forEach(s => {
-          newWeights[s.id] = s.weight_in_parent !== undefined ? s.weight_in_parent : defaultWeight;
+          // 如果 weight_in_parent 是 0-1 的小数，则乘以 100 转换为整数，否则直接使用或默认值
+          const initialWeight = s.weight_in_parent !== undefined
+            ? (s.weight_in_parent >= 0 && s.weight_in_parent <= 1.001 && Math.abs(s.weight_in_parent * 100 - Math.round(s.weight_in_parent * 100)) > 0.001 ? Math.round(s.weight_in_parent * 100) : s.weight_in_parent)
+            : defaultWeight;
+          newWeights[s.id] = Math.min(Math.max(0, Math.round(initialWeight)), 100); // 确保是整数并钳制在 0-100
         });
         console.log('[StandardSelector] useEffect: 使用默认权重', newWeights);
       }
@@ -84,8 +113,12 @@ export const StandardSelector = forwardRef<StandardSelectorRef, StandardSelector
 
     // 权重输入变化
     const handleWeightChange = (id: string, value: string) => {
-      let num = parseFloat(value);
-      if (isNaN(num) || num < 0) num = 0;
+      let num = parseInt(value, 10);
+      if (isNaN(num) || num < 0) {
+        num = 0;
+      } else if (num > 100) {
+        num = 100;
+      }
       setStandardWeights(prev => {
         const updated = { ...prev, [id]: num };
         console.log('[StandardSelector] handleWeightChange', id, value, updated);
@@ -95,8 +128,21 @@ export const StandardSelector = forwardRef<StandardSelectorRef, StandardSelector
 
     // 暴露 getWeights 方法
     useImperativeHandle(ref, () => ({
-      getWeights: () => ({ ...standardWeights })
+      getWeights: () => {
+        const result: { [id: string]: number } = {};
+        for (const id in standardWeights) {
+          result[id] = (standardWeights[id] ?? 0) / 100;
+        }
+        console.log('[StandardSelector] getWeights 返回', result);
+        return result;
+      }
     }), [standardWeights]);
+
+    // 计算已选标准的总权重
+    const totalWeight = selectedStandardIds.reduce((sum, id) => {
+      const weight = standardWeights[id];
+      return sum + (isNaN(weight) ? 0 : weight);
+    }, 0);
 
     if (standards.length === 0) {
       return (
@@ -142,6 +188,7 @@ export const StandardSelector = forwardRef<StandardSelectorRef, StandardSelector
               console.log('[StandardSelector] 反选后已选id:', []);
             }}
           >反选</button>
+          {parseInt(totalWeight.toFixed(0)) != 100 && <div className='text-sm text-red-600'>总权不等于100（当前为{totalWeight.toFixed(0)}）</div>}
         </div>
         <div className="space-y-2 max-h-[420px] overflow-y-auto">
           {standards.map((standard) => (
@@ -168,13 +215,14 @@ export const StandardSelector = forwardRef<StandardSelectorRef, StandardSelector
                       <input
                         type="number"
                         min="0"
-                        step="0.01"
+                        step="1"
                         value={standardWeights[standard.id] ?? ''}
                         onChange={e => handleWeightChange(standard.id, e.target.value)}
                         className="w-16 px-1 py-0.5 border rounded text-xs text-right focus:outline-none focus:ring-2 focus:ring-blue-200 dark:focus:ring-blue-700 dark:border-gray-600 dark:bg-gray-800 dark:text-white"
                         onClick={e => e.stopPropagation()}
                         disabled={isEvaluating}
                       />
+                      %
                     </div>
                   )}
                 </CardHeader>

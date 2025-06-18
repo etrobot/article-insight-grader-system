@@ -231,7 +231,7 @@ export const ArticleEvaluationsDetail = ({
                       <div className="flex-1 flex items-center gap-2">
                         <CardTitle className="text-base text-foreground mb-1">
                           {evaluation.standard_name}
-                          <p className="text-sm text-muted-foreground">权重: {evaluation.weight_in_parent !== undefined ? evaluation.weight_in_parent.toFixed(2) : '–'}</p>
+                          <p className="text-sm text-muted-foreground">权重: {evaluation.weight_in_parent !== undefined ? (evaluation.weight_in_parent*100).toFixed(0) : '–'}%</p>
                         </CardTitle>
                       </div>
                       <Badge
