@@ -47,9 +47,9 @@ export const evaluationProcess = async ({
       updateQueueItem(queueItem.id, { status: 'completed', progress: ((i + 1) / selectedStandards.length) * 100, result });
       onResult(result);
       onProgress(((i + 1) / selectedStandards.length) * 100, `已完成标准"${standard.name}"的评估`);
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error(`评估标准"${standard.name}"失败:`, error);
-      updateQueueItem(queueItem.id, { status: 'failed', error: error?.message || '未知错误', progress: ((i + 1) / selectedStandards.length) * 100 });
+      updateQueueItem(queueItem.id, { status: 'failed', error: (error instanceof Error ? error.message : '未知错误'), progress: ((i + 1) / selectedStandards.length) * 100 });
       onProgress(((i + 1) / selectedStandards.length) * 100, `标准"${standard.name}"评估失败: ${error instanceof Error ? error.message : '未知错误'}`);
       break;
     }

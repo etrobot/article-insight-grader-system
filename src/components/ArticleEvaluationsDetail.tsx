@@ -93,11 +93,23 @@ export const ArticleEvaluationsDetail = ({
       const weight = evaluation.weight_in_parent !== undefined ? evaluation.weight_in_parent : (1 / articleGroup.evaluations.length);
       const fullScore = (sumMaxScore * weight).toFixed(2);
       const score = (sumScore * weight).toFixed(2);
-      // summary字段内如有Tab替换为空格
-      const summary = (evaluation.summary || '').replace(/\t/g, ' ');
-      console.log(`evaluation.criteria:`, evaluation.criteria);
-      console.log(`评估${idx + 1}：sumMaxScore(固定100)=${sumMaxScore}, sumScore(用total_score)=${sumScore}, weight=${weight}, fullScore=${fullScore}, score=${score}, summary=${summary}`);
-      textToCopy += `${fullScore}\t${score}\t${summary}\n`;
+      // summary字段内如有Tab替换为空格，换行替换为\n
+      const summary = (evaluation.summary || '').replace(/\t/g, ' ').replace(/\r?\n/g, '\n');
+      console.log(`原始summary:`, evaluation.summary);
+      console.log(`处理后summary:`, summary);
+      // criterion.comment如有换行也替换为\n
+      let criteriaStr = '';
+      if (evaluation.criteria && Array.isArray(evaluation.criteria)) {
+        criteriaStr = evaluation.criteria.map((criterion, cidx) => {
+          const comment = (criterion.comment || '').replace(/\r?\n/g, '\n');
+          if (criterion.comment) {
+            console.log(`原始criterion[${cidx}].comment:`, criterion.comment);
+            console.log(`处理后criterion[${cidx}].comment:`, comment);
+          }
+          return `${criterion.name}:${criterion.score}/${criterion.max_score}${comment ? ' ' + comment : ''}`;
+        }).join('; ');
+      }
+      textToCopy += `${fullScore}\t${score}\t${summary}${criteriaStr ? '\t' + criteriaStr : ''}\n`;
     });
 
     navigator.clipboard.writeText(textToCopy.slice(0,-1))
