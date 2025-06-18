@@ -132,7 +132,7 @@ export const ArticleEvaluationDialog = ({
           )}
 
           {/* 待评内容输入 - 仅在未开始评估时显示 */}
-          <div className="md:w-1/2">
+          <div className="w-full">
           {!isEvaluating && queueItems.length === 0 && (
             <ArticleContentInput
               articleContent={articleContent}
