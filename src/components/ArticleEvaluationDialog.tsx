@@ -86,7 +86,7 @@ export const ArticleEvaluationDialog = ({
           </DialogTitle>
         </DialogHeader>
 
-        <div className="flex gap-2">
+        <div className="md:flex gap-2">
           {/* 评估队列 - 在评估开始后显示 */}
           <EvaluationQueue
             queueItems={queueItems}
@@ -109,7 +109,7 @@ export const ArticleEvaluationDialog = ({
           )}
 
           {/* 待评内容输入 - 仅在未开始评估时显示 */}
-          <div className="w-1/2">
+          <div className="md:w-1/2">
           {!isEvaluating && queueItems.length === 0 && (
             <ArticleContentInput
               articleContent={articleContent}

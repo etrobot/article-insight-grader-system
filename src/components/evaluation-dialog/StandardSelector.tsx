@@ -164,7 +164,7 @@ export const StandardSelector = forwardRef<StandardSelectorRef, StandardSelector
     return (
       <div className="space-y-3">
         <div className="flex items-center space-x-2">
-          <Label className="text-base font-medium">选择评估标准</Label>
+          <Label className="text-base font-medium">选择标准</Label>
           <button
             type="button"
             className="px-2 py-0.5 text-xs border rounded bg-gray-100 text-gray-700 hover:bg-gray-200 transition disabled:opacity-50 dark:bg-gray-700 dark:text-gray-200 dark:hover:bg-gray-600 dark:border-gray-600"
