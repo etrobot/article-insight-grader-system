@@ -1,16 +1,19 @@
 import { evaluateSingleStandard } from './evaluationApi';
 import { EvaluationSystem } from '@/hooks/useStandards';
 import { EvaluationQueueItemData } from './types';
+import type { EvaluationResult } from './types';
+import type { ApiConfig } from './evaluationApi';
 
 interface EvaluationProcessParams {
   selectedStandards: EvaluationSystem[];
   articleContent: string;
-  apiConfig: any;
+  apiConfig: ApiConfig;
   onProgress: (progress: number, description: string) => void;
-  onResult: (result: any) => void;
+  onResult: (result: EvaluationResult) => void;
   updateQueueItem: (id: string, updates: Partial<EvaluationQueueItemData>) => void;
   queueItems: EvaluationQueueItemData[];
   groupKey?: string;
+  isEvaluatingRef?: React.MutableRefObject<boolean>;
 }
 
 export const evaluationProcess = async ({
@@ -21,9 +24,14 @@ export const evaluationProcess = async ({
   onResult,
   updateQueueItem,
   queueItems,
-  groupKey
+  groupKey,
+  isEvaluatingRef
 }: EvaluationProcessParams) => {
   for (let i = 0; i < selectedStandards.length; i++) {
+    if (isEvaluatingRef && isEvaluatingRef.current === false) {
+      console.log('[evaluationProcess] 检测到 isEvaluatingRef.current=false，流程中断');
+      break;
+    }
     const standard = selectedStandards[i];
     const queueItem = queueItems[i];
     if (!queueItem) {

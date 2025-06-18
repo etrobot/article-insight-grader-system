@@ -1,4 +1,3 @@
-
 import { useState } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -14,8 +13,9 @@ interface ApiSettingsProps {
     baseUrl: string;
     apiKey: string;
     model: string;
+    model2?: string;
   };
-  onConfigChange: (config: { baseUrl: string; apiKey: string; model: string }) => void;
+  onConfigChange: (config: { baseUrl: string; apiKey: string; model: string; model2?: string }) => void;
 }
 
 export const ApiSettings = ({ config, onConfigChange }: ApiSettingsProps) => {
@@ -24,6 +24,7 @@ export const ApiSettings = ({ config, onConfigChange }: ApiSettingsProps) => {
     baseUrl: config.baseUrl,
     apiKey: config.apiKey,
     model: config.model || '',
+    model2: config.model2 || '',
   }));
   const [isConnected, setIsConnected] = useState<boolean | null>(null);
   const [isTesting, setIsTesting] = useState(false);
@@ -84,7 +85,7 @@ export const ApiSettings = ({ config, onConfigChange }: ApiSettingsProps) => {
     }
   };
 
-  const handleInputChange = (field: 'baseUrl' | 'apiKey' | 'model', value: string) => {
+  const handleInputChange = (field: 'baseUrl' | 'apiKey' | 'model' | 'model2', value: string) => {
     console.log(`handleInputChange: field=${field}, value=${value}`);
     setLocalConfig(prev => {
       const newConfig = { ...prev, [field]: value };
@@ -167,6 +168,21 @@ export const ApiSettings = ({ config, onConfigChange }: ApiSettingsProps) => {
               />
               <p className="text-xs text-gray-500 dark:text-gray-400">
                 {t('api.modelHelp')}
+              </p>
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="model2" className="text-gray-700 dark:text-gray-300">Model 2</Label>
+              <Input
+                id="model2"
+                type="text"
+                value={localConfig.model2}
+                onChange={(e) => handleInputChange('model2', e.target.value)}
+                placeholder="备用模型名称"
+                className="border-gray-300 placeholder:text-gray-400 dark:bg-gray-700 dark:border-gray-600 dark:text-gray-100 dark:placeholder:text-gray-500"
+              />
+              <p className="text-xs text-gray-500 dark:text-gray-400">
+                可选，备用模型名称
               </p>
             </div>
           </div>

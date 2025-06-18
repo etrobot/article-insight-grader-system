@@ -10,6 +10,7 @@ interface StandardSelectorProps {
   selectedStandardIds: string[];
   onStandardToggle: (standardId: string) => void;
   isEvaluating: boolean;
+  setSelectedStandardIds: (ids: string[]) => void;
 }
 
 export interface StandardSelectorRef {
@@ -36,16 +37,13 @@ function loadWeightsFromStorage(ids: string[]): { [id: string]: number } | null 
       for (const id in obj) {
         let weight = obj[id];
         if (typeof weight === 'number') {
-          // 如果存储的值可能是旧的浮点数（例如，0.1 到 1.0）
-          // 并且还不是 100 的整数倍 (即小数部分不为0)
-          if (weight >= 0 && weight <= 1.001 && Math.abs(weight * 100 - Math.round(weight * 100)) > 0.001) {
-              weight = Math.round(weight * 100);
-              needsConversion = true;
-          } else if (weight > 100) { // 如果是异常大的数字，钳制它
-              weight = 100;
-              needsConversion = true;
+          if (weight >= 0 && weight <= 1.001) {
+            // 0-1小数，先乘100再四舍五入
+            convertedWeights[id] = Math.min(Math.max(0, Math.round(weight * 100)), 100);
+          } else {
+            // 其它情况直接四舍五入
+            convertedWeights[id] = Math.min(Math.max(0, Math.round(weight)), 100);
           }
-          convertedWeights[id] = Math.min(Math.max(0, Math.round(weight)), 100); // 确保是整数并钳制在 0-100
         } else {
             convertedWeights[id] = 0; // 无效类型默认为 0
             needsConversion = true;
@@ -70,7 +68,8 @@ export const StandardSelector = forwardRef<StandardSelectorRef, StandardSelector
     standards,
     selectedStandardIds,
     onStandardToggle,
-    isEvaluating
+    isEvaluating,
+    setSelectedStandardIds
   }, ref) => {
     const formatDate = (dateString: string) => {
       return new Date(dateString).toLocaleString('zh-CN', {
@@ -172,8 +171,9 @@ export const StandardSelector = forwardRef<StandardSelectorRef, StandardSelector
             onClick={e => {
               e.stopPropagation();
               if (isEvaluating) return;
-              const toSelect = standards.filter(s => !selectedStandardIds.includes(s.id)).map(s => s.id);
-              toSelect.forEach(id => onStandardToggle(id));
+              const allIds = standards.map(s => s.id);
+              setSelectedStandardIds(allIds);
+              console.log('[StandardSelector] 全选按钮点击, 设置为:', allIds);
             }}
           >全选</button>
           <button

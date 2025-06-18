@@ -7,7 +7,7 @@ import { StandardSelector, StandardSelectorRef } from './evaluation-dialog/Stand
 import { ArticleContentInput } from './evaluation-dialog/ArticleContentInput';
 import { useEvaluationLogic } from './evaluation-dialog/useEvaluationLogic';
 import { EvaluationResult as EvaluationResultType } from './evaluation-dialog/types';
-import { useRef } from 'react';
+import { useRef, useState, useEffect } from 'react';
 import { useStandards, EvaluationSystem } from '@/hooks/useStandards';
 
 interface ArticleEvaluationDialogProps {
@@ -18,6 +18,7 @@ interface ArticleEvaluationDialogProps {
     baseUrl: string;
     apiKey: string;
     model: string;
+    model2?: string;
   };
   onEvaluationComplete: (evaluationResult: EvaluationResultType | EvaluationResultType[]) => void;
 }
@@ -29,8 +30,25 @@ export const ArticleEvaluationDialog = ({
   apiConfig,
   onEvaluationComplete
 }: ArticleEvaluationDialogProps) => {
+  // 新增：模型选择
+  const [selectedModel, setSelectedModel] = useState(apiConfig.model);
+  useEffect(() => {
+    const saved = localStorage.getItem('article_eval_model');
+    if (saved && (saved === apiConfig.model || saved === apiConfig.model2)) {
+      setSelectedModel(saved);
+    } else {
+      setSelectedModel(apiConfig.model);
+    }
+  }, [apiConfig.model, apiConfig.model2]);
+  const handleModelChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    setSelectedModel(e.target.value);
+    localStorage.setItem('article_eval_model', e.target.value);
+    console.log('[ArticleEvaluationDialog] 选择模型:', e.target.value);
+  };
+
   const {
     selectedStandardIds,
+    setSelectedStandardIds,
     articleContent,
     isEvaluating,
     queueItems,
@@ -44,7 +62,7 @@ export const ArticleEvaluationDialog = ({
     evaluationResults
   } = useEvaluationLogic({
     standards,
-    apiConfig,
+    apiConfig: { ...apiConfig, model: selectedModel },
     onEvaluationComplete,
     onClose: () => onOpenChange(false)
   });
@@ -82,9 +100,13 @@ export const ArticleEvaluationDialog = ({
         <DialogHeader>
           <DialogTitle className="flex items-center space-x-2">
             <FileText className="w-5 h-5" />
-            <span>内容评估</span>
+            <select value={selectedModel} onChange={handleModelChange} className="w-full border rounded px-2 py-1">
+              <option value={apiConfig.model}>{apiConfig.model}</option>
+              {apiConfig.model2 && <option value={apiConfig.model2}>{apiConfig.model2}</option>}
+            </select>
           </DialogTitle>
         </DialogHeader>
+
 
         <div className="md:flex gap-2">
           {/* 评估队列 - 在评估开始后显示 */}
@@ -105,6 +127,7 @@ export const ArticleEvaluationDialog = ({
               selectedStandardIds={selectedStandardIds}
               onStandardToggle={handleStandardToggle}
               isEvaluating={isEvaluating}
+              setSelectedStandardIds={setSelectedStandardIds}
             />
           )}
 

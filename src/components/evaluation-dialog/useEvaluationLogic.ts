@@ -123,7 +123,8 @@ export const useEvaluationLogic = ({
         onResult: (result) => onResult(result, groupKey),
         updateQueueItem,
         queueItems: initialQueue,
-        groupKey
+        groupKey,
+        isEvaluatingRef
       });
       toast({
         title: "评估流程完成",
