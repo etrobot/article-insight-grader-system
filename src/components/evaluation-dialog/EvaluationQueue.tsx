@@ -28,7 +28,7 @@ export const EvaluationQueue = ({
   const successCount = queueItems.filter(item => item.status === 'completed').length;
 
   return (
-    <Card className="border-border bg-gradient-to-r from-muted to-muted/50 dark:from-muted dark:to-muted/50 w-full">
+    <Card className="border-border bg-gradient-to-r from-muted to-muted/50 dark:from-muted dark:to-muted/50 md:max-w-1/2">
       <CardHeader className="pb-4">
         <CardTitle className="text-lg text-foreground flex items-center space-x-2">
           <List className="w-5 h-5" />
