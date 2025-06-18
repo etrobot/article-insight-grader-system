@@ -108,7 +108,7 @@ export const ArticleEvaluationDialog = ({
         </DialogHeader>
 
 
-        <div className="md:flex gap-2">
+        <div className="md:flex gap-2 md:max-w-1/2 w-full">
           {/* 评估队列 - 在评估开始后显示 */}
           <EvaluationQueue
             queueItems={queueItems}
