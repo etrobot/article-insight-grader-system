@@ -93,8 +93,8 @@ export const ArticleEvaluationsDetail = ({
       const weight = evaluation.weight_in_parent !== undefined ? evaluation.weight_in_parent : (1 / articleGroup.evaluations.length);
       const fullScore = (sumMaxScore * weight).toFixed(2);
       const score = (sumScore * weight).toFixed(2);
-      // summary字段内如有Tab替换为空格，换行替换为\n
-      const summary = (evaluation.summary || '').replace(/\t/g, ' ').replace(/\r?\n/g, '\n');
+      // summary字段内如有Tab替换为空格，换行替换为分号
+      const summary = (evaluation.summary || '').replace(/\t/g, ' ').replace(/\r?\n/g, ';');
       console.log(`原始summary:`, evaluation.summary);
       console.log(`处理后summary:`, summary);
       // 只拼接summary，不拼接criteriaStr
