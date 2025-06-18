@@ -19,9 +19,8 @@ export const ArticleContentInput = ({
     <div className="space-y-3">
       <div className="flex items-center justify-between">
         <Label htmlFor="article-content" className="text-base font-medium">待评内容</Label>
-        <Button
-          variant="outline"
-          size="sm"
+        <button
+          className="px-2 py-0.5 text-xs border rounded"
           onClick={() => {
             toast({
               title: "功能开发中",
@@ -30,7 +29,7 @@ export const ArticleContentInput = ({
           }}
         >
           上传文档(pdf/word)
-        </Button>
+        </button>
       </div>
       <Textarea
         id="article-content"

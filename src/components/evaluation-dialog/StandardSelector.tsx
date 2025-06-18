@@ -121,7 +121,7 @@ export const StandardSelector = forwardRef<StandardSelectorRef, StandardSelector
           <Label className="text-base font-medium">选择评估标准</Label>
           <button
             type="button"
-            className="px-2 py-0.5 text-xs border rounded bg-gray-100 text-gray-700 hover:bg-gray-200 transition disabled:opacity-50"
+            className="px-2 py-0.5 text-xs border rounded bg-gray-100 text-gray-700 hover:bg-gray-200 transition disabled:opacity-50 dark:bg-gray-700 dark:text-gray-200 dark:hover:bg-gray-600 dark:border-gray-600"
             disabled={isEvaluating || standards.length === selectedStandardIds.length}
             onClick={e => {
               e.stopPropagation();
@@ -132,7 +132,7 @@ export const StandardSelector = forwardRef<StandardSelectorRef, StandardSelector
           >全选</button>
           <button
             type="button"
-            className="px-2 py-0.5 text-xs border rounded bg-gray-100 text-gray-700 hover:bg-gray-200 transition disabled:opacity-50"
+            className="px-2 py-0.5 text-xs border rounded bg-gray-100 text-gray-700 hover:bg-gray-200 transition disabled:opacity-50 dark:bg-gray-700 dark:text-gray-200 dark:hover:bg-gray-600 dark:border-gray-600"
             disabled={isEvaluating || selectedStandardIds.length === 0}
             onClick={e => {
               e.stopPropagation();
@@ -143,18 +143,18 @@ export const StandardSelector = forwardRef<StandardSelectorRef, StandardSelector
             }}
           >反选</button>
         </div>
-        <div className="space-y-2 max-h- overflow-y-auto">
+        <div className="space-y-2 max-h-[420px] overflow-y-auto">
           {standards.map((standard) => (
             <div key={standard.id} className="cursor-pointer" onClick={() => !isEvaluating && onStandardToggle(standard.id)}>
               <Card className={`border transition-colors ${
                 selectedStandardIds.includes(standard.id)
-                  ? 'border-blue-300 bg-blue-50'
+                  ? 'border-blue-300 bg-blue-50 dark:border-blue-700 dark:bg-blue-950'
                   : 'border-border hover:bg-secondary/50'
               } ${isEvaluating ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}`}>
                 <CardHeader className="p-3">
                   <CardTitle className="text-sm flex items-center space-x-2">
                     {selectedStandardIds.includes(standard.id) && (
-                      <CheckCircle2 className="w-4 h-4 text-blue-600" />
+                      <CheckCircle2 className="w-4 h-4 text-blue-600 dark:text-blue-400" />
                     )}
                     <span>{standard.name}</span>
                   </CardTitle>
@@ -164,14 +164,14 @@ export const StandardSelector = forwardRef<StandardSelectorRef, StandardSelector
                   {/* 权重输入框，仅在被选中时显示 */}
                   {selectedStandardIds.includes(standard.id) && (
                     <div className="mt-2 flex items-center space-x-2">
-                      <span className="text-xs text-foreground">权重：</span>
+                      <span className="text-xs text-foreground dark:text-gray-300">权重：</span>
                       <input
                         type="number"
                         min="0"
                         step="0.01"
                         value={standardWeights[standard.id] ?? ''}
                         onChange={e => handleWeightChange(standard.id, e.target.value)}
-                        className="w-16 px-1 py-0.5 border rounded text-xs text-right focus:outline-none focus:ring-2 focus:ring-blue-200"
+                        className="w-16 px-1 py-0.5 border rounded text-xs text-right focus:outline-none focus:ring-2 focus:ring-blue-200 dark:focus:ring-blue-700 dark:border-gray-600 dark:bg-gray-800 dark:text-white"
                         onClick={e => e.stopPropagation()}
                         disabled={isEvaluating}
                       />
