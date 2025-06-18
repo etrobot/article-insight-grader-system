@@ -1,5 +1,7 @@
 import { useRef, useImperativeHandle, forwardRef } from 'react';
-import MonacoEditor, { Monaco } from 'react-monaco-editor';
+import Editor, { OnMount } from '@monaco-editor/react';
+import type { editor as MonacoEditorType } from 'monaco-editor';
+import { useTheme } from '@/contexts/ThemeContext';
 
 export interface JsonEditorProps {
   value: object;
@@ -10,33 +12,41 @@ export interface JsonEditorProps {
 
 export const JsonEditor = forwardRef<{ getValue: () => object | null }, JsonEditorProps>(
   ({ value, onChange, readOnly = false, height = '400px' }, ref) => {
-    const editorRef = useRef<any>(null);
+    const { theme } = useTheme();
+    const editorRef = useRef<MonacoEditorType.IStandaloneCodeEditor | null>(null);
 
     useImperativeHandle(ref, () => ({
       getValue: () => {
         if (editorRef.current) {
+          const val = editorRef.current.getValue();
           try {
-            return JSON.parse(editorRef.current.getValue());
-          } catch {
+            return JSON.parse(val);
+          } catch (e) {
+            console.error('JsonEditor.getValue parse error:', e);
             return null;
           }
         }
         return null;
-      }
+      },
     }));
 
-    const handleEditorChange = (newValue: string) => {
+    const handleEditorChange = (newValue: string | undefined) => {
+      if (newValue === undefined) return;
       try {
         const obj = JSON.parse(newValue);
         onChange?.(obj);
-      } catch {
-        // 不合法时不触发onChange
+      } catch (e) {
+        // Invalid JSON, do not trigger onChange
       }
     };
 
+    const handleEditorDidMount: OnMount = (editor) => {
+      editorRef.current = editor;
+    };
+
     return (
-      <MonacoEditor
-        ref={editorRef}
+      <Editor
+        height={height}
         language="json"
         value={JSON.stringify(value, null, 2)}
         options={{
@@ -46,9 +56,9 @@ export const JsonEditor = forwardRef<{ getValue: () => object | null }, JsonEdit
           scrollBeyondLastLine: false,
           automaticLayout: true,
         }}
-        height={height}
         onChange={handleEditorChange}
-        theme="vs"
+        onMount={handleEditorDidMount}
+        theme={theme === 'dark' ? 'vs-dark' : 'vs'}
       />
     );
   }
