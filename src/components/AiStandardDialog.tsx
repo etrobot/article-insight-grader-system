@@ -64,7 +64,7 @@ export const AiStandardDialog = ({ apiConfig, onStandardGenerated }: AiStandardD
           <DialogTitle>AI生成评估标准</DialogTitle>
         </DialogHeader>
         <div className="mb-2">
-          <select value={selectedModel} onChange={handleModelChange} className="w-full border rounded px-2 py-1">
+          <select value={selectedModel} onChange={handleModelChange} className="w-full border rounded px-2 py-1 bg-background text-foreground">
             <option value={apiConfig.model}>{apiConfig.model}</option>
             {apiConfig.model2 && <option value={apiConfig.model2}>{apiConfig.model2}</option>}
           </select>

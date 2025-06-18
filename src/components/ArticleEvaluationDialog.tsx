@@ -100,7 +100,7 @@ export const ArticleEvaluationDialog = ({
         <DialogHeader>
           <DialogTitle className="flex items-center space-x-2">
             <FileText className="w-5 h-5" />
-            <select value={selectedModel} onChange={handleModelChange} className="border rounded px-2 py-1">
+            <select value={selectedModel} onChange={handleModelChange} className="border rounded px-2 py-1 bg-background text-foreground">
               <option value={apiConfig.model}>{apiConfig.model}</option>
               {apiConfig.model2 && <option value={apiConfig.model2}>{apiConfig.model2}</option>}
             </select>
