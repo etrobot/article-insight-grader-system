@@ -61,7 +61,7 @@ ${articleContent}
       "cite":["引用段落1开头+省略号......+引用段落1结尾","引用段落2开头+省略......+引用段落2结尾","引用段落N开头+省略......+引用段落N结尾"]
     }
   ],
-  "summary": "综合评价总结"
+  "summary": "用分析师的口吻总结被评对象在这个标准下的表现"
 }`;
 
   const response = await fetch(`${apiConfig.baseUrl}/chat/completions`, {
