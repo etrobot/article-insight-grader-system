@@ -3,7 +3,6 @@ export const DEFAULT_STANDARDS = [
   {
     "name": "公司行业发展前景评估体系",
     "description": "评估公司所在行业的发展前景，包括当前市场容量、未来市场容量及增速，政策扶持力度等",
-    "version": "1.0",
     "total_weight": 100,
     "criteria": [
       {
@@ -71,17 +70,11 @@ export const DEFAULT_STANDARDS = [
         "weight": 10,
         "score_range": [1, 5]
       }
-    ],
-    "scoring_algorithm": {
-      "description": "加权平均算法",
-      "formula": "总分 = Σ(标准权重 × 标准得分)",
-      "normalization": "最终得分归一化到0-100分"
-    }
+    ]
   },
   {
     "name": "公司竞争地位评估体系",
     "description": "评估公司在行业内的技术、产品、品牌、客户、销售能力、成本控制、产能等方面的综合竞争力",
-    "version": "1.0",
     "total_weight": 100,
     "criteria": [
       {
@@ -175,17 +168,11 @@ export const DEFAULT_STANDARDS = [
         "weight": 10,
         "score_range": [1, 5]
       }
-    ],
-    "scoring_algorithm": {
-      "description": "加权平均算法",
-      "formula": "总分 = Σ(标准权重 × 标准得分)",
-      "normalization": "最终得分归一化到0-100分"
-    }
+    ]
   },
   {
     "name": "股东情况",
     "description": "是否有明星股东加持，近期是否有大股东减持？股东支持力度如何？",
-    "version": "1.0",
     "total_weight": 100,
     "criteria": [
       {
@@ -253,18 +240,12 @@ export const DEFAULT_STANDARDS = [
         "weight": 20,
         "score_range": [1, 5]
       }
-    ],
-    "scoring_algorithm": {
-      "description": "加权平均算法",
-      "formula": "总分 = Σ(权重 × 得分) / 总权重 × 100",
-      "normalization": "最终得分已归一化到0–100分区间"
-    }
+    ]
   }
 ,
   {
     "name": "公司管理水平评估系统",
     "description": "用于评估公司管理层行业经验、业务专业度、核心团队的持续研发能力等管理水平的多维度标准体系",
-    "version": "1.0",
     "total_weight": 100,
     "criteria": [
       {
@@ -332,17 +313,11 @@ export const DEFAULT_STANDARDS = [
         "weight": 15,
         "score_range": [1, 5]
       }
-    ],
-    "scoring_algorithm": {
-      "description": "加权平均算法",
-      "formula": "总分 = Σ(标准权重 × 标准得分)",
-      "normalization": "最终得分归一化到0-100分"
-    }
+    ]
   },
   {
     "name": "收入盈利增长预期评估系统",
     "description": "用于评估公司过去收入及盈利增长历史数据以及未来收入盈利增长预期的多维度标准体系",
-    "version": "1.0",
     "total_weight": 100,
     "criteria": [
       {
@@ -423,17 +398,11 @@ export const DEFAULT_STANDARDS = [
         "weight": 20,
         "score_range": [1, 5]
       }
-    ],
-    "scoring_algorithm": {
-      "description": "加权平均算法",
-      "formula": "总分 = Σ(标准权重 × 标准得分)",
-      "normalization": "最终得分归一化到0-100分"
-    }
+    ]
   },
   {
     "name": "公司财务质量评估体系",
     "description": "评估公司盈利的质量、制造内生现金流的能力（内部造血能力）以及流动性、资产负债率等财务状况",
-    "version": "1.0",
     "total_weight": 100,
     "criteria": [
       {
@@ -505,7 +474,6 @@ export const DEFAULT_STANDARDS = [
   {
     "name": "股价走势评估体系",
     "description": "综合评估标的证券当前价格位置、技术形态、资金动向及未来上涨空间的多维度分析框架",
-    "version": "1.0",
     "total_weight": 100,
     "criteria": [
       {
@@ -633,7 +601,6 @@ export const DEFAULT_STANDARDS = [
   {
     "name": "成交量变动分析体系",
     "description": "评估股票成交量的边际变化，识别资金布局迹象，包括放量下跌、放量上涨、缩量下跌、缩量上涨等量价关系分析",
-    "version": "1.0",
     "total_weight": 100,
     "criteria": [
       {
@@ -705,7 +672,6 @@ export const DEFAULT_STANDARDS = [
   {
     "name": "估值水平评估体系",
     "description": "综合评估公司当前估值相对于自身历史水平及行业可比公司的合理性与投资价值",
-    "version": "1.0",
     "total_weight": 100,
     "criteria": [
       {
@@ -800,7 +766,6 @@ export const DEFAULT_STANDARDS = [
   {
     "name": "卖方分析师预测评估系统",
     "description": "用于评估卖方分析师覆盖数量、买入/中性/卖出评级数量分布以及一致性预期股价位置的多维度标准体系",
-    "version": "1.0",
     "total_weight": 100,
     "criteria": [
       {
@@ -881,17 +846,11 @@ export const DEFAULT_STANDARDS = [
         "weight": 10,
         "score_range": [1, 5]
       }
-    ],
-    "scoring_algorithm": {
-      "description": "加权平均算法",
-      "formula": "总分 = Σ(标准权重 × 标准得分)",
-      "normalization": "最终得分归一化到0-100分"
-    }
+    ]
   },
   {
     "name": "内外部催化剂因子评估系统",
     "description": "用于评估任何有利于股价上涨的催化剂，包括政策方向、行业变局、重组概念等因子影响力的多维度标准体系",
-    "version": "1.0",
     "total_weight": 100,
     "criteria": [
       {
@@ -959,11 +918,6 @@ export const DEFAULT_STANDARDS = [
         "weight": 15,
         "score_range": [1, 5]
       }
-    ],
-    "scoring_algorithm": {
-      "description": "加权平均算法",
-      "formula": "总分 = Σ(标准权重 × 标准得分)",
-      "normalization": "最终得分归一化到0-100分"
-    }
+    ]
   }
 ];

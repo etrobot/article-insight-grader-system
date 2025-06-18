@@ -313,16 +313,16 @@ export const StandardDetail = ({ standard, onBack, onUpdate }: StandardDetailPro
                         <CardContent className="p-4">
                           <div className="space-y-2">
                             <p className="text-sm text-muted-foreground">
-                              {standard.scoring_algorithm.description}
+                             加权平均算法
                             </p>
                             <div className="flex items-center space-x-2 text-sm">
                               <span className="font-medium">计算公式：</span>
                               <code className="bg-secondary px-2 py-1 rounded">
-                                {standard.scoring_algorithm.formula}
+                               总分 = Σ(标准权重 × 标准得分)
                               </code>
                             </div>
                             <p className="text-sm text-muted-foreground">
-                              {standard.scoring_algorithm.normalization}
+                              最终得分归一化到0-100分
                             </p>
                           </div>
                         </CardContent>

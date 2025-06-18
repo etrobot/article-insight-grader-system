@@ -76,9 +76,6 @@ export const useAiStandardGeneration = (apiConfig: ApiConfig) => {
         throw new Error('AI返回内容无法解析为JSON，请检查提示词或稍后重试');
       }
 
-      // 记录解析后的标准结构
-      console.log('[useAiStandardGeneration] parsedStandard:', parsedStandard);
-
       toast({
         title: "生成成功",
         description: "AI已为您生成评估标准，正在跳转到详情页面",

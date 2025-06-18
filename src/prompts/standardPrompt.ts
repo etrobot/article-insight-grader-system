@@ -3,7 +3,6 @@
 export const standardPromptExampleJson = {
   "name": "AI内容质量评估系统",
   "description": "用于评估AI生成内容质量的多维度标准体系",
-  "version": "1.0",
   "total_weight": 100,
   "criteria": [
     {
@@ -84,41 +83,9 @@ export const standardPromptExampleJson = {
       "weight": 15,
       "score_range": [1, 5]
     }
-  ],
-  "scoring_algorithm": {
-    "description": "加权平均算法",
-    "formula": "总分 = Σ(标准权重 × 标准得分)",
-    "normalization": "最终得分归一化到0-100分"
-  }
+  ]
 };
 
-const standardPrompt = `请根据以下需求生成一个完整的内容质量评估标准：
-
-标准名称：{{systemName}}
-标准描述：{{systemDescription}}
-
-请返回一个JSON格式的评估标准，包含以下结构：
-- 评估系统基本信息（name, description, version）
-- 评估标准列表（criteria数组），每个标准包含：
-  - id: 唯一标识符
-  - name: 标准名称
-  - description: 标准描述（包含1-5分的详细评分标准）
-  - weight: 权重（所有标准权重之和应为100）
-  - score_range: 评分范围（建议[1,5]）
-- 评分算法说明
-
-请确保：
-1. 权重分配合理，总和为100
-2. 标准覆盖全面，适合对内容进行客观评估
-3. 每个标准都有详细的1-5分评分描述
-4. JSON格式严格规范：
-   - 所有属性名和字符串值必须使用双引号
-   - 不要使用任何特殊字符或Unicode字符
-   - 不要有多余的空格和换行
-   - 确保所有数值类型正确（weight为数字，score_range为数字数组）
-
-以下是JSON结构示例：
-${JSON.stringify(standardPromptExampleJson, null, 2)}
-请严格按照上述结构返回JSON。`
+const standardPrompt = `请根据以下需求生成一个完整的内容质量评估标准：\n\n标准名称：{{systemName}}\n标准描述：{{systemDescription}}\n\n请返回一个JSON格式的评估标准，包含以下结构：\n- 评估系统基本信息（name, description, version）\n- 评估标准列表（criteria数组），每个标准包含：\n  - id: 唯一标识符\n  - name: 标准名称\n  - description: 标准描述（包含1-5分的详细评分标准）\n  - weight: 权重（所有标准权重之和应为100）\n  - score_range: 评分范围（建议[1,5]）\n\n请确保：\n1. 权重分配合理，总和为100\n2. 标准覆盖全面，适合对内容进行客观评估\n3. 每个标准都有详细的1-5分评分描述\n4. JSON格式严格规范：\n   - 所有属性名和字符串值必须使用双引号\n   - 不要使用任何特殊字符或Unicode字符\n   - 不要有多余的空格和换行\n   - 确保所有数值类型正确（weight为数字，score_range为数字数组）\n\n以下是JSON结构示例：\n${JSON.stringify(standardPromptExampleJson, null, 2)}\n请严格按照上述结构返回JSON。`
 
 export default standardPrompt;
