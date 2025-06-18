@@ -192,9 +192,6 @@ export const StandardDetail = ({ standard, onBack, onUpdate }: StandardDetailPro
                 <FileJson className="w-5 h-5" />
                 <span>评估标准详情</span>
               </CardTitle>
-              <CardDescription className="text-muted-foreground">
-                {standard.description}
-              </CardDescription>
             </div>
             <div className="flex space-x-2">
               {isEditing ? (
@@ -273,12 +270,12 @@ export const StandardDetail = ({ standard, onBack, onUpdate }: StandardDetailPro
                       )}
                       <div className="flex items-center space-x-4 text-sm text-muted-foreground">
                         <span>版本 {standard.version}</span>
-                        <span>总权重 {standard.total_weight}</span>
+                        <span>总权重 {standard.total_weight}%</span>
                       </div>
                     </div>
 
                     <div className="space-y-4">
-                      <h4 className="text-md font-semibold">评估标准</h4>
+                      <h4 className="text-md font-semibold">评估点</h4>
                       {Array.isArray(standard.criteria) && standard.criteria.map((criterion: Criterion) => (
                         <Card key={criterion.id} className="bg-card/50 border-border">
                           <CardContent className="p-4">
