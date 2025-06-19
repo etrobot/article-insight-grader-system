@@ -48,7 +48,6 @@ export const useAiStandardGeneration = (apiConfig: ApiConfig) => {
             }
           ],
           temperature: 0.7,
-          max_tokens: 2000
         })
       });
 
