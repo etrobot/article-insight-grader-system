@@ -1,4 +1,3 @@
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Sparkles } from 'lucide-react';
 import { AiStandardDialog } from '@/components/AiStandardDialog';
 import { EvaluationSystem } from '@/hooks/useStandards';
@@ -23,17 +22,8 @@ export const EvaluationStandardBuilder = ({ onStandardGenerated, apiConfig, onTa
   return (
     <div className="space-y-6">
       {/* AI生成区域 */}
-      <Card className="border-gray-200 dark:bg-gray-800 dark:border-gray-700 shadow-sm">
-        <CardHeader className="text-center">
-          <CardTitle className="flex items-center justify-center space-x-2">
-            <Sparkles className="w-6 h-6 text-blue-600" />
-            <span>AI智能生成评估标准</span>
-          </CardTitle>
-          <CardDescription className="text-gray-600">
-            只需填写标准名称和描述，AI将为您生成专业的评估标准体系
-          </CardDescription>
-        </CardHeader>
-        <CardContent className="text-center space-y-6">
+
+        <div className="text-center space-y-6">
           <div className="p-8  rounded-lg border border-blue-100 dark:bg-gray-800 dark:border-gray-700">
             <div className="space-y-4 ">
               <div className="w-16 h-16 bg-gradient-to-r from-blue-500 to-purple-600 rounded-full flex items-center justify-center mx-auto">
@@ -74,8 +64,7 @@ export const EvaluationStandardBuilder = ({ onStandardGenerated, apiConfig, onTa
               <p className="text-sm text-gray-600 dark:text-gray-300">AI将自动生成专业的评估标准，可在预览页面查看和导出</p>
             </div>
           </div>
-        </CardContent>
-      </Card>
+        </div>
     </div>
   );
 };

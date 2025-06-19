@@ -1,4 +1,3 @@
-
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
@@ -16,7 +15,7 @@ interface HeaderProps {
   isApiDialogOpen: boolean;
   setIsApiDialogOpen: (open: boolean) => void;
   setIsEvaluationDialogOpen: (open: boolean) => void;
-  setApiConfig: (config: any) => void;
+  setApiConfig: (config: { baseUrl: string; apiKey: string; model: string; }) => void;
 }
 
 export const Header = ({
@@ -30,7 +29,7 @@ export const Header = ({
   const { theme, toggleTheme } = useTheme();
 
   return (
-    <div className="bg-white/80 backdrop-blur-sm border-b border-gray-200 dark:bg-gray-900/80 dark:border-gray-700">
+    <div className="border-b">
       <div className="container mx-auto px-6 py-4">
         <div className="md:flex items-center justify-between">
           <div className="flex items-center space-x-3">
