@@ -3,6 +3,9 @@ import { FileText, List, History } from 'lucide-react';
 import { EvaluationStandardBuilder } from '@/components/EvaluationStandardBuilder';
 import { StandardsList } from '@/components/StandardsList';
 import { StandardDetail } from '@/components/StandardDetail';
+import type { ArticleEvaluationGroup } from '@/hooks/useArticleEvaluations';
+import type { EvaluationResult as DialogEvaluationResult } from './evaluation-dialog/types';
+import type { EvaluationResult as ComponentEvaluationResult } from '@/components/EvaluationResult';
 import { EvaluationResult } from '@/components/EvaluationResult';
 import { ArticleGroupsList } from '@/components/ArticleGroupsList';
 import { ArticleEvaluationsDetail } from '@/components/ArticleEvaluationsDetail';
@@ -16,8 +19,13 @@ interface TabsContainerProps {
   evaluations: unknown[];
   selectedStandard: EvaluationSystem | null;
   selectedEvaluation: unknown;
-  evaluationResult: unknown;
-  apiConfig: unknown;
+  evaluationResult: DialogEvaluationResult | null;
+  apiConfig: {
+    baseUrl: string;
+    apiKey: string;
+    model: string;
+    model2?: string;
+  };
   onStandardGenerated: (data: EvaluationSystem) => void;
   onViewStandard: (id: string) => void;
   onViewEvaluation: (id: string) => void;
@@ -26,8 +34,8 @@ interface TabsContainerProps {
   deleteStandard: (id: string) => void;
   deleteEvaluation: (id: string) => void;
   // 新增的props
-  articleGroups: unknown[];
-  selectedArticleGroup: unknown;
+  articleGroups: ArticleEvaluationGroup[];
+  selectedArticleGroup: ArticleEvaluationGroup | null;
   onViewArticleGroup: (articleId: string) => void;
   onBackToArticleList: () => void;
   deleteArticleGroup: (articleId: string) => void;
@@ -112,12 +120,18 @@ export const TabsContainer = ({
       <TabsContent value="evaluations" className="space-y-6">
         {evaluationResult ? (
           <EvaluationResult
-            result={evaluationResult}
+            result={{
+              ...evaluationResult,
+              standard_name: evaluationResult.standard?.name || ''
+            }}
             onBack={onBackToEvaluationList}
           />
         ) : selectedEvaluation ? (
           <EvaluationResult
-            result={selectedEvaluation}
+            result={{
+              ...(selectedEvaluation as DialogEvaluationResult),
+              standard_name: (selectedEvaluation as { standard?: { name: string } })?.standard?.name || ''
+            }}
             onBack={onBackToEvaluationList}
           />
         ) : selectedArticleGroup ? (
@@ -126,6 +140,7 @@ export const TabsContainer = ({
             onBack={onBackToArticleList}
             onViewEvaluation={onViewEvaluation}
             onDeleteEvaluation={deleteEvaluation}
+            onViewArticleGroup={onViewArticleGroup}
           />
         ) : (
           <ArticleGroupsList

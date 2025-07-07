@@ -1,5 +1,5 @@
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
@@ -11,14 +11,48 @@ interface AiStandardFormProps {
   isGenerating: boolean;
 }
 
+const STORAGE_KEY = 'ai_standard_form_data';
+
 export const AiStandardForm = ({ onGenerate, isGenerating }: AiStandardFormProps) => {
   const [systemName, setSystemName] = useState('');
   const [systemDescription, setSystemDescription] = useState('');
 
+  // 加载保存的表单数据
+  useEffect(() => {
+    const savedData = localStorage.getItem(STORAGE_KEY);
+    if (savedData) {
+      try {
+        const { name, description } = JSON.parse(savedData);
+        setSystemName(name || '');
+        setSystemDescription(description || '');
+      } catch (e) {
+        console.error('Failed to parse saved form data', e);
+      }
+    }
+  }, []);
+
+  // 保存表单数据到本地存储
+  const saveFormData = (name: string, description: string) => {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify({ name, description }));
+  };
+
   const handleSubmit = () => {
     if (systemName.trim() && systemDescription.trim()) {
       onGenerate(systemName, systemDescription);
+      // 提交后清空本地存储
+      localStorage.removeItem(STORAGE_KEY);
     }
+  };
+
+  // 输入变化时保存到本地存储
+  const handleNameChange = (value: string) => {
+    setSystemName(value);
+    saveFormData(value, systemDescription);
+  };
+
+  const handleDescriptionChange = (value: string) => {
+    setSystemDescription(value);
+    saveFormData(systemName, value);
   };
 
   const isValid = systemName.trim() && systemDescription.trim();
@@ -30,7 +64,7 @@ export const AiStandardForm = ({ onGenerate, isGenerating }: AiStandardFormProps
         <Input
           id="name"
           value={systemName}
-          onChange={(e) => setSystemName(e.target.value)}
+          onChange={(e) => handleNameChange(e.target.value)}
           placeholder="如：AI内容质量评估系统"
           className="border-gray-300"
         />
@@ -40,7 +74,7 @@ export const AiStandardForm = ({ onGenerate, isGenerating }: AiStandardFormProps
         <Textarea
           id="description"
           value={systemDescription}
-          onChange={(e) => setSystemDescription(e.target.value)}
+          onChange={(e) => handleDescriptionChange(e.target.value)}
           placeholder="描述评估系统的用途和特点..."
           className="border-gray-300"
           rows={3}

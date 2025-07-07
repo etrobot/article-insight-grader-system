@@ -96,10 +96,15 @@ export const useEvaluationLogic = ({
     });
   };
 
-  const handleEvaluate = async (externalSelectedStandards?: EvaluationSystem[], groupKey?: string) => {
+  const handleEvaluate = async (
+    externalSelectedStandards?: EvaluationSystem[],
+    groupKey?: string,
+    customArticleContent?: string
+  ) => {
+    const actualArticleContent = customArticleContent !== undefined ? customArticleContent : articleContent;
     console.log('开始评估按钮被点击, groupKey:', groupKey);
 
-    if (!validateInputs({ selectedStandardIds, articleContent, apiConfig })) {
+    if (!validateInputs({ selectedStandardIds, articleContent: actualArticleContent, apiConfig })) {
       return;
     }
 
@@ -109,7 +114,7 @@ export const useEvaluationLogic = ({
 
     // 初始化队列
     const initialQueue = createQueueItems(selectedStandardsToUse);
-    setQueueItems(initialQueue);
+    setQueueItems(prev => [...prev, ...initialQueue]);
     setIsEvaluating(true);
     isEvaluatingRef.current = true;
     setOverallProgress(0);
@@ -117,7 +122,7 @@ export const useEvaluationLogic = ({
     try {
       await evaluationProcess({
         selectedStandards: selectedStandardsToUse,
-        articleContent,
+        articleContent: actualArticleContent,
         apiConfig,
         onProgress,
         onResult: (result) => onResult(result, groupKey),
@@ -144,6 +149,7 @@ export const useEvaluationLogic = ({
       setIsEvaluating(false);
     }
   };
+
 
   const handleCancel = () => {
     if (isEvaluating) {

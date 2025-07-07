@@ -49,12 +49,10 @@ export const ArticleEvaluationDialog = ({
   const {
     selectedStandardIds,
     setSelectedStandardIds,
-    articleContent,
     isEvaluating,
     queueItems,
     overallProgress,
     completedCount,
-    setArticleContent,
     handleStandardToggle,
     handleEvaluate,
     handleCancel,
@@ -73,6 +71,10 @@ export const ArticleEvaluationDialog = ({
   const standardSelectorRef = useRef<StandardSelectorRef>(null);
   const { updateStandard } = useStandards();
 
+  // 本地管理两个待评内容的state
+  const [articleContent1, setArticleContent1] = useState('');
+  const [articleContent2, setArticleContent2] = useState('');
+
   // 包装 handleEvaluate，先保存权重
   const handleEvaluateWithWeight = () => {
     let weightedStandards = selectedStandards;
@@ -90,9 +92,16 @@ export const ArticleEvaluationDialog = ({
       localStorage.setItem(key, JSON.stringify(weights));
       console.log('[ArticleEvaluationDialog] 评估时存储权重到localStorage', key, weights);
     }
-    const groupKey = Date.now().toString();
-    handleEvaluate(weightedStandards, groupKey);
+    const groupKey1 = Date.now().toString() + '_1';
+    const groupKey2 = Date.now().toString() + '_2';
+    if (articleContent1.trim()) {
+      handleEvaluate(weightedStandards, groupKey1, articleContent1);
+    }
+    if (articleContent2.trim()) {
+      handleEvaluate(weightedStandards, groupKey2, articleContent2);
+    }
   };
+
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -133,13 +142,16 @@ export const ArticleEvaluationDialog = ({
 
           {/* 待评内容输入 - 仅在未开始评估时显示 */}
           <div className="w-full">
+          {/* 本地管理两个待评内容的state */}
           {!isEvaluating && queueItems.length === 0 && (
             <ArticleContentInput
-              articleContent={articleContent}
-              onContentChange={setArticleContent}
+              articleContent1={articleContent1}
+              articleContent2={articleContent2}
+              onContentChange1={setArticleContent1}
+              onContentChange2={setArticleContent2}
               isEvaluating={isEvaluating}
             />
-            )}
+          )}
           </div>
         </div>
         <div className="flex justify-end space-x-3">
@@ -154,7 +166,7 @@ export const ArticleEvaluationDialog = ({
           {(!isEvaluating && queueItems.length === 0) && (
             <Button
               onClick={handleEvaluateWithWeight}
-              disabled={selectedStandardIds.length === 0 || !articleContent.trim()}
+              disabled={selectedStandardIds.length === 0 || (!articleContent1.trim() && !articleContent2.trim())}
               className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white hover:text-white"
             >
               <Sparkles className="w-4 h-4 mr-2" />

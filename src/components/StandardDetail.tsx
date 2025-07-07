@@ -40,19 +40,55 @@ export const StandardDetail = ({ standard, onBack, onUpdate }: StandardDetailPro
     });
   };
 
-  const exportJson = () => {
-    const dataStr = JSON.stringify(standard, null, 2);
-    const dataUri = 'data:application/json;charset=utf-8,'+ encodeURIComponent(dataStr);
-    const exportFileDefaultName = `${standard.name.replace(/\s+/g, '_')}_evaluation_standard.json`;
-
+  const exportCsv = () => {
+    // 创建CSV头部
+    let csvContent = 'id,name,score,description\n';
+    
+    // 遍历所有标准项
+    standard.criteria.forEach((criterion: Criterion) => {
+      // 确保每个字段都转义引号并用引号包裹
+      const escapeCsv = (field: any) => {
+        const str = String(field || '');
+        return `"${str.replace(/"/g, '""')}"`;
+      };
+      
+      // 为每个评分等级创建一行
+      if (criterion.description) {
+        Object.entries(criterion.description).forEach(([score, desc]) => {
+          const row = [
+            criterion.id || '',
+            criterion.name || '',
+            score, // 评分等级
+            desc   // 描述内容
+          ].map(escapeCsv).join(',');
+          
+          csvContent += row + '\n';
+        });
+      } else {
+        // 如果没有description，至少输出一行
+        const row = [
+          criterion.id || '',
+          criterion.name || '',
+          '', // 空评分
+          ''  // 空描述
+        ].map(escapeCsv).join(',');
+        
+        csvContent += row + '\n';
+      }
+    });
+    
+    // 创建CSV文件下载
+    const dataUri = 'data:text/csv;charset=utf-8,\uFEFF' + encodeURIComponent(csvContent);
+    const exportFileDefaultName = `${standard.name.replace(/\s+/g, '_')}_evaluation_standard.csv`;
+    
     const linkElement = document.createElement('a');
     linkElement.setAttribute('href', dataUri);
     linkElement.setAttribute('download', exportFileDefaultName);
     linkElement.click();
-
+    
     toast({
       title: "导出成功",
-      description: "评估标准已保存为JSON文件",
+      description: "评估标准已保存为CSV文件",
     });
   };
 
@@ -235,12 +271,12 @@ export const StandardDetail = ({ standard, onBack, onUpdate }: StandardDetailPro
                     复制
                   </Button>
                   <Button
-                    onClick={exportJson}
+                    onClick={exportCsv}
                     size="sm"
                     className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white"
                   >
                     <Download className="w-4 h-4 mr-2" />
-                    导出JSON
+                    导出CSV
                   </Button>
                 </>
               )}

@@ -4,26 +4,33 @@ import { Badge } from '@/components/ui/badge';
 import {
   ArrowLeft,
   Copy,
-  CheckCircle
+  CheckCircle,
+  ChevronLeft,
+  ChevronRight
 } from 'lucide-react';
-import { ArticleEvaluationGroup } from '@/hooks/useArticleEvaluations';
-import { useRef } from 'react';
+import { useRef, useContext } from 'react';
+import { ArticleEvaluationsContext } from '@/contexts/ArticleEvaluationsContext';
 import { useToast } from '@/hooks/use-toast';
+import type { ArticleEvaluationGroup } from '@/hooks/useArticleEvaluations';
 
-interface ArticleEvaluationsDetailProps {
+type ArticleEvaluationsDetailProps = {
   articleGroup: ArticleEvaluationGroup;
   onBack: () => void;
   onViewEvaluation: (evaluationId: string) => void;
   onDeleteEvaluation: (evaluationId: string) => void;
-}
+  onViewArticleGroup: (articleId: string) => void;
+};
 
 export const ArticleEvaluationsDetail = ({
   articleGroup,
   onBack,
   onViewEvaluation,
-  onDeleteEvaluation
+  onDeleteEvaluation,
+  onViewArticleGroup
 }: ArticleEvaluationsDetailProps) => {
   const cardRef = useRef<HTMLDivElement>(null); // 创建一个ref来引用Card组件
+  const { getArticleGroups } = useContext(ArticleEvaluationsContext); // 获取文章组数据
+  const { toast } = useToast();
 
   const getScoreColor = (score: number) => {
     if (score >= 80) return 'text-green-500';
@@ -118,21 +125,61 @@ export const ArticleEvaluationsDetail = ({
       });
   };
 
-  const { toast } = useToast();
+  // 获取所有文章组
+  const articleGroups = getArticleGroups();
+  const currentIndex = articleGroups.findIndex((group: ArticleEvaluationGroup) => group.id === articleGroup.id);
+  const hasPrev = currentIndex > 0;
+  const hasNext = currentIndex < articleGroups.length - 1;
+  
+  const handlePrev = () => {
+    if (hasPrev) {
+      // 直接导航到上一个文章组，不调用 onBack
+      onViewArticleGroup(articleGroups[currentIndex - 1].id);
+    }
+  };
+  
+  const handleNext = () => {
+    if (hasNext) {
+      // 直接导航到下一个文章组，不调用 onBack
+      onViewArticleGroup(articleGroups[currentIndex + 1].id);
+    }
+  };
 
   return (
     <div className="space-y-6">
       {/* Header */}
       <div className="flex items-center space-x-4 justify-between">
-        <Button
-          onClick={onBack}
-          variant="outline"
-          size="sm"
-          className="border-border text-foreground hover:bg-secondary"
-        >
-          <ArrowLeft className="w-4 h-4 mr-2" />
-          返回列表
-        </Button>
+        <div className="flex items-center space-x-2">
+          <Button
+            onClick={onBack}
+            variant="outline"
+            size="sm"
+            className="border-border text-foreground hover:bg-secondary"
+          >
+            <ArrowLeft className="w-4 h-4 mr-2" />
+            返回列表
+          </Button>
+          <Button
+            onClick={handlePrev}
+            variant="outline"
+            size="sm"
+            disabled={!hasPrev}
+            className="border-border text-foreground hover:bg-secondary disabled:opacity-50 disabled:cursor-not-allowed"
+          >
+            <ChevronLeft className="w-4 h-4" />
+            上一个
+          </Button>
+          <Button
+            onClick={handleNext}
+            variant="outline"
+            size="sm"
+            disabled={!hasNext}
+            className="border-border text-foreground hover:bg-secondary disabled:opacity-50 disabled:cursor-not-allowed"
+          >
+            下一个
+            <ChevronRight className="w-4 h-4 ml-1" />
+          </Button>
+        </div>
         <Button
           onClick={copyToClipboard}
           variant="outline"
