@@ -159,7 +159,7 @@ export const ArticleEvaluationsDetail = ({
             <ArrowLeft className="w-4 h-4 mr-2" />
             返回列表
           </Button>
-          <Button
+          {/* <Button
             onClick={handlePrev}
             variant="outline"
             size="sm"
@@ -178,7 +178,7 @@ export const ArticleEvaluationsDetail = ({
           >
             下一个
             <ChevronRight className="w-4 h-4 ml-1" />
-          </Button>
+          </Button> */}
         </div>
         <Button
           onClick={copyToClipboard}

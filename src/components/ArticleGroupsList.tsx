@@ -93,10 +93,12 @@ export const ArticleGroupsList = ({ articleGroups, onView, onDelete }: ArticleGr
                       <span>共 {group.evaluation_count} 个评估</span>
                     </div>
                     <div className="flex items-center space-x-1">
-                      <TrendingUp className="w-4 h-4" />
+                      {/* <TrendingUp className="w-4 h-4" />
                       <span className={getScoreColor(weightedTotalScore)}>
-                        {weightedTotalScore >= 80 ? '优秀' : weightedTotalScore >= 60 ? '良好' : '需改进'}
-                      </span>
+                       {weightedTotalScore >= 80 ? '优秀' : weightedTotalScore >= 60 ? '良好' : '需改进'} 
+
+                      </span>*/}
+                       user1
                     </div>
                   </div>
                   <div className="flex space-x-2">
