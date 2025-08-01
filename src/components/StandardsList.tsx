@@ -134,7 +134,7 @@ export const StandardsList = ({ standards, onDelete, onView, onUpdate }: Standar
           <Badge variant="secondary" className="bg-blue-500/20 text-blue-300">
             共 {orderedStandards.length} 个标准
           </Badge>
-          <Button
+          {/* <Button
             onClick={handleCopyAll}
             size="sm"
             variant="outline"
@@ -142,7 +142,7 @@ export const StandardsList = ({ standards, onDelete, onView, onUpdate }: Standar
           >
             <Copy className="w-4 h-4 mr-1" />
             复制全部
-          </Button>
+          </Button> */}
         </div>
       </div>
       <DragDropContext onDragEnd={handleDragEnd}>

@@ -17,6 +17,7 @@ import {
 import { useToast } from '@/hooks/use-toast';
 import { EvaluationSystem, Criterion } from '@/hooks/useStandards';
 import { JsonEditor } from '@/components/JsonEditor';
+import { StandardEditForm } from '@/components/StandardEditForm';
 
 interface StandardDetailProps {
   standard: EvaluationSystem;
@@ -246,11 +247,9 @@ export const StandardDetail = ({ standard, onBack, onUpdate }: StandardDetailPro
         <CardContent>
           {isEditing ? (
             <div className="w-full">
-              <JsonEditor
-                ref={jsonEditorRef}
+              <StandardEditForm
                 value={editedJson}
                 onChange={handleJsonEditorChange}
-                height="600px"
               />
             </div>
           ) : (
