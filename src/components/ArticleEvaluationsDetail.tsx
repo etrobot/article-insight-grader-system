@@ -240,11 +240,12 @@ export const ArticleEvaluationsDetail = ({
                         {evaluation.total_score}分
                       </Badge>
                     </div>
+                   <div className="text-xs">{evaluation.summary} </div>
                   </CardHeader>
                   <CardContent className="pt-0">
                     <div className="mt-4 space-y-1">
                       {evaluation.criteria && evaluation.criteria.map((criterion) => (
-                        <div key={criterion.id} className="flex flex-col gap-1 border-b pb-2 mb-2 last:border-b-0 last:pb-0 last:mb-0">
+                        <div key={criterion.id} className="flex flex-col gap-1 border-t p-1 m-1 last:border-b-0 last:pb-0 last:mb-0">
                           <div className="flex items-center text-sm">
                             <div className={getScoreColorForCriterion(criterion.score)}>{criterion.score}</div>
                             <div className="text-muted-foreground">/{criterion.max_score}</div>
